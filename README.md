@@ -1,150 +1,219 @@
-# BMP Optimization
+# BMP Optimization – SAT & Exact Optimization Framework
 
-Research software for the **graph Bandwidth Minimization Problem (BMP)**. For an
-undirected simple graph, BMP seeks a bijection from vertices to positions
-`1..n` that minimises the largest position difference across an edge.
+Research software for the **Bandwidth Minimization Problem (BMP)** on undirected simple graphs, developed for Assignment 2 of Modern Topics in Computer Science (2026–2027).
 
-This repository currently contains the completed **Phase 1 foundation**. It does
-not yet claim a SAT implementation or publish benchmark performance results.
+---
 
-## Implemented and verified
+## 1. Problem Definition and Mathematical Formulation
 
-- Immutable canonical graph model for undirected simple graphs.
-- Edge-list, adjacency-matrix, and coordinate Matrix Market readers.
-- Deterministic path, cycle, complete, star, edgeless, and `G(n,p)` generators.
-- Solver-independent solution/status schema with certified lower/upper bounds.
-- Independent bijection and bandwidth validator.
-- Exact depth-first brute-force oracle for tiny graphs (default maximum: 10).
-- JSON command-line output and TOML quick-run configuration.
-- Known-optimum tests for P5, K5, K1,4, C4, and an edgeless graph.
+Given an undirected, unweighted, simple graph $G = (V, E)$ with $n = |V|$ vertices and $m = |E|$ edges. Vertices are indexed $V = \{0, 1, \dots, n-1\}$.
 
-The brute-force solver is a correctness oracle for future SAT/CP/MIP solvers, not
-a scalable BMP algorithm.
+A **labeling** (embedding) is a bijection:
+$$p: V \to \{1, 2, \dots, n\}$$
 
-## Project structure
+The **bandwidth** of graph $G$ under labeling $p$ is:
+$$B_p(G) = \max_{(u, v) \in E} |p(u) - p(v)|$$
+
+The **Bandwidth Minimization Problem (BMP)** seeks a labeling $p^*$ achieving the minimum possible bandwidth:
+$$B^*(G) = \min_{p \in \Pi(V)} B_p(G)$$
+
+### Decision Problem $SAT(G, k)$
+For a target bandwidth threshold $k \ge 0$, determine whether there exists a bijection $p$ such that:
+$$\forall (u, v) \in E, \quad |p(u) - p(v)| \le k$$
+
+- **Edgeless graph ($E = \emptyset$) or $n \le 1$**: $B^*(G) = 0$.
+- **Path graph $P_5$**: $B^*(P_5) = 1$.
+- **Complete graph $K_5$**: $B^*(K_5) = 4$.
+- **Star graph $K_{1, 4}$**: $B^*(K_{1, 4}) = 2$.
+- **Cycle graph $C_4$**: $B^*(C_4) = 2$.
+
+---
+
+## 2. Implemented Leader Scope
+
+### A. SAT Encodings
+1. **Pairwise / Basic Position Encoding (`PairwiseEncoding`)**:
+   - Variables $x[v, p] \in \{0, 1\}$ indicating vertex $v$ receives label $p \in \{1, \dots, n\}$.
+   - **Exactly-One (ALO + AMO)** per vertex: $\bigvee_{p=1}^n x[v, p]$ and $\sum_{p=1}^n x[v, p] \le 1$.
+   - **All-Different (Injectivity)** per label: $\sum_{v \in V} x[v, p] \le 1$.
+   - **Bandwidth Clauses**: $\forall (u, v) \in E, \; |p - q| > k \implies \neg x[u, p] \lor \neg x[v, q]$.
+2. **Order SAT Encoding (`OrderEncoding`)**:
+   - Unary threshold variables $y[v, t] \in \{0, 1\}$ indicating $p(v) \ge t$ for $t \in \{2, \dots, n\}$.
+   - **Monotonicity**: $y[v, t+1] \implies y[v, t]$.
+   - **Exact-value Channeling**: $x[v, p] \iff (y[v, p] \land \neg y[v, p+1])$.
+   - **Injectivity**: At-Most-One on channeled variables $x[v, p]$ for each label $p$.
+   - **Linear Bandwidth Clauses**: $\forall (u, v) \in E$ and $t \ge 2, \; t + k \le n$:
+     $$\neg y[u, t+k] \lor y[v, t] \quad \text{and} \quad \neg y[v, t+k] \lor y[u, t]$$
+     Requires only $2(n - k - 1) = O(n)$ binary clauses per edge (vs $O(n^2)$ for pairwise).
+3. **Cardinality Encodings for AMO**:
+   - **Pairwise AMO** (`PairwiseAMOEncoder`): Quadratic $\binom{m}{2}$ binary exclusion clauses, 0 auxiliary variables.
+   - **Sequential Counter AMO** (`SequentialCounterAMOEncoder`, Sinz 2005): Linear $3m - 4$ clauses, $m - 1$ auxiliary variables, arc-consistent unit propagation.
+   - Extensible registry interface for integrating Binary, Commander, Product, and Ladder in future milestones.
+
+### B. SAT Solving & Strategies
+1. **Repeated SAT (`RepeatedSATSolver`)**:
+   - Fresh SAT solver instance per tested bandwidth $k$.
+   - Descending linear search from upper bound $UB$ down to certified lower bound $LB$.
+   - Binary search mode (`search_mode="binary"`).
+2. **Incremental SAT (`IncrementalSATSolver`)**:
+   - Single persistent CaDiCaL solver instance reusing learned conflict clauses.
+   - Fixed $k$-independent clauses asserted once.
+   - Monotonic constraint addition as $k$ decreases.
+   - Proves global optimality upon receiving UNSAT at $B - 1$.
+3. **CaDiCaL SAT Backend (`CadicalBackend`)**:
+   - Seamless integration with PySAT supporting CaDiCaL (versions `cadical195`, `cadical300`, `cadical153`, `cadical103`).
+   - Clean lifecycle management with context manager and `.delete()`.
+
+### C. Advanced Techniques
+1. **Reversal Symmetry Breaking**:
+   - Label reversal $p'(v) = n + 1 - p(v)$ preserves edge bandwidth.
+   - Deterministic anchor vertex selection $a = \arg\max_{v} (\deg(v), \sum_{u \in N(v)} \deg(u), -v)$.
+   - Adds unit clause $p(a) \le \lceil n / 2 \rceil$, cutting the search space in half.
+2. **Bounds Optimization**:
+   - Certified degree bound $LB_{deg} = \lceil \Delta(G) / 2 \rceil$.
+   - Component diameter bound $LB_{comp} = \max_C \lceil (|C| - 1) / \operatorname{diam}(C) \rceil$.
+3. **Hybrid Heuristic + SAT Interface**:
+   - Allows injecting an initial heuristic permutation (e.g. from RCM, SA, DRSA).
+
+---
+
+## 3. Project Structure
 
 ```text
 .
-├── .github/workflows/ci.yml
-├── configs/quick.toml
-├── data/samples/
+├── configs/
+│   └── quick.toml
+├── data/
+│   ├── samples/
+│   ├── leader_sat_benchmark.csv
+│   └── leader_sat_benchmark.json
 ├── docs/
-│   ├── methodology.md
+│   ├── sat_methodology.md
+│   ├── leader_experiments.md
 │   ├── requirements-analysis.md
 │   └── roadmap.md
 ├── src/bmp/
 │   ├── cli.py
 │   ├── core/
+│   │   ├── graph.py          # GraphInstance / Graph model
+│   │   ├── solution.py       # SolverResult / BMPSolution
+│   │   ├── validation.py     # Independent validator & calculate_bandwidth
+│   │   ├── bounds.py         # Analytical lower/upper bounds
+│   │   └── generators.py     # Deterministic graph generators
+│   ├── encodings/
+│   │   ├── base.py           # CNFFormula & BMPEncoder interface
+│   │   ├── pairwise.py       # Position / Pairwise encoding
+│   │   ├── order.py          # Order / Threshold encoding
+│   │   └── cardinality/
+│   │       ├── base.py       # AMO protocol and registry
+│   │       ├── pairwise_amo.py
+│   │       └── sequential.py # Sinz (2005) sequential counter
 │   ├── io/
-│   └── solvers/brute_force.py
+│   │   └── readers.py
+│   └── solvers/
+│       ├── brute_force.py    # Small-instance exact oracle
+│       └── sat/
+│           ├── backends/
+│           │   ├── base.py   # SATBackend interface
+│           │   └── cadical.py# CaDiCaL PySAT backend
+│           ├── repeated.py   # Repeated SAT solver
+│           ├── incremental.py# Incremental SAT solver
+│           ├── search.py     # Search helpers and bounds
+│           └── benchmark.py  # Leader SAT experiment runner
 ├── tests/
+│   ├── core/
+│   ├── encodings/
+│   └── sat/
 ├── pyproject.toml
 └── README.md
 ```
 
-Directories for unimplemented SAT adapters, commercial solvers, experiments, and
-plots are intentionally absent. They will be added with working code in later
-phases.
+---
 
-## Installation on macOS and VS Code
-
-From the repository root:
+## 4. Installation
 
 ```bash
+# Clone repository and enter directory
+cd BMP
+
+# Create and activate virtual environment
 python3 -m venv .venv
 source .venv/bin/activate
-python -m pip install -e .
+
+# Install package and SAT dependencies
+pip install -e .
+pip install python-sat pytest
 ```
 
-In VS Code, run **Python: Select Interpreter** and select
-`.venv/bin/python`. Phase 1 has no third-party runtime dependency.
+---
 
-## Usage
+## 5. CLI Usage
 
-Run the checked-in quick configuration:
+### Solve with Repeated SAT (Pairwise Encoding)
+```bash
+python -m bmp solve data/samples/star_k1_4.edgelist --encoding pairwise --strategy repeated --solver cadical --amo pairwise
+```
+
+### Solve with Incremental SAT (Sequential Counter AMO)
+```bash
+python -m bmp solve data/samples/star_k1_4.edgelist --encoding pairwise --strategy incremental --solver cadical --amo sequential
+```
+
+### Solve with Order Encoding (Repeated SAT)
+```bash
+python -m bmp solve data/samples/star_k1_4.edgelist --encoding order --strategy repeated --solver cadical
+```
+
+### Solve with Order Encoding (Incremental SAT)
+```bash
+python -m bmp solve data/samples/star_k1_4.edgelist --encoding order --strategy incremental --solver cadical
+```
+
+### Enable Symmetry Breaking
+```bash
+python -m bmp solve data/samples/cycle_c4.edgelist --encoding pairwise --strategy incremental --symmetry-breaking
+```
+
+### Run Leader SAT Benchmark Suite
+```bash
+python -m bmp benchmark-sat --output-json data/leader_sat_benchmark.json --output-csv data/leader_sat_benchmark.csv
+```
+
+---
+
+## 6. Real Experimental Results (Leader SAT Evaluation)
+
+Benchmark summary across 10 instances (100 runs total) from `data/leader_sat_benchmark.csv`:
+
+| Encoding | Strategy | Symmetry Breaking | Avg Total Runtime (s) | Avg Solver Time (s) | Avg Clauses | Avg SAT Calls |
+| :--- | :--- | :---: | :---: | :---: | :---: |
+| **pairwise** | repeated | False | 0.001924 | 0.001783 | 152.0 | 1.8 |
+| **pairwise** | repeated | True | 0.000287 | 0.000212 | 152.3 | 1.2 |
+| **pairwise** | incremental | False | 0.000305 | 0.000128 | 152.0 | 1.8 |
+| **pairwise** | incremental | True | 0.000173 | 0.000072 | 152.3 | 1.2 |
+| **order** | repeated | False | 0.000336 | 0.000218 | 156.9 | 1.8 |
+| **order** | repeated | True | 0.000212 | 0.000128 | 150.9 | 1.2 |
+| **order** | incremental | False | 0.000195 | 0.000045 | 162.3 | 1.8 |
+| **order** | incremental | True | **0.000137** | **0.000027** | 156.9 | 1.2 |
+
+Detailed methodology and ablation analysis are available in:
+- [SAT Methodology](docs/sat_methodology.md)
+- [Leader Experiments](docs/leader_experiments.md)
+
+---
+
+## 7. Running Tests
+
+Run the complete test suite (unit tests, encoding equivalence, solver consistency, oracle cross-checks):
 
 ```bash
-bmp run-config configs/quick.toml
+pytest -v
 ```
 
-Solve a sample directly:
+---
 
-```bash
-bmp solve data/samples/star_k1_4.edgelist --timeout 5
-```
+## 8. Ongoing Development & Member Responsibilities
 
-Inspect an input without solving it:
-
-```bash
-bmp inspect data/samples/cycle_c4.edgelist
-```
-
-Generate a reproducible random graph and solve it if it is small enough:
-
-```bash
-bmp generate random 8 /tmp/random8.edgelist --probability 0.3 --seed 2026
-bmp solve /tmp/random8.edgelist --timeout 10
-```
-
-Validate a JSON result independently:
-
-```bash
-bmp solve data/samples/path_p5.edgelist > /tmp/path-result.json
-bmp validate data/samples/path_p5.edgelist /tmp/path-result.json
-```
-
-## Tests
-
-The standard-library suite needs no test framework dependency:
-
-```bash
-python -m unittest discover -s tests -v
-```
-
-## Input conventions
-
-The project edge-list format accepts comments and an optional DIMACS-style
-header. Use a header to retain isolated vertices:
-
-```text
-# four vertices, two edges
-p edge 4 2
-1 2
-2 3
-```
-
-Adjacency matrices must be square, symmetric, and zero-diagonal. Matrix Market
-support currently covers coordinate `pattern`, `integer`, and `real` matrices;
-non-zero entries are interpreted as unweighted adjacency.
-
-## Scientific scope and roadmap
-
-The [requirements analysis](docs/requirements-analysis.md) separates official
-mandatory work from encouraged extensions and flags questions for the instructor.
-The [methodology](docs/methodology.md) documents Phase 1 invariants and the exact
-oracle. The [roadmap](docs/roadmap.md) gives the staged plan for mandatory
-Pairwise/Order SAT encodings, Repeated/Incremental SAT, exact-solver adapters,
-cardinality experiments, heuristics, benchmarking, and report-ready figures.
-
-The supplied “Order Encoding” paper concerns Radio Mean Labeling. Only its
-threshold-variable concepts will be considered; its problem-specific constraints
-will not be copied into BMP without a separate correctness derivation.
-
-## Reproducibility and results
-
-Random generators require explicit seeds. Every solve result records status,
-objective, certified bounds, runtime, search effort, graph metadata, and an
-independent validation report. No benchmark numbers have been fabricated or
-pre-populated. Curated real CSV/JSON results and figures may be committed later;
-large raw artifacts remain ignored.
-
-## References
-
-- Official Assignment 2 requirements, Modern Topics in Computer Science,
-  academic year 2026-2027.
-- J. Torres-Jimenez et al., “A dual representation simulated annealing algorithm
-  for the bandwidth minimization problem on graphs,” *Information Sciences*,
-  303 (2015), 33-49. DOI: 10.1016/j.ins.2014.12.041.
-- N. Tamura et al., “Compiling finite linear CSP into SAT,” *Constraints*, 14(2),
-  2009. This is the general order-encoding reference cited by the supplied Radio
-  Mean Labeling manuscript.
+- **`dev/leader` (Current Branch)**: SAT Position & Order Encodings, Pairwise & Sequential AMO, Repeated & Incremental CaDiCaL SAT, Symmetry Breaking.
+- **`dev/member-2` (In Development by Member 2)**: Binary & Commander Cardinality Encodings, Glucose SAT Solver, Gurobi MIP, CPLEX MIP, Comprehensive Benchmarking Suite.
+- **`dev/member-3` (In Development by Member 3)**: Product & Ladder Cardinality Encodings, MiniSat Solver, CP-SAT, CP Optimizer, Harwell-Boeing Dataset Pipeline, Metaheuristics (RCM, SA, DRSA).

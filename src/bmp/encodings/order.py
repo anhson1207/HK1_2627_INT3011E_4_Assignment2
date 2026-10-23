@@ -135,6 +135,15 @@ class OrderEncoding(BMPEncoder):
             amo_clauses, _ = self._amo_encoder.encode(lits, allocator)
             clauses.extend(amo_clauses)
 
+        # 4. Optional Reversal Symmetry Breaking: p(anchor) <= ceil(n / 2)
+        if kwargs.get("symmetry_breaking", False) and n >= 2:
+            from bmp.solvers.sat.search import select_anchor_vertex
+            anchor = select_anchor_vertex(graph)
+            a_idx = v_map[anchor]
+            cutoff = (n + 1) // 2  # ceil(n / 2)
+            if cutoff + 1 <= n:
+                clauses.append([-self.var_y(a_idx, cutoff + 1, n)])
+
         top_var = allocator.next_id - 1
         num_aux_vars = top_var - num_orig_vars
 

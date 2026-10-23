@@ -73,6 +73,27 @@ def compute_lower_bound(graph: Graph) -> int:
     return max(lb_degree, lb_component)
 
 
+def select_anchor_vertex(graph: Graph) -> int:
+    """Select a deterministic anchor vertex for reversal symmetry breaking.
+
+    Priority:
+    1. Maximum vertex degree
+    2. Maximum sum of neighbor degrees
+    3. Smallest vertex ID (as tie-breaker)
+    """
+    if not graph.vertices:
+        raise ValueError("Cannot select anchor on an empty graph")
+
+    return max(
+        graph.vertices,
+        key=lambda v: (
+            graph.degree(v),
+            sum(graph.degree(nbr) for nbr in graph.neighbors(v)),
+            -v,
+        ),
+    )
+
+
 def compute_initial_upper_bound(
     graph: Graph,
     heuristic_permutation: Mapping[int, int] | None = None,

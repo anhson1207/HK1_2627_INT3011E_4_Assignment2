@@ -147,6 +147,12 @@ def _build_parser() -> argparse.ArgumentParser:
     generate.add_argument("output", type=Path)
     generate.add_argument("--probability", type=float, default=0.25)
     generate.add_argument("--seed", type=int, default=0)
+
+    bench = subparsers.add_parser("benchmark-sat", help="run SAT benchmark suite across configurations")
+    bench.add_argument("--output-json", type=Path, default=Path("data/sat_benchmark_results.json"))
+    bench.add_argument("--output-csv", type=Path, default=Path("data/sat_benchmark_results.csv"))
+    bench.add_argument("--timeout", type=float, default=20.0)
+    bench.add_argument("--quick", action="store_true", default=False, help="run small quick suite")
     return parser
 
 
@@ -237,6 +243,42 @@ def main(argv: Sequence[str] | None = None) -> int:
                 )
             write_edge_list(graph, args.output)
             payload = {"output": str(args.output), "graph": graph.to_dict()}
+        elif args.command == "benchmark-sat":
+            from bmp.solvers.sat.benchmark import export_csv, export_json, run_benchmark
+            if args.quick:
+                suite = [
+                    path_graph(5),
+                    star_graph(4),
+                    cycle_graph(4),
+                    complete_graph(5),
+                    edgeless_graph(5),
+                ]
+            else:
+                suite = [
+                    path_graph(5),
+                    path_graph(7),
+                    cycle_graph(4),
+                    cycle_graph(6),
+                    star_graph(4),
+                    star_graph(6),
+                    complete_graph(5),
+                    edgeless_graph(5),
+                    erdos_renyi_graph(6, 0.35, seed=42),
+                    erdos_renyi_graph(7, 0.4, seed=100),
+                ]
+            records = run_benchmark(suite, timeout_per_instance=args.timeout)
+            if args.output_csv:
+                args.output_csv.parent.mkdir(parents=True, exist_ok=True)
+                export_csv(records, args.output_csv)
+            if args.output_json:
+                args.output_json.parent.mkdir(parents=True, exist_ok=True)
+                export_json(records, args.output_json)
+            payload = {
+                "num_instances": len(suite),
+                "num_records": len(records),
+                "output_json": str(args.output_json),
+                "output_csv": str(args.output_csv),
+            }
         else:  # pragma: no cover
             parser.error("Unknown command")
             return 2
