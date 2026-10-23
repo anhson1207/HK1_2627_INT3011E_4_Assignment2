@@ -70,3 +70,4 @@ All experiments were executed on an Apple Silicon M-series system using **Python
 ## 4. Verification and Data Availability
 - Full dataset available in `data/leader_sat_benchmark.csv` and `data/leader_sat_benchmark.json`.
 - All solutions verified by independent validator `validate_solution()`.
+

@@ -80,3 +80,4 @@ class BMPEncoder(ABC):
 
 
 __all__ = ["BMPEncoder", "CNFFormula"]
+

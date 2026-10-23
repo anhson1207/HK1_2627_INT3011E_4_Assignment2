@@ -26,3 +26,4 @@ __all__ = [
     "get_amo_encoder",
     "register_amo_encoder",
 ]
+

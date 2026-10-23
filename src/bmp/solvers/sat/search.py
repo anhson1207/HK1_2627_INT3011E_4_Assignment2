@@ -97,18 +97,34 @@ def select_anchor_vertex(graph: Graph) -> int:
 def compute_initial_upper_bound(
     graph: Graph,
     heuristic_permutation: Mapping[int, int] | None = None,
+    *,
+    symmetry_breaking: bool = False,
 ) -> tuple[int, dict[int, int]]:
-    """Compute an initial upper bound and valid permutation."""
+    """Compute an initial upper bound and valid permutation.
+
+    If symmetry_breaking is True, normalises the incumbent so the anchor vertex
+    satisfies p(anchor) <= ceil(n / 2).
+    """
     if not graph.edges or graph.order <= 1:
         identity_perm = {v: i + 1 for i, v in enumerate(graph.vertices)}
         return 0, identity_perm
 
     if heuristic_permutation is not None:
         from bmp.core.validation import calculate_bandwidth
-        h_bw = calculate_bandwidth(graph, heuristic_permutation)
-        return h_bw, dict(heuristic_permutation)
+        perm = dict(heuristic_permutation)
+        bw = calculate_bandwidth(graph, perm)
+    else:
+        bw, perm = identity_upper_bound(graph)
 
-    return identity_upper_bound(graph)
+    if symmetry_breaking and graph.order >= 2:
+        anchor = select_anchor_vertex(graph)
+        cutoff = (graph.order + 1) // 2
+        if perm[anchor] > cutoff:
+            perm = {v: graph.order + 1 - label for v, label in perm.items()}
+            from bmp.core.validation import calculate_bandwidth
+            bw = calculate_bandwidth(graph, perm)
+
+    return bw, perm
 
 
 __all__ = [

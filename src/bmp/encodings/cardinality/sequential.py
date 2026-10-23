@@ -57,3 +57,4 @@ register_amo_encoder("sequential", SequentialCounterAMOEncoder)
 register_amo_encoder("seqcounter", SequentialCounterAMOEncoder)
 
 __all__ = ["SequentialCounterAMOEncoder"]
+

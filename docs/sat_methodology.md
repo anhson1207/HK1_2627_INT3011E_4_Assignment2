@@ -185,3 +185,4 @@ If an optimal labeling has $\pi^*(a) > \lceil n / 2 \rceil$, its reflection $(\p
 ### CNF Implementation
 - **Pairwise**: Unit clauses $\neg x_{a, p}$ for all $p \in \{\lceil n / 2 \rceil + 1, \dots, n\}$.
 - **Order**: A single unit clause $\neg y_{a, \lceil n / 2 \rceil + 1}$, which automatically propagates to all higher thresholds.
+

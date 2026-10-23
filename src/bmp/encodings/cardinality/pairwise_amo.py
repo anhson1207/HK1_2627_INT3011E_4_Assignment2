@@ -36,3 +36,4 @@ register_amo_encoder("pairwise", PairwiseAMOEncoder)
 register_amo_encoder("naive", PairwiseAMOEncoder)
 
 __all__ = ["PairwiseAMOEncoder"]
+

@@ -62,7 +62,11 @@ class IncrementalSATSolver:
             )
 
         lb = compute_lower_bound(graph)
-        ub, init_perm = compute_initial_upper_bound(graph, heuristic_permutation)
+        ub, init_perm = compute_initial_upper_bound(
+            graph,
+            heuristic_permutation,
+            symmetry_breaking=symmetry_breaking,
+        )
 
         if lb == ub:
             return SolverResult(
@@ -195,3 +199,4 @@ class IncrementalSATSolver:
 
 
 __all__ = ["IncrementalSATSolver"]
+

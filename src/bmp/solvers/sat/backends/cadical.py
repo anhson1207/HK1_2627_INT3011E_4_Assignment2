@@ -92,3 +92,4 @@ register_sat_backend("cadical", CadicalBackend)
 register_sat_backend("cadical195", lambda: CadicalBackend(solver_name="cadical195"))
 
 __all__ = ["CadicalBackend"]
+
