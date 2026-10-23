@@ -1,4 +1,4 @@
-"""Command-line entry point for Phase 1 workflows."""
+"""Command-line entry point for BMP workflows and SAT solving."""
 
 from __future__ import annotations
 
@@ -17,42 +17,95 @@ from bmp.core.generators import (
     path_graph,
     star_graph,
 )
-from bmp.core.validation import validate_assignment
+from bmp.core.validation import validate_solution
+from bmp.encodings.cardinality import get_amo_encoder
+from bmp.encodings.pairwise import PairwiseEncoding
 from bmp.io.readers import read_graph, write_edge_list
 from bmp.solvers.brute_force import BruteForceSolver
+from bmp.solvers.sat.repeated import RepeatedSATSolver
 
 FORMATS = ("auto", "edge-list", "adjacency-matrix", "matrix-market")
 
 
-def _solve(
+def _solve_instance(
     input_path: Path,
     *,
-    graph_format: str,
-    timeout_seconds: float | None,
-    max_vertices: int,
+    graph_format: str = "auto",
+    solver_name: str = "cadical",
+    encoding_name: str = "pairwise",
+    strategy_name: str = "repeated",
+    amo_name: str = "pairwise",
+    search_mode: str = "linear",
+    symmetry_breaking: bool = False,
+    timeout_seconds: float | None = None,
+    max_vertices: int = 10,
 ) -> dict[str, object]:
     graph = read_graph(input_path, graph_format)  # type: ignore[arg-type]
-    result = BruteForceSolver(max_vertices=max_vertices).solve(
-        graph,
-        timeout_seconds=timeout_seconds,
-    )
+
+    if strategy_name == "brute-force" or solver_name == "brute-force":
+        solver = BruteForceSolver(max_vertices=max_vertices)
+        result = solver.solve(graph, timeout_seconds=timeout_seconds)
+    elif strategy_name in ("repeated", "repeated_linear", "repeated_binary"):
+        if encoding_name == "pairwise":
+            encoder = PairwiseEncoding(amo=amo_name)
+        elif encoding_name == "order":
+            from bmp.encodings.order import OrderEncoding
+            encoder = OrderEncoding()
+        else:
+            raise ValueError(f"Unknown encoding: {encoding_name}")
+
+        mode = "binary" if "binary" in strategy_name or search_mode == "binary" else "linear"
+        sat_solver = RepeatedSATSolver(
+            encoder=encoder,
+            backend_name=solver_name,
+            search_mode=mode,
+        )
+        result = sat_solver.solve(
+            graph,
+            timeout_seconds=timeout_seconds,
+            symmetry_breaking=symmetry_breaking,
+        )
+    elif strategy_name == "incremental":
+        from bmp.solvers.sat.incremental import IncrementalSATSolver
+        if encoding_name == "pairwise":
+            encoder = PairwiseEncoding(amo=amo_name)
+        elif encoding_name == "order":
+            from bmp.encodings.order import OrderEncoding
+            encoder = OrderEncoding()
+        else:
+            raise ValueError(f"Unknown encoding: {encoding_name}")
+
+        inc_solver = IncrementalSATSolver(
+            encoder=encoder,
+            backend_name=solver_name,
+        )
+        result = inc_solver.solve(
+            graph,
+            timeout_seconds=timeout_seconds,
+            symmetry_breaking=symmetry_breaking,
+        )
+    else:
+        raise ValueError(f"Unsupported strategy: {strategy_name}")
+
     payload = result.to_dict()
-    payload["instance"] = {
+    payload["instance_info"] = {
         "id": graph.name,
         "n": graph.order,
         "m": graph.size,
         "density": graph.density,
         "source": str(input_path),
     }
-    if result.assignment is not None:
-        validation = validate_assignment(
+
+    if result.permutation is not None:
+        validation = validate_solution(
             graph,
-            result.assignment,
+            result.permutation,
             claimed_bandwidth=result.bandwidth,
         )
         payload["validation"] = validation.to_dict()
         if not validation.valid:
             raise RuntimeError(f"Internal solver validation failed: {validation.errors}")
+
     return payload
 
 
@@ -63,9 +116,16 @@ def _build_parser() -> argparse.ArgumentParser:
     )
     subparsers = parser.add_subparsers(dest="command", required=True)
 
-    solve = subparsers.add_parser("solve", help="solve a tiny instance with the exact oracle")
-    solve.add_argument("input", type=Path)
+    solve = subparsers.add_parser("solve", help="solve an instance using SAT or brute force")
+    solve.add_argument("input", nargs="?", type=Path, default=None, help="path to input graph file")
+    solve.add_argument("--graph", "-g", type=Path, default=None, dest="graph_opt", help="alias for input path")
     solve.add_argument("--format", choices=FORMATS, default="auto")
+    solve.add_argument("--solver", choices=("cadical", "cadical195", "brute-force"), default="cadical")
+    solve.add_argument("--encoding", choices=("pairwise", "order"), default="pairwise")
+    solve.add_argument("--strategy", choices=("repeated", "incremental", "brute-force"), default="repeated")
+    solve.add_argument("--amo", choices=("pairwise", "sequential"), default="pairwise")
+    solve.add_argument("--search-mode", choices=("linear", "binary"), default="linear")
+    solve.add_argument("--symmetry-breaking", action="store_true", default=False)
     solve.add_argument("--timeout", type=float, default=None)
     solve.add_argument("--max-vertices", type=int, default=10)
 
@@ -100,12 +160,19 @@ def _run_config(path: Path) -> dict[str, object]:
         raise ValueError("Config must contain [solve] and solve.input") from error
     if not configured_input.is_absolute():
         configured_input = path.parent / configured_input
-    solver = solve.get("solver", "brute-force")
-    if solver != "brute-force":
-        raise ValueError(f"Phase 1 supports only solver='brute-force', got {solver!r}")
-    return _solve(
+
+    solver_name = solve.get("solver", "cadical")
+    encoding_name = solve.get("encoding", "pairwise")
+    strategy_name = solve.get("strategy", "repeated")
+    amo_name = solve.get("amo", "pairwise")
+
+    return _solve_instance(
         configured_input,
         graph_format=solve.get("format", "auto"),
+        solver_name=solver_name,
+        encoding_name=encoding_name,
+        strategy_name=strategy_name,
+        amo_name=amo_name,
         timeout_seconds=solve.get("timeout_seconds"),
         max_vertices=solve.get("max_vertices", 10),
     )
@@ -116,9 +183,19 @@ def main(argv: Sequence[str] | None = None) -> int:
     args = parser.parse_args(argv)
     try:
         if args.command == "solve":
-            payload = _solve(
-                args.input,
+            input_file = args.input or args.graph_opt
+            if input_file is None:
+                parser.error("Must specify graph input either as positional argument or via --graph/-g")
+
+            payload = _solve_instance(
+                input_file,
                 graph_format=args.format,
+                solver_name=args.solver,
+                encoding_name=args.encoding,
+                strategy_name=args.strategy,
+                amo_name=args.amo,
+                search_mode=args.search_mode,
+                symmetry_breaking=args.symmetry_breaking,
                 timeout_seconds=args.timeout,
                 max_vertices=args.max_vertices,
             )
@@ -129,12 +206,12 @@ def main(argv: Sequence[str] | None = None) -> int:
         elif args.command == "validate":
             graph = read_graph(args.input, args.format)
             raw = json.loads(args.solution.read_text(encoding="utf-8"))
-            assignment_data = raw.get("assignment", raw)
+            assignment_data = raw.get("permutation", raw.get("assignment", raw))
             if not isinstance(assignment_data, dict):
-                raise ValueError("Solution JSON must contain an assignment object")
+                raise ValueError("Solution JSON must contain an assignment or permutation object")
             assignment = {int(vertex): label for vertex, label in assignment_data.items()}
             claimed = raw.get("bandwidth") if isinstance(raw, dict) else None
-            payload = validate_assignment(
+            payload = validate_solution(
                 graph,
                 assignment,
                 claimed_bandwidth=claimed,
@@ -160,7 +237,7 @@ def main(argv: Sequence[str] | None = None) -> int:
                 )
             write_edge_list(graph, args.output)
             payload = {"output": str(args.output), "graph": graph.to_dict()}
-        else:  # pragma: no cover - argparse enforces a valid command
+        else:  # pragma: no cover
             parser.error("Unknown command")
             return 2
     except (OSError, ValueError, TypeError, json.JSONDecodeError) as error:
