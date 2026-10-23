@@ -1,0 +1,2 @@
+# Edgeless graph on five vertices; project convention bandwidth = 0.
+p edge 5 0

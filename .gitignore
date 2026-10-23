@@ -1,0 +1,42 @@
+# Python environments and bytecode
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+build/
+dist/
+
+# Editors and operating systems
+.DS_Store
+.vscode/settings.json
+.idea/
+*.swp
+
+# Secrets and machine-local configuration
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+secrets.*
+
+# Temporary files and large/raw research artifacts
+tmp/
+data/benchmarks/raw/
+results/raw/
+results/tmp/
+papers/
+report/
+*.pdf
+
+# Curated result tables and figures remain trackable.
+!results/**/*.csv
+!results/**/*.json
+!results/**/*.png
+!results/**/*.pdf

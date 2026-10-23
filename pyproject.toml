@@ -1,0 +1,31 @@
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "bmp-optimization"
+version = "0.1.0"
+description = "Reproducible research software for the graph bandwidth minimization problem"
+readme = "README.md"
+requires-python = ">=3.11"
+authors = [{ name = "BMP Optimization contributors" }]
+keywords = ["bandwidth-minimization", "combinatorial-optimization", "sat"]
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "Intended Audience :: Science/Research",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3 :: Only",
+  "Topic :: Scientific/Engineering",
+]
+dependencies = []
+
+[project.scripts]
+bmp = "bmp.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+addopts = "-q"
+pythonpath = ["src"]
+testpaths = ["tests"]

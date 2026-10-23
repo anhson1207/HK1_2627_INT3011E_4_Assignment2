@@ -1,0 +1,6 @@
+# Path P5; known optimum bandwidth = 1.
+p edge 5 4
+1 2
+2 3
+3 4
+4 5

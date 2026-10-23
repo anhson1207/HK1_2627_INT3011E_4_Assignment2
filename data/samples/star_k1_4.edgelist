@@ -1,0 +1,6 @@
+# Star K1,4; known optimum bandwidth = 2.
+p edge 5 4
+1 2
+1 3
+1 4
+1 5

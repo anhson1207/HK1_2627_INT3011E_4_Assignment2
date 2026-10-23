@@ -1,0 +1,6 @@
+[solve]
+input = "../data/samples/path_p5.edgelist"
+format = "edge-list"
+solver = "brute-force"
+timeout_seconds = 5.0
+max_vertices = 10

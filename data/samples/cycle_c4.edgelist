@@ -1,0 +1,6 @@
+# Cycle C4; known optimum bandwidth = 2.
+p edge 4 4
+1 2
+2 3
+3 4
+4 1
