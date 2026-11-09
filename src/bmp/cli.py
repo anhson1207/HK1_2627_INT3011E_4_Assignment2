@@ -20,6 +20,8 @@ from bmp.core.generators import (
 from bmp.core.validation import validate_assignment
 from bmp.io.readers import read_graph, write_edge_list
 from bmp.solvers.brute_force import BruteForceSolver
+from bmp.solvers.exact.cplex import CPLEXMIPSolver
+from bmp.solvers.exact.gurobi import GurobiMIPSolver
 
 FORMATS = ("auto", "edge-list", "adjacency-matrix", "matrix-market")
 
@@ -30,9 +32,18 @@ def _solve(
     graph_format: str,
     timeout_seconds: float | None,
     max_vertices: int,
+    solver: str = "brute-force",
 ) -> dict[str, object]:
     graph = read_graph(input_path, graph_format)  # type: ignore[arg-type]
-    result = BruteForceSolver(max_vertices=max_vertices).solve(
+    if solver == "brute-force":
+        selected_solver = BruteForceSolver(max_vertices=max_vertices)
+    elif solver == "gurobi":
+        selected_solver = GurobiMIPSolver()
+    elif solver == "cplex":
+        selected_solver = CPLEXMIPSolver()
+    else:
+        raise ValueError(f"Unknown solver: {solver!r}")
+    result = selected_solver.solve(
         graph,
         timeout_seconds=timeout_seconds,
     )
@@ -68,6 +79,7 @@ def _build_parser() -> argparse.ArgumentParser:
     solve.add_argument("--format", choices=FORMATS, default="auto")
     solve.add_argument("--timeout", type=float, default=None)
     solve.add_argument("--max-vertices", type=int, default=10)
+    solve.add_argument("--solver", choices=("brute-force", "gurobi", "cplex"), default="brute-force")
 
     run_config = subparsers.add_parser("run-config", help="run a TOML solve configuration")
     run_config.add_argument("config", type=Path)
@@ -101,13 +113,14 @@ def _run_config(path: Path) -> dict[str, object]:
     if not configured_input.is_absolute():
         configured_input = path.parent / configured_input
     solver = solve.get("solver", "brute-force")
-    if solver != "brute-force":
-        raise ValueError(f"Phase 1 supports only solver='brute-force', got {solver!r}")
+    if solver not in ("brute-force", "gurobi", "cplex"):
+        raise ValueError(f"Unknown solver: {solver!r}")
     return _solve(
         configured_input,
         graph_format=solve.get("format", "auto"),
         timeout_seconds=solve.get("timeout_seconds"),
         max_vertices=solve.get("max_vertices", 10),
+        solver=solver,
     )
 
 
@@ -121,6 +134,7 @@ def main(argv: Sequence[str] | None = None) -> int:
                 graph_format=args.format,
                 timeout_seconds=args.timeout,
                 max_vertices=args.max_vertices,
+                solver=args.solver,
             )
         elif args.command == "run-config":
             payload = _run_config(args.config)

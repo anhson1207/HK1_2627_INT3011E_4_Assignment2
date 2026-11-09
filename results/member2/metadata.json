@@ -1,0 +1,9 @@
+{
+  "config": "C:\\Users\\Os\\Documents\\C\u00c1C V\u1ea4N \u0110\u1ec0 HI\u1ec6N \u0110\u1ea0I TRONG KHMT\\HK1_2627_INT3011E_4_Assignment2\\configs\\member2.toml",
+  "python": "3.13.12 (tags/v3.13.12:1cbe481, Feb  3 2026, 18:22:25) [MSC v.1944 64 bit (AMD64)]",
+  "platform": "Windows-10-10.0.19045-SP0",
+  "sample_scope": "repository sample edge lists",
+  "seed_used": false,
+  "leader_core_commit": "414606c50c352888e4ed9f0a04bef257c7e9d099",
+  "note": "SAT strategy timeout is checked by leader code between SAT calls; individual solve calls have no hard deadline."
+}

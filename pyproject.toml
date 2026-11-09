@@ -17,7 +17,12 @@ classifiers = [
   "Programming Language :: Python :: 3 :: Only",
   "Topic :: Scientific/Engineering",
 ]
-dependencies = []
+dependencies = ["python-sat==1.9.dev21"]
+
+[project.optional-dependencies]
+gurobi = ["gurobipy"]
+cplex = ["cplex"]
+plots = ["cnsplots==0.8.0"]
 
 [project.scripts]
 bmp = "bmp.cli:main"
