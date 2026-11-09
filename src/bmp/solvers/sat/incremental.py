@@ -9,6 +9,7 @@ from bmp.core.graph import Graph
 from bmp.core.solution import SolutionStatus, SolverResult
 from bmp.core.validation import calculate_bandwidth
 from bmp.encodings.base import BMPEncoder
+from bmp.encodings.estimator import ResourceLimits, estimate_cnf_size
 from bmp.encodings.order import OrderEncoding
 from bmp.encodings.pairwise import PairwiseEncoding
 from bmp.solvers.sat.backends.base import get_sat_backend
@@ -34,9 +35,12 @@ class IncrementalSATSolver:
         timeout_seconds: float | None = None,
         heuristic_permutation: Mapping[int, int] | None = None,
         symmetry_breaking: bool = False,
+        limits: ResourceLimits | None = None,
     ) -> SolverResult:
         started = monotonic()
         n = graph.order
+
+        effective_timeout = timeout_seconds if timeout_seconds is not None else (limits.timeout_seconds if limits else None)
 
         # Base case: edgeless or order <= 1
         if n <= 1 or not graph.edges:
@@ -89,6 +93,43 @@ class IncrementalSATSolver:
                 metadata={"symmetry_breaking": symmetry_breaking, "fast_path": "lb_equals_ub"},
             )
 
+        # Resource safety check
+        if limits is not None:
+            enc_family = "order" if "order" in self.encoder.name else "pairwise"
+            amo_type = getattr(self.encoder, "amo_name", "pairwise")
+            estimate = estimate_cnf_size(
+                graph,
+                encoding=enc_family,
+                amo=amo_type,
+                k=ub - 1,
+                symmetry_breaking=symmetry_breaking,
+            )
+            is_ok, reason = limits.check(estimate)
+            if not is_ok:
+                return SolverResult(
+                    instance=graph.name,
+                    method="SAT",
+                    solver=self.backend_name,
+                    encoding=self.encoder.name,
+                    strategy="incremental",
+                    status=SolutionStatus.SKIPPED,
+                    bandwidth=ub,
+                    permutation=init_perm,
+                    runtime_s=monotonic() - started,
+                    encoding_time_s=0.0,
+                    solving_time_s=0.0,
+                    num_variables=estimate.num_variables,
+                    num_clauses=estimate.num_clauses,
+                    sat_calls=0,
+                    lower_bound=lb,
+                    upper_bound=ub,
+                    metadata={
+                        "skipped_reason": reason,
+                        "estimate": estimate.to_dict(),
+                        "symmetry_breaking": symmetry_breaking,
+                    },
+                )
+
         best_bandwidth = ub
         best_permutation: dict[int, int] | None = dict(init_perm) if init_perm else None
         certified_lb = lb
@@ -122,7 +163,7 @@ class IncrementalSATSolver:
             accumulated_clauses += len(bw_clauses)
 
             while k_curr >= certified_lb:
-                if timeout_seconds is not None and (monotonic() - started) >= timeout_seconds:
+                if effective_timeout is not None and (monotonic() - started) >= effective_timeout:
                     timed_out = True
                     break
 

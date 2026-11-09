@@ -19,6 +19,7 @@ from bmp.core.generators import (
 )
 from bmp.core.validation import validate_solution
 from bmp.encodings.cardinality import get_amo_encoder
+from bmp.encodings.estimator import ResourceLimits, estimate_cnf_size
 from bmp.encodings.pairwise import PairwiseEncoding
 from bmp.io.readers import read_graph, write_edge_list
 from bmp.solvers.brute_force import BruteForceSolver
@@ -39,8 +40,15 @@ def _solve_instance(
     symmetry_breaking: bool = False,
     timeout_seconds: float | None = None,
     max_vertices: int = 10,
+    max_variables: int | None = None,
+    max_clauses: int | None = None,
 ) -> dict[str, object]:
     graph = read_graph(input_path, graph_format)  # type: ignore[arg-type]
+    limits = ResourceLimits(
+        max_variables=max_variables,
+        max_clauses=max_clauses,
+        timeout_seconds=timeout_seconds,
+    )
 
     if strategy_name == "brute-force" or solver_name == "brute-force":
         solver = BruteForceSolver(max_vertices=max_vertices)
@@ -50,7 +58,7 @@ def _solve_instance(
             encoder = PairwiseEncoding(amo=amo_name)
         elif encoding_name == "order":
             from bmp.encodings.order import OrderEncoding
-            encoder = OrderEncoding()
+            encoder = OrderEncoding(amo=amo_name)
         else:
             raise ValueError(f"Unknown encoding: {encoding_name}")
 
@@ -64,6 +72,7 @@ def _solve_instance(
             graph,
             timeout_seconds=timeout_seconds,
             symmetry_breaking=symmetry_breaking,
+            limits=limits,
         )
     elif strategy_name == "incremental":
         from bmp.solvers.sat.incremental import IncrementalSATSolver
@@ -71,7 +80,7 @@ def _solve_instance(
             encoder = PairwiseEncoding(amo=amo_name)
         elif encoding_name == "order":
             from bmp.encodings.order import OrderEncoding
-            encoder = OrderEncoding()
+            encoder = OrderEncoding(amo=amo_name)
         else:
             raise ValueError(f"Unknown encoding: {encoding_name}")
 
@@ -83,6 +92,7 @@ def _solve_instance(
             graph,
             timeout_seconds=timeout_seconds,
             symmetry_breaking=symmetry_breaking,
+            limits=limits,
         )
     else:
         raise ValueError(f"Unsupported strategy: {strategy_name}")
@@ -128,6 +138,16 @@ def _build_parser() -> argparse.ArgumentParser:
     solve.add_argument("--symmetry-breaking", action="store_true", default=False)
     solve.add_argument("--timeout", type=float, default=None)
     solve.add_argument("--max-vertices", type=int, default=10)
+    solve.add_argument("--max-variables", type=int, default=None, help="safety limit on maximum estimated variables")
+    solve.add_argument("--max-clauses", type=int, default=None, help="safety limit on maximum estimated clauses")
+
+    estimate = subparsers.add_parser("estimate-cnf", help="analytically estimate CNF formula size without building it")
+    estimate.add_argument("input", type=Path, help="path to input graph file")
+    estimate.add_argument("--format", choices=FORMATS, default="auto")
+    estimate.add_argument("--encoding", choices=("pairwise", "order"), default="pairwise")
+    estimate.add_argument("--amo", choices=("pairwise", "sequential"), default="pairwise")
+    estimate.add_argument("--k", "-k", type=int, default=None, help="target bandwidth threshold (default: worst-case k=0)")
+    estimate.add_argument("--symmetry-breaking", action="store_true", default=False)
 
     run_config = subparsers.add_parser("run-config", help="run a TOML solve configuration")
     run_config.add_argument("config", type=Path)
@@ -153,6 +173,10 @@ def _build_parser() -> argparse.ArgumentParser:
     bench.add_argument("--output-csv", type=Path, default=Path("data/sat_benchmark_results.csv"))
     bench.add_argument("--timeout", type=float, default=20.0)
     bench.add_argument("--quick", action="store_true", default=False, help="run small quick suite")
+
+    preflight = subparsers.add_parser("preflight-benchmark", help="check readiness of Harwell-Boeing benchmark dataset")
+    preflight.add_argument("--dir", "-d", type=Path, default=Path("data/harwell_boeing"), help="path to benchmark directory")
+    preflight.add_argument("--table", choices=("6", "7", "all"), default="6", help="benchmark table to check")
     return parser
 
 
@@ -204,7 +228,32 @@ def main(argv: Sequence[str] | None = None) -> int:
                 symmetry_breaking=args.symmetry_breaking,
                 timeout_seconds=args.timeout,
                 max_vertices=args.max_vertices,
+                max_variables=args.max_variables,
+                max_clauses=args.max_clauses,
             )
+        elif args.command == "estimate-cnf":
+            graph = read_graph(args.input, args.format)
+            estimate = estimate_cnf_size(
+                graph,
+                encoding=args.encoding,
+                amo=args.amo,
+                k=args.k,
+                symmetry_breaking=args.symmetry_breaking,
+            )
+            payload = {
+                "instance": {
+                    "id": graph.name,
+                    "n": graph.order,
+                    "m": graph.size,
+                    "density": graph.density,
+                    "source": str(args.input),
+                },
+                "encoding": args.encoding,
+                "amo": args.amo,
+                "k": args.k,
+                "symmetry_breaking": args.symmetry_breaking,
+                "estimate": estimate.to_dict(),
+            }
         elif args.command == "run-config":
             payload = _run_config(args.config)
         elif args.command == "inspect":
@@ -278,6 +327,34 @@ def main(argv: Sequence[str] | None = None) -> int:
                 "num_records": len(records),
                 "output_json": str(args.output_json),
                 "output_csv": str(args.output_csv),
+            }
+        elif args.command == "preflight-benchmark":
+            from bmp.core.benchmark_catalog import (
+                TABLE_6_INSTANCES,
+                TABLE_7_INSTANCES,
+                preflight_check_dataset,
+            )
+            if args.table == "6":
+                catalog = TABLE_6_INSTANCES
+            elif args.table == "7":
+                catalog = TABLE_7_INSTANCES
+            else:
+                catalog = {**TABLE_6_INSTANCES, **TABLE_7_INSTANCES}
+
+            report = preflight_check_dataset(args.dir, catalog)
+            payload = {
+                "target_directory": str(args.dir),
+                "table": args.table,
+                "total_expected": report.total_expected,
+                "found_count": report.found_count,
+                "missing_count": report.missing_count,
+                "valid_count": report.valid_count,
+                "invalid_count": report.invalid_count,
+                "ready_for_execution": report.ready_for_execution,
+                "verified_instances": list(report.verified_instances),
+                "missing_instances": list(report.missing_instances),
+                "errors": list(report.errors),
+                "dependency_status": "READY" if report.ready_for_execution else "AWAITING_MEMBER_3_DATASET",
             }
         else:  # pragma: no cover
             parser.error("Unknown command")
