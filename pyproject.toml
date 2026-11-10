@@ -19,6 +19,12 @@ classifiers = [
 ]
 dependencies = []
 
+[project.optional-dependencies]
+sat = ["python-sat==1.9.dev15"]
+cp-sat = ["ortools==9.15.6755"]
+cp-optimizer = ["docplex==2.32.264"]
+test = ["pytest==9.2.0"]
+
 [project.scripts]
 bmp = "bmp.cli:main"
 
