@@ -1,57 +1,35 @@
-# Member 2: Harwell–Boeing Tables 6–7
+# Member 2: Harwell–Boeing Official 113-Instance Catalog & Legacy Note
 
-The manifest in `data/hb_table6_7/manifest.csv` transcribes all 31 rows of
-Table 6 and all 41 rows of Table 7 through `gre_343`. `LB`, `Best`, and `DRSA`
-are reference values only; they are never fed to a solver or used to make a
-graph. The source PDF is `2 - Bandwidth Minimization Problem -  BMP.pdf`.
-Before downloading, the working tree and `origin/dev/leader` and
-`origin/dev/member-3` were checked for HB graph data; only the five sample
-graphs were available.
+## Official Dataset Policy (Post-M2.1 Sync)
 
-`data/hb_table6_7/sources.csv` records the NIST Matrix Market URL, matrix name,
-compressed-file SHA-256, entry count, graph edge count, and size check for each
-matrix. `raw/` holds downloaded `.mtx.gz` files. The conversion keeps every
-matrix row as a vertex, ignores diagonal entries and numeric zeros, and makes
-one undirected edge from every nonzero off-diagonal structural entry. Reverse
-and duplicate entries collapse into one edge. Components and isolated vertices
-remain in the graph. The graph files are `graphs/*.edgelist`.
+Following Leader L8 synchronization (`dev/leader` -> `dev/member-2`), the sole official benchmark catalog for Member 2 experiments is **Leader's 113-instance catalog** (`bmp.core.benchmark_catalog.ALL_INSTANCES`, populated from `official_paper_results.csv`):
 
-Run from the repository root in PowerShell:
+- **Table 6**: 31 instances
+- **Table 7**: 41 instances
+- **Table 8**: 41 instances
+- **L8 Provenance Audit (`data/benchmark_provenance.json`)**:
+  - **54 `READY`** (verified structurally symmetric or fully mirrored nonzeros)
+  - **58 `NEEDS_VERIFICATION`** (general unsymmetric coordinate storage without published edge-list rule)
+  - **1 `INVALID_DATA`** (`mbeause`, 496 vs 492 vertex discrepancy)
 
-```powershell
-# Recreate the source download and verify all 72 graph sizes.
-python scripts/fetch_hb.py
+`bmp.experiments.member2_hb` enforces this policy strictly:
+- Non-`READY` instances are automatically recorded as `SKIPPED` (`Dataset status is not READY`) and never benchmarked as official results.
+- Raw verified matrices live under `data/benchmarks/raw/` (acquired via `python scripts/acquire_benchmark.py`) and are checked against SHA-256 provenance and `inspect_matrix_market`.
+- SAT runs use Leader's exact `estimate_cnf_size`, `ResourceLimits`, and bounded worker/subprocess timeout controls with explicit `incumbent_source` tracking (`sat`, `initial`, `heuristic`) and RSS sampling.
 
-# Pilot: all Member 2 configurations on ibm32.
-.\.venv\Scripts\python.exe -m bmp.experiments.member2_hb configs/member2_hb_table6_7.toml --instance ibm32
+## Commands
 
-# Full run. Previously written rows are skipped.
-.\.venv\Scripts\python.exe -m bmp.experiments.member2_hb configs/member2_hb_table6_7.toml
+```bash
+# Acquire and verify raw NIST Harwell-Boeing matrices (113 catalog):
+python scripts/acquire_benchmark.py --max-instances 113
 
-# Resume after an interruption: repeat the same command.
-.\.venv\Scripts\python.exe -m bmp.experiments.member2_hb configs/member2_hb_table6_7.toml
+# Pilot single READY instance (e.g. bcspwr01):
+python -m bmp.experiments.member2_hb configs/member2_hb_table6_7.toml --instance bcspwr01
 
-# Refresh the human-readable comparison while a run is still underway.
-.\.venv\Scripts\python.exe -m bmp.experiments.member2_hb configs/member2_hb_table6_7.toml --report-only
+# Run full resumable official benchmark (READY instances only):
+python -m bmp.experiments.member2_hb configs/member2_hb_table6_7.toml
 ```
 
-The runner writes and flushes each row to `results/member2_hb_table6_7/runs.csv`
-before starting the next. Each row has its own wall time, status, certified
-bound, assignment, and independent assignment check. A subprocess enforces the
-60-second total limit even when a SAT solve call cannot be interrupted. An
-incumbent checkpoint preserves the latest valid SAT assignment found before a
-hard timeout. `TIMEOUT` can therefore carry a valid bandwidth. `OPTIMAL` is
-reserved for a proof from SAT or MIP. `RESOURCE_LIMIT` records a configured CNF
-or MIP size cap, and `UNAVAILABLE` records a solver or license failure.
+## Legacy 72-Instance Subset (`data/hb_table6_7/`)
 
-The comparison in `comparison.md` reports the best valid assignment observed
-for each graph and the runtime of the single row that supplied it. Smaller
-bandwidth is better. The paper's `Best` is a best-known solution and does not
-by itself prove optimality.
-
-Change `timeout_seconds`, `repetitions`, `max_sat_estimated_clauses`, or
-`max_mip_variables` in the dedicated TOML config as needed. The SAT tests use
-Pairwise/Order × Repeated/Incremental and compare AMO variants on the same
-Pairwise position model with Repeated search. Gurobi and CPLEX each use the
-existing baseline and reversal-symmetry configurations. The old 225-row sample
-benchmark remains in `results/member2/`.
+The earlier `data/hb_table6_7/` snapshot (72 instances: 31 from Table 6 and 41 from Table 7), along with `scripts/extract_hb_manifest.py` and `scripts/fetch_hb.py`, is **deprecated as an official benchmark source**. It omitted all 41 Table 8 rows and automatically converted 32 `NEEDS_VERIFICATION` unsymmetric matrices via edge union. Those files remain untouched solely for historical reproducibility (`tests/test_member2_hb_data.py`) and are excluded from default benchmarking.
