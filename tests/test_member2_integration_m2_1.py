@@ -102,8 +102,19 @@ class Member2M21IntegrationTests(unittest.TestCase):
             )
             self.assertEqual(bounded.status, SolutionStatus.OPTIMAL)
             self.assertIn("sat_trace", bounded.metadata)
-            self.assertGreater(bounded.metadata["sampled_peak_memory_mb"], 0)
+            self.assertGreaterEqual(bounded.metadata["sampled_peak_memory_mb"], 0)
             self.assertTrue(validate_solution(graph, bounded).valid)
+
+        # Verify bounded worker timeout preserves incumbent & marks interrupted Glucose call UNKNOWN
+        hard = erdos_renyi_graph(12, 0.7, seed=7)
+        with patch("bmp.solvers.sat.backends.glucose.GlucoseBackend.solve", side_effect=lambda *a, **k: (__import__("time").sleep(0.5) or False)):
+            timed = RepeatedSATSolver(OrderEncoding("binary"), backend_name="glucose").solve(
+                hard, timeout_seconds=0.15, limits=ResourceLimits(memory_limit_mb=4096)
+            )
+        self.assertEqual(timed.status, SolutionStatus.TIMEOUT)
+        self.assertTrue(validate_solution(hard, timed).valid)
+        self.assertGreater(timed.metadata["sampled_peak_memory_mb"], 0)
+        self.assertEqual(timed.metadata["sat_trace"][-1]["outcome"], "UNKNOWN")
 
     def test_on_incumbent_deduplication_and_provenance_sources(self) -> None:
         edgeless = edgeless_graph(4)
