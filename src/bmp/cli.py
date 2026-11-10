@@ -40,8 +40,8 @@ def _solve_instance(
     symmetry_breaking: bool = False,
     timeout_seconds: float | None = None,
     max_vertices: int = 10,
-    max_variables: int | None = None,
-    max_clauses: int | None = None,
+    max_variables: int | None = 500_000,
+    max_clauses: int | None = 2_500_000,
 ) -> dict[str, object]:
     graph = read_graph(input_path, graph_format)  # type: ignore[arg-type]
     limits = ResourceLimits(
@@ -138,8 +138,8 @@ def _build_parser() -> argparse.ArgumentParser:
     solve.add_argument("--symmetry-breaking", action="store_true", default=False)
     solve.add_argument("--timeout", type=float, default=None)
     solve.add_argument("--max-vertices", type=int, default=10)
-    solve.add_argument("--max-variables", type=int, default=None, help="safety limit on maximum estimated variables")
-    solve.add_argument("--max-clauses", type=int, default=None, help="safety limit on maximum estimated clauses")
+    solve.add_argument("--max-variables", type=int, default=500_000, help="safety limit on maximum estimated variables")
+    solve.add_argument("--max-clauses", type=int, default=2_500_000, help="safety limit on maximum estimated clauses")
 
     estimate = subparsers.add_parser("estimate-cnf", help="analytically estimate CNF formula size without building it")
     estimate.add_argument("input", type=Path, help="path to input graph file")
@@ -175,8 +175,8 @@ def _build_parser() -> argparse.ArgumentParser:
     bench.add_argument("--quick", action="store_true", default=False, help="run small quick suite")
 
     preflight = subparsers.add_parser("preflight-benchmark", help="check readiness of Harwell-Boeing benchmark dataset")
-    preflight.add_argument("--dir", "-d", type=Path, default=Path("data/harwell_boeing"), help="path to benchmark directory")
-    preflight.add_argument("--table", choices=("6", "7", "all"), default="6", help="benchmark table to check")
+    preflight.add_argument("--dir", "-d", type=Path, default=Path("data/benchmarks/raw"), help="path to benchmark directory")
+    preflight.add_argument("--table", choices=("6", "7", "8", "all"), default="all", help="benchmark table to check")
     return parser
 
 
@@ -205,6 +205,8 @@ def _run_config(path: Path) -> dict[str, object]:
         amo_name=amo_name,
         timeout_seconds=solve.get("timeout_seconds"),
         max_vertices=solve.get("max_vertices", 10),
+        max_variables=solve.get("max_variables", 500_000),
+        max_clauses=solve.get("max_clauses", 2_500_000),
     )
 
 
@@ -332,14 +334,18 @@ def main(argv: Sequence[str] | None = None) -> int:
             from bmp.core.benchmark_catalog import (
                 TABLE_6_INSTANCES,
                 TABLE_7_INSTANCES,
+                TABLE_8_INSTANCES,
+                ALL_INSTANCES,
                 preflight_check_dataset,
             )
             if args.table == "6":
                 catalog = TABLE_6_INSTANCES
             elif args.table == "7":
                 catalog = TABLE_7_INSTANCES
+            elif args.table == "8":
+                catalog = TABLE_8_INSTANCES
             else:
-                catalog = {**TABLE_6_INSTANCES, **TABLE_7_INSTANCES}
+                catalog = ALL_INSTANCES
 
             report = preflight_check_dataset(args.dir, catalog)
             payload = {
@@ -350,11 +356,14 @@ def main(argv: Sequence[str] | None = None) -> int:
                 "missing_count": report.missing_count,
                 "valid_count": report.valid_count,
                 "invalid_count": report.invalid_count,
+                "needs_verification_count": report.needs_verification_count,
                 "ready_for_execution": report.ready_for_execution,
                 "verified_instances": list(report.verified_instances),
+                "needs_verification_instances": list(report.needs_verification_instances),
                 "missing_instances": list(report.missing_instances),
                 "errors": list(report.errors),
-                "dependency_status": "READY" if report.ready_for_execution else "AWAITING_MEMBER_3_DATASET",
+                "dependency_status": "STRUCTURAL_READY" if report.ready_for_execution else "DATA_REVIEW_REQUIRED",
+                "verification_level": "file_parse_and_vertex_count_only; use benchmark_provenance.json for topology audit",
             }
         else:  # pragma: no cover
             parser.error("Unknown command")

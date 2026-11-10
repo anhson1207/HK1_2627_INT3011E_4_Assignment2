@@ -25,6 +25,9 @@ bmp = "bmp.cli:main"
 [tool.setuptools.packages.find]
 where = ["src"]
 
+[tool.setuptools.package-data]
+"bmp.core" = ["official_paper_results.csv"]
+
 [tool.pytest.ini_options]
 addopts = "-q"
 pythonpath = ["src"]

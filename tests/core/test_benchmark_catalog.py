@@ -7,6 +7,8 @@ from pathlib import Path
 from bmp.core.benchmark_catalog import (
     TABLE_6_INSTANCES,
     TABLE_7_INSTANCES,
+    TABLE_8_INSTANCES,
+    ALL_INSTANCES,
     preflight_check_dataset,
     verify_instance_file,
 )
@@ -14,6 +16,19 @@ from bmp.core.benchmark_catalog import (
 
 class BenchmarkCatalogTests(unittest.TestCase):
     def test_catalog_definitions(self) -> None:
+        self.assertEqual((len(TABLE_6_INSTANCES), len(TABLE_7_INSTANCES), len(TABLE_8_INSTANCES)), (31, 41, 41))
+        self.assertEqual(len(ALL_INSTANCES), 113)
+        self.assertIn("dwt_234", TABLE_7_INSTANCES)
+        self.assertNotIn("dwt_234", TABLE_6_INSTANCES)
+        self.assertEqual(TABLE_8_INSTANCES["mbeaflw"].drsa_bandwidth, 260)
+        self.assertEqual(TABLE_7_INSTANCES["bp_0"].drsa_time_s, 1218.72)
+        for meta in ALL_INSTANCES.values():
+            self.assertEqual(
+                meta.paper_best,
+                min(meta.grasp_pr_bandwidth, meta.sa_bandwidth,
+                    meta.vns_bandwidth, meta.drsa_bandwidth),
+            )
+            self.assertLessEqual(meta.paper_lb, meta.paper_best)
         self.assertIn("bcspwr01", TABLE_6_INSTANCES)
         self.assertEqual(TABLE_6_INSTANCES["bcspwr01"].n, 39)
         self.assertEqual(TABLE_6_INSTANCES["bcspwr01"].paper_lb, 5)
@@ -57,6 +72,16 @@ class BenchmarkCatalogTests(unittest.TestCase):
             self.assertIn("pores_1", report.verified_instances)
             self.assertFalse(report.ready_for_execution)
             self.assertTrue(any("Vertex count mismatch" in err for err in report.errors))
+
+    def test_preflight_separates_unsymmetric_pattern(self) -> None:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            path = Path(tmpdir) / "pores_1.mtx"
+            path.write_text("%%MatrixMarket matrix coordinate pattern general\n30 30 1\n1 2\n")
+            report = preflight_check_dataset(Path(tmpdir), {"pores_1": TABLE_6_INSTANCES["pores_1"]})
+            self.assertEqual(report.valid_count, 0)
+            self.assertEqual(report.invalid_count, 0)
+            self.assertEqual(report.needs_verification_count, 1)
+            self.assertFalse(report.ready_for_execution)
 
 
 if __name__ == "__main__":
