@@ -41,6 +41,65 @@ Bảng tiền kiểm đầy đủ 32 cột được xuất tại [`results/membe
 | **Table 8** ($n \in [237, 1104]$) | 14 | **3** (`nos1`, `saylr1`, `plskz362`) | 0 | 0 | 0 | `plat362` vượt `2.5M` clauses (`2,872,477c`); `10` instances $n \ge 468$ vượt `500k` vars |
 | **Tổng cộng** | **54** | **25** | **4** | **1** | **0** | Tách biệt rõ `DATASET_READY` (54) vs `SOLVER_EXECUTABLE` (25 SAT / 1 Gurobi / 0 CPLEX) |
 
+### Bảng Preflight Chi tiết Toàn bộ 54 Instance `READY`
+
+| Instance | Table | n | m | SHA-256 | Graph Status | Pairwise CNF | Order CNF | MIP Est. (Vars/Constrs) | SAT | Gurobi | CPLEX | Reason |
+|---|---|---:|---:|---|---|---|---|---| :---: | :---: | :---: |---|
+| `bcspwr01` | Table 6 | 39 | 46 | VERIFIED | READY | 4,485v / 77,044c | 4,485v / 13,832c | 1,522v / 171c | True | True | False | CPLEX: 1,522 vars exceeds CE cap 1000 |
+| `bcsstk01` | Table 6 | 48 | 176 | VERIFIED | READY | 6,816v / 410,568c | 6,816v / 32,289c | 2,305v / 449c | True | False | False | Gurobi: 2,305 vars exceeds cap 2000; CPLEX: 2,305 vars exceeds CE cap 1000 |
+| `bcspwr02` | Table 6 | 49 | 59 | VERIFIED | READY | 7,105v / 152,855c | 7,105v / 22,080c | 2,402v / 217c | True | False | False | Gurobi: 2,402 vars exceeds cap 2000; CPLEX: 2,402 vars exceeds CE cap 1000 |
+| `ash85` | Table 6 | 85 | 219 | VERIFIED | READY | 21,505v / 1,606,457c | 21,505v / 86,688c | 7,226v / 609c | True | False | False | Gurobi: 7,226 vars exceeds cap 2000; CPLEX: 7,226 vars exceeds CE cap 1000 |
+| `nos4` | Table 6 | 100 | 247 | VERIFIED | READY | 29,800v / 2,504,650c | 29,800v / 118,107c | 10,001v / 695c | True | False | False | Gurobi: 10,001 vars exceeds cap 2000; CPLEX: 10,001 vars exceeds CE cap 1000 |
+| `bcspwr03` | Table 6 | 118 | 179 | VERIFIED | READY | 41,536v / 2,554,051c | 41,536v / 138,411c | 13,925v / 595c | True | False | False | Gurobi: 13,925 vars exceeds cap 2000; CPLEX: 13,925 vars exceeds CE cap 1000 |
+| `bcsstk04` | Table 6 | 132 | 1758 | VERIFIED | READY | 52,008v / 30,503,022c | 52,008v / 581,509c | 17,425v / 3,781c | True | False | False | Gurobi: 17,425 vars exceeds cap 2000; CPLEX: 17,425 vars exceeds CE cap 1000 |
+| `bcsstk22` | Table 6 | 138 | 279 | VERIFIED | READY | 56,856v / 5,388,141c | 56,856v / 208,651c | 19,045v / 835c | True | False | False | Gurobi: 19,045 vars exceeds cap 2000; CPLEX: 19,045 vars exceeds CE cap 1000 |
+| `can_144` | Table 6 | 144 | 576 | VERIFIED | READY | 61,920v / 11,984,472c | 61,920v / 308,737c | 20,737v / 1,441c | True | False | False | Gurobi: 20,737 vars exceeds cap 2000; CPLEX: 20,737 vars exceeds CE cap 1000 |
+| `lund_a` | Table 6 | 147 | 1151 | VERIFIED | READY | 64,533v / 24,831,460c | 64,533v / 486,180c | 21,610v / 2,597c | True | False | False | Gurobi: 21,610 vars exceeds cap 2000; CPLEX: 21,610 vars exceeds CE cap 1000 |
+| `lund_b` | Table 6 | 147 | 1147 | VERIFIED | READY | 64,533v / 24,745,612c | 64,533v / 485,012c | 21,610v / 2,589c | True | False | False | Gurobi: 21,610 vars exceeds cap 2000; CPLEX: 21,610 vars exceeds CE cap 1000 |
+| `bcsstk05` | Table 6 | 153 | 1135 | VERIFIED | READY | 69,921v / 26,535,019c | 69,921v / 507,680c | 23,410v / 2,577c | True | False | False | Gurobi: 23,410 vars exceeds cap 2000; CPLEX: 23,410 vars exceeds CE cap 1000 |
+| `can_161` | Table 6 | 161 | 608 | VERIFIED | READY | 77,441v / 15,816,559c | 77,441v / 374,720c | 25,922v / 1,539c | True | False | False | Gurobi: 25,922 vars exceeds cap 2000; CPLEX: 25,922 vars exceeds CE cap 1000 |
+| `dwt_209` | Table 7 | 209 | 767 | VERIFIED | READY | 130,625v / 33,603,751c | 130,625v / 623,168c | 43,682v / 1,953c | True | False | False | Gurobi: 43,682 vars exceeds cap 2000; CPLEX: 43,682 vars exceeds CE cap 1000 |
+| `dwt_221` | Table 7 | 221 | 704 | VERIFIED | READY | 146,081v / 34,520,089c | 146,081v / 649,880c | 48,842v / 1,851c | True | False | False | Gurobi: 48,842 vars exceeds cap 2000; CPLEX: 48,842 vars exceeds CE cap 1000 |
+| `dwt_234` | Table 7 | 234 | 300 | VERIFIED | READY | 163,800v / 16,683,615c | 163,800v / 521,221c | 54,757v / 1,069c | True | False | False | Gurobi: 54,757 vars exceeds cap 2000; CPLEX: 54,757 vars exceeds CE cap 1000 |
+| `dwt_245` | Table 7 | 245 | 608 | VERIFIED | READY | 179,585v / 36,704,797c | 179,585v / 714,920c | 60,026v / 1,707c | True | False | False | Gurobi: 60,026 vars exceeds cap 2000; CPLEX: 60,026 vars exceeds CE cap 1000 |
+| `bcspwr04` | Table 7 | 274 | 669 | VERIFIED | READY | 224,680v / 50,491,213c | 224,680v / 888,615c | 75,077v / 1,887c | True | False | False | Gurobi: 75,077 vars exceeds cap 2000; CPLEX: 75,077 vars exceeds CE cap 1000 |
+| `ash292` | Table 7 | 292 | 958 | VERIFIED | READY | 255,208v / 81,912,862c | 255,208v / 1,152,069c | 85,265v / 2,501c | True | False | False | Gurobi: 85,265 vars exceeds cap 2000; CPLEX: 85,265 vars exceeds CE cap 1000 |
+| `can_292` | Table 7 | 292 | 1124 | VERIFIED | READY | 255,208v / 96,018,214c | 255,208v / 1,248,681c | 85,265v / 2,833c | True | False | False | Gurobi: 85,265 vars exceeds cap 2000; CPLEX: 85,265 vars exceeds CE cap 1000 |
+| `dwt_310` | Table 7 | 310 | 1069 | VERIFIED | READY | 287,680v / 102,974,095c | 287,680v / 1,330,863c | 96,101v / 2,759c | True | False | False | Gurobi: 96,101 vars exceeds cap 2000; CPLEX: 96,101 vars exceeds CE cap 1000 |
+| `dwt_361` | Table 7 | 361 | 1296 | VERIFIED | READY | 390,241v / 169,207,739c | 390,241v / 1,842,480c | 130,322v / 3,315c | True | False | False | Gurobi: 130,322 vars exceeds cap 2000; CPLEX: 130,322 vars exceeds CE cap 1000 |
+| `dwt_419` | Table 7 | 419 | 1572 | VERIFIED | READY | 525,845v / 276,373,866c | 525,845v / 2,539,768c | 175,562v / 3,983c | False | False | False | SAT(order/seq): Estimated variables (525,845) exceeds safety limit (500,000); Gurobi: 175,562 vars exceeds cap 2000; CPLEX: 175,562 vars exceeds CE cap 1000 |
+| `bcsstk06` | Table 7 | 420 | 3720 | VERIFIED | READY | 528,360v / 655,701,270c | 528,360v / 4,348,801c | 176,401v / 8,281c | False | False | False | SAT(order/seq): Estimated variables (528,360) exceeds safety limit (500,000); Gurobi: 176,401 vars exceeds cap 2000; CPLEX: 176,401 vars exceeds CE cap 1000 |
+| `bcsstm07` | Table 7 | 420 | 3416 | VERIFIED | READY | 528,360v / 602,203,350c | 528,360v / 4,094,049c | 176,401v / 7,673c | False | False | False | SAT(order/seq): Estimated variables (528,360) exceeds safety limit (500,000); Gurobi: 176,401 vars exceeds cap 2000; CPLEX: 176,401 vars exceeds CE cap 1000 |
+| `bcspwr05` | Table 7 | 443 | 590 | VERIFIED | READY | 587,861v / 116,700,154c | 587,861v / 1,891,760c | 196,250v / 2,067c | False | False | False | SAT(order/seq): Estimated variables (587,861) exceeds safety limit (500,000); Gurobi: 196,250 vars exceeds cap 2000; CPLEX: 196,250 vars exceeds CE cap 1000 |
+| `can_445` | Table 7 | 445 | 1682 | VERIFIED | READY | 593,185v / 333,514,817c | 593,185v / 2,876,232c | 198,026v / 4,255c | False | False | False | SAT(order/seq): Estimated variables (593,185) exceeds safety limit (500,000); Gurobi: 198,026 vars exceeds cap 2000; CPLEX: 198,026 vars exceeds CE cap 1000 |
+| `bcsstk20` | Table 7 | 485 | 1325 | VERIFIED | READY | 704,705v / 312,438,697c | 704,705v / 2,925,296c | 235,226v / 3,621c | False | False | False | SAT(order/seq): Estimated variables (704,705) exceeds safety limit (500,000); Gurobi: 235,226 vars exceeds cap 2000; CPLEX: 235,226 vars exceeds CE cap 1000 |
+| `494_bus` | Table 7 | 494 | 586 | VERIFIED | READY | 731,120v / 144,176,617c | 731,120v / 2,282,097c | 244,037v / 2,161c | False | False | False | SAT(order/seq): Estimated variables (731,120) exceeds safety limit (500,000); Gurobi: 244,037 vars exceeds cap 2000; CPLEX: 244,037 vars exceeds CE cap 1000 |
+| `dwt_503` | Table 7 | 503 | 2762 | VERIFIED | READY | 758,021v / 698,936,356c | 758,021v / 4,540,088c | 253,010v / 6,531c | False | False | False | SAT(order/seq): Estimated variables (758,021) exceeds safety limit (500,000); Gurobi: 253,010 vars exceeds cap 2000; CPLEX: 253,010 vars exceeds CE cap 1000 |
+| `dwt_592` | Table 7 | 592 | 2256 | VERIFIED | READY | 1,050,208v / 791,410,168c | 1,050,208v / 5,115,105c | 350,465v / 5,697c | False | False | False | SAT(order/seq): Estimated variables (1,050,208) exceeds safety limit (500,000); Gurobi: 350,465 vars exceeds cap 2000; CPLEX: 350,465 vars exceeds CE cap 1000 |
+| `662_bus` | Table 7 | 662 | 906 | VERIFIED | READY | 1,313,408v / 399,074,453c | 1,313,408v / 4,260,145c | 438,245v / 3,137c | False | False | False | SAT(order/seq): Estimated variables (1,313,408) exceeds safety limit (500,000); Gurobi: 438,245 vars exceeds cap 2000; CPLEX: 438,245 vars exceeds CE cap 1000 |
+| `685_bus` | Table 7 | 685 | 1282 | VERIFIED | READY | 1,406,305v / 603,479,177c | 1,406,305v / 5,032,872c | 469,226v / 3,935c | False | False | False | SAT(order/seq): Estimated variables (1,406,305) exceeds safety limit (500,000); Gurobi: 469,226 vars exceeds cap 2000; CPLEX: 469,226 vars exceeds CE cap 1000 |
+| `can_715` | Table 7 | 715 | 2975 | VERIFIED | READY | 1,532,245v / 1,521,829,952c | 1,532,245v / 7,821,156c | 511,226v / 7,381c | False | False | False | SAT(order/seq): Estimated variables (1,532,245) exceeds safety limit (500,000); Gurobi: 511,226 vars exceeds cap 2000; CPLEX: 511,226 vars exceeds CE cap 1000 |
+| `bcsstk19` | Table 7 | 817 | 3018 | VERIFIED | READY | 2,000,833v / 2,016,015,719c | 2,000,833v / 9,591,264c | 667,490v / 7,671c | False | False | False | SAT(order/seq): Estimated variables (2,000,833) exceeds safety limit (500,000); Gurobi: 667,490 vars exceeds cap 2000; CPLEX: 667,490 vars exceeds CE cap 1000 |
+| `can_838` | Table 7 | 838 | 4586 | VERIFIED | READY | 2,105,056v / 3,220,855,933c | 2,105,056v / 12,585,969c | 702,245v / 10,849c | False | False | False | SAT(order/seq): Estimated variables (2,105,056) exceeds safety limit (500,000); Gurobi: 702,245 vars exceeds cap 2000; CPLEX: 702,245 vars exceeds CE cap 1000 |
+| `dwt_878` | Table 7 | 878 | 3285 | VERIFIED | READY | 2,310,896v / 2,534,089,307c | 2,310,896v / 11,151,055c | 770,885v / 8,327c | False | False | False | SAT(order/seq): Estimated variables (2,310,896) exceeds safety limit (500,000); Gurobi: 770,885 vars exceeds cap 2000; CPLEX: 770,885 vars exceeds CE cap 1000 |
+| `gr_30_30` | Table 7 | 900 | 3422 | VERIFIED | READY | 2,428,200v / 2,773,594,350c | 2,428,200v / 11,815,557c | 810,001v / 8,645c | False | False | False | SAT(order/seq): Estimated variables (2,428,200) exceeds safety limit (500,000); Gurobi: 810,001 vars exceeds cap 2000; CPLEX: 810,001 vars exceeds CE cap 1000 |
+| `dwt_918` | Table 7 | 918 | 3233 | VERIFIED | READY | 2,526,336v / 2,726,609,175c | 2,526,336v / 11,821,047c | 842,725v / 8,303c | False | False | False | SAT(order/seq): Estimated variables (2,526,336) exceeds safety limit (500,000); Gurobi: 842,725 vars exceeds cap 2000; CPLEX: 842,725 vars exceeds CE cap 1000 |
+| `dwt_992` | Table 7 | 992 | 7876 | VERIFIED | READY | 2,950,208v / 7,748,573,008c | 2,950,208v / 22,490,745c | 984,065v / 17,737c | False | False | False | SAT(order/seq): Estimated variables (2,950,208) exceeds safety limit (500,000); Gurobi: 984,065 vars exceeds cap 2000; CPLEX: 984,065 vars exceeds CE cap 1000 |
+| `nos1` | Table 8 | 237 | 390 | VERIFIED | READY | 168,033v / 22,148,953c | 168,033v / 575,368c | 56,170v / 1,255c | True | False | False | Gurobi: 56,170 vars exceeds cap 2000; CPLEX: 56,170 vars exceeds CE cap 1000 |
+| `saylr1` | Table 8 | 238 | 445 | VERIFIED | READY | 169,456v / 25,438,987c | 169,456v / 605,535c | 56,645v / 1,367c | True | False | False | Gurobi: 56,645 vars exceeds cap 2000; CPLEX: 56,645 vars exceeds CE cap 1000 |
+| `plat362` | Table 8 | 362 | 2712 | VERIFIED | READY | 392,408v / 355,193,495c | 392,408v / 2,872,477c | 131,045v / 6,149c | False | False | False | SAT(order/seq): Estimated clauses (2,872,477) exceeds safety limit (2,500,000); Gurobi: 131,045 vars exceeds cap 2000; CPLEX: 131,045 vars exceeds CE cap 1000 |
+| `plskz362` | Table 8 | 362 | 880 | VERIFIED | READY | 392,408v / 115,784,071c | 392,408v / 1,549,773c | 131,045v / 2,485c | True | False | False | Gurobi: 131,045 vars exceeds cap 2000; CPLEX: 131,045 vars exceeds CE cap 1000 |
+| `nos5` | Table 8 | 468 | 2352 | VERIFIED | READY | 656,136v / 515,354,814c | 656,136v / 3,726,193c | 219,025v / 5,641c | False | False | False | SAT(order/seq): Estimated variables (656,136) exceeds safety limit (500,000); Gurobi: 219,025 vars exceeds cap 2000; CPLEX: 219,025 vars exceeds CE cap 1000 |
+| `nos6` | Table 8 | 675 | 1290 | VERIFIED | READY | 1,365,525v / 589,614,862c | 1,365,525v / 4,922,896c | 455,626v / 3,931c | False | False | False | SAT(order/seq): Estimated variables (1,365,525) exceeds safety limit (500,000); Gurobi: 455,626 vars exceeds cap 2000; CPLEX: 455,626 vars exceeds CE cap 1000 |
+| `nos7` | Table 8 | 729 | 1944 | VERIFIED | READY | 1,592,865v / 1,034,888,035c | 1,592,865v / 6,544,720c | 531,442v / 5,347c | False | False | False | SAT(order/seq): Estimated variables (1,592,865) exceeds safety limit (500,000); Gurobi: 531,442 vars exceeds cap 2000; CPLEX: 531,442 vars exceeds CE cap 1000 |
+| `orsirr_2` | Table 8 | 886 | 2542 | VERIFIED | READY | 2,353,216v / 1,997,911,837c | 2,353,216v / 9,987,225c | 784,997v / 6,857c | False | False | False | SAT(order/seq): Estimated variables (2,353,216) exceeds safety limit (500,000); Gurobi: 784,997 vars exceeds cap 2000; CPLEX: 784,997 vars exceeds CE cap 1000 |
+| `jagmesh1` | Table 8 | 936 | 2664 | VERIFIED | READY | 2,626,416v / 2,336,676,732c | 2,626,416v / 11,106,865c | 876,097v / 7,201c | False | False | False | SAT(order/seq): Estimated variables (2,626,416) exceeds safety limit (500,000); Gurobi: 876,097 vars exceeds cap 2000; CPLEX: 876,097 vars exceeds CE cap 1000 |
+| `nos2` | Table 8 | 957 | 1590 | VERIFIED | READY | 2,745,633v / 1,460,167,153c | 2,745,633v / 9,443,368c | 915,850v / 5,095c | False | False | False | SAT(order/seq): Estimated variables (2,745,633) exceeds safety limit (500,000); Gurobi: 915,850 vars exceeds cap 2000; CPLEX: 915,850 vars exceeds CE cap 1000 |
+| `nos3` | Table 8 | 960 | 7442 | VERIFIED | READY | 2,762,880v / 6,856,926,240c | 2,762,880v / 20,717,277c | 921,601v / 16,805c | False | False | False | SAT(order/seq): Estimated variables (2,762,880) exceeds safety limit (500,000); Gurobi: 921,601 vars exceeds cap 2000; CPLEX: 921,601 vars exceeds CE cap 1000 |
+| `saylr3` | Table 8 | 1000 | 1375 | VERIFIED | READY | 2,998,000v / 1,379,618,500c | 2,998,000v / 9,739,251c | 1,000,001v / 4,751c | False | False | False | SAT(order/seq): Estimated variables (2,998,000) exceeds safety limit (500,000); Gurobi: 1,000,001 vars exceeds cap 2000; CPLEX: 1,000,001 vars exceeds CE cap 1000 |
+| `sherman1` | Table 8 | 1000 | 1375 | VERIFIED | READY | 2,998,000v / 1,379,618,500c | 2,998,000v / 9,739,251c | 1,000,001v / 4,751c | False | False | False | SAT(order/seq): Estimated variables (2,998,000) exceeds safety limit (500,000); Gurobi: 1,000,001 vars exceeds cap 2000; CPLEX: 1,000,001 vars exceeds CE cap 1000 |
+| `sherman4` | Table 8 | 1104 | 1341 | VERIFIED | READY | 3,654,240v / 1,640,257,512c | 3,654,240v / 11,481,127c | 1,218,817v / 4,891c | False | False | False | SAT(order/seq): Estimated variables (3,654,240) exceeds safety limit (500,000); Gurobi: 1,218,817 vars exceeds cap 2000; CPLEX: 1,218,817 vars exceeds CE cap 1000 |
+
 ---
 
 ## 4. Kết quả Baseline SAT Benchmark trên 54 READY (TASK M2.3.3)
@@ -145,3 +204,24 @@ Toàn bộ `10` biểu đồ chuẩn SVG nằm tại [`results/member2_m2_3/figu
 | 13 | Integration readiness (Member 3) | **COMPLETE** | Toàn bộ contract đã audit & tài liệu hóa chi tiết tại [`docs/member3-integration-guide.md`](member3-integration-guide.md) |
 
 **Kết luận nghiệm thu**: Member 2 **đạt đủ điều kiện nghiệm thu (`COMPLETE` cho phần kiến trúc/SAT Core extensions/testing/runner/integration và `COMPLETE_WITH_LIMITATIONS` cho phần benchmark quy mô lớn dưới giới hạn license thương mại + ngân sách timeout `30s`)** và **sẵn sàng bàn giao trực tiếp cho Member 3 và Leader**.
+
+---
+
+## 9. Hướng dẫn Tái lập M2.3
+
+```bash
+# 1. Preflight toàn bộ 54 instance READY
+.venv/bin/python -m bmp.experiments.member2_m2_3 configs/member2_m2_3_baseline.toml --preflight-only
+
+# 2. Chạy Baseline SAT trên 54 READY (Batch 900s, tự chặn 29 RESOURCE_LIMIT)
+.venv/bin/python -m bmp.experiments.member2_m2_3 configs/member2_m2_3_baseline.toml --rerun
+
+# 3. Chạy Controlled Studies A-G (tự động kế thừa Baseline_54 và resume nếu chạm 900s)
+.venv/bin/python -m bmp.experiments.member2_m2_3 configs/member2_m2_3_studies.toml
+
+# 4. Sinh toàn bộ 10 biểu đồ cnsplots SVG cho M2.3
+.venv/bin/python -m bmp.experiments.member2_plots results/member2_m2_3/runs.csv --m2-3 --preflight results/member2_m2_3/preflight_54.csv
+
+# 5. Chạy toàn bộ regression tests
+.venv/bin/pytest -v -r a
+```
