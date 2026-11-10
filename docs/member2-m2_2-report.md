@@ -109,7 +109,7 @@ So sánh trực tiếp với cấu hình `order + sequential + sym=True`:
 | `cadical` | `repeated` | `OPTIMAL` | 5 | 5 | 6.925 | 6.873 | 61.58 |
 | `glucose` | `repeated` | `OPTIMAL` | 5 | 5 | 6.928 | 6.882 | 56.47 |
 
-- Trên `bcspwr01`, cả hai backend đều chứng minh tối ưu **`bw = 5`** trong khoảng `6.9s–7.8s` (nhanh hơn đáng kể so với baseline L8 `16.8s–22.7s` trước đó khi không có khởi tạo/cập nhật mới).
+- Trên `bcspwr01`, cả hai backend đều chứng minh tối ưu **`bw = 5`** trong khoảng `6.9s–7.8s` (nhanh hơn giá trị tham chiếu `16.8s–22.7s` ghi nhận trong `l8_sat_runs.csv`, tuy nhiên không so sánh chéo hiệu năng tuyệt đối do khác bối cảnh/thời điểm chạy).
 - Lưu ý: trên các bài toán timeout lớn hơn (`30s` và `60s`), `cadical` đạt **incumbent chất lượng tốt hơn rõ rệt** so với `glucose`:
   - `bcspwr02` (`order/sequential/incremental`): CaDiCaL đạt `bw = 7` (bằng Paper Best) tại `30s` và `60s`, Glucose chỉ dừng ở `bw = 8` (`m2_2_0060`, `m2_2_0111`).
   - `bcsstk01` (`order/sequential/incremental`): CaDiCaL đạt `bw = 17` tại `30s` (`10` `sat_calls`) và `60s` (khớp Leader L8 `120s`), trong khi Glucose dừng ở `bw = 21` (`6` `sat_calls`).
@@ -169,7 +169,7 @@ So sánh `order` vs `pairwise` cùng cấu hình `sequential + incremental + sym
 | `nos4` | `cadical` | `TIMEOUT` | **10** | 30.007s | 199,617 | `RESOURCE_LIMIT` | N/A | 0.000s | 2,504,650 (est) |
 | `nos4` | `glucose` | `TIMEOUT` | **13** | 30.009s | 112,179 | `RESOURCE_LIMIT` | N/A | 0.000s | 2,504,650 (est) |
 
-`OrderEncoding` vượt trội toàn diện so với `PairwiseEncoding`: số mệnh đề nhỏ hơn `2.5x–21x` (giảm từ `2.50M` xuống `112k–200k` trên `nos4`), đồng thời là mã hóa **duy nhất** chứng minh được `OPTIMAL bw=5` trên `bcspwr01` trong `30s`.
+`OrderEncoding` vượt trội rõ rệt so với `PairwiseEncoding` trên cả 4 instance Harwell–Boeing trong pilot này: số mệnh đề tích lũy nhỏ hơn từ `1.48x` (`bcsstk01`: `105,505` vs `156,424`) đến `2.71x` (`bcspwr01`) và tránh bùng nổ `2,504,650` mệnh đề trên `nos4` (`>12.5x` so với CaDiCaL `order` tích lũy `199,617`), đồng thời là mã hóa **duy nhất** trong 4 cấu hình thử nghiệm chứng minh được `OPTIMAL bw=5` trên `bcspwr01` trong `30s`.
 
 ---
 
@@ -182,7 +182,7 @@ So sánh `order` vs `pairwise` cùng cấu hình `sequential + incremental + sym
      - CPLEX median: `0.0070s -> 0.0013s` (trên `Erdos–Rényi n=12`: `0.1342s -> 0.0747s`).
 2. **Trên Harwell–Boeing `bcspwr01` ($n=39, m=46$, `1,522` biến, `170` ràng buộc, `threads=1`, `timeout=30s`)**:
    - **Gurobi `symmetry_breaking=False`** (`m2_2_0095`): `TIMEOUT` tại `30.014s` (`bw = 5`, `objective_bound = 4.0`, `UNPROVED`).
-   - **Gurobi `symmetry_breaking=True`** (`m2_2_0099`): **`OPTIMAL (PROVED)`** chỉ trong **`3.403s`** (`bw = 5`, `objective_bound = 5.0`) — cho thấy symmetry breaking đảo nhãn $p(a) \le \lceil n/2 \rceil$ giúp Gurobi đóng cận dưới từ 4 lên 5 nhanh hơn **>8.8x** và biến bài toán từ TIMEOUT thành PROVED OPTIMAL!
+   - **Gurobi `symmetry_breaking=True`** (`m2_2_0099`): **`OPTIMAL (PROVED)`** chỉ trong **`3.403s`** (`bw = 5`, `objective_bound = 5.0`) — cho thấy symmetry breaking đảo nhãn $p(a) \le \lceil n/2 \rceil$ giúp Gurobi đóng cận dưới từ 4 lên 5 thành công trong `3.403s` so với việc chưa thể chứng minh tối ưu tại ngưỡng timeout `30.014s`!
    - **CPLEX** trên `bcspwr01`: `UNAVAILABLE` (`Error 1016: Community Edition > 1000 vars`).
    - Trên `bcspwr02`, `bcsstk01`, `nos4` ($n \ge 48$): cả Gurobi và CPLEX đều trả về `UNAVAILABLE` sạch theo đúng giới hạn license PyPI/CE.
 
