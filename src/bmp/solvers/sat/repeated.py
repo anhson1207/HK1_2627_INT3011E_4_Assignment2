@@ -14,7 +14,7 @@ from bmp.encodings.order import OrderEncoding
 from bmp.encodings.pairwise import PairwiseEncoding
 from bmp.solvers.sat.backends.base import get_sat_backend
 from bmp.solvers.sat.search import compute_initial_upper_bound, compute_lower_bound
-from bmp.solvers.sat.worker import report_progress
+from bmp.solvers.sat.worker import report_progress, report_sat_event
 
 
 class RepeatedSATSolver:
@@ -189,7 +189,6 @@ class RepeatedSATSolver:
                 last_num_clauses = formula.num_clauses
 
                 # Solve with fresh solver
-                solve_start = monotonic()
                 backend = get_sat_backend(self.backend_name)
                 backend.append_formula(formula.clauses)
                 report_progress(
@@ -198,14 +197,17 @@ class RepeatedSATSolver:
                     encoding_time_s=total_encoding_time, solving_time_s=total_solving_time,
                     num_variables=last_num_vars, num_clauses=last_num_clauses,
                 )
+                report_sat_event(self, k=k, outcome="STARTED")
                 sat_calls += 1
                 remaining = None if effective_timeout is None else effective_timeout - (monotonic() - started)
+                solve_start = monotonic()
                 is_sat = backend.solve_with_timeout(remaining)
                 solve_time = monotonic() - solve_start
                 total_solving_time += solve_time
 
                 if is_sat is None:
                     backend.delete()
+                    report_sat_event(self, k=k, outcome="UNKNOWN", solve_time_s=solve_time)
                     timed_out = True
                     break
 
@@ -216,6 +218,8 @@ class RepeatedSATSolver:
                         raise RuntimeError(f"Solver returned SAT but model is None for k={k}")
                     decoded_perm = self.encoder.decode(graph, model, k)
                     actual_bw = calculate_bandwidth(graph, decoded_perm)
+                    report_sat_event(self, k=k, outcome="SAT", solve_time_s=solve_time,
+                                     bandwidth=actual_bw)
                     best_bandwidth = actual_bw
                     best_permutation = decoded_perm
                     report_progress(
@@ -232,6 +236,7 @@ class RepeatedSATSolver:
                     k = k - 1 if self.threshold_policy == "unit" else best_bandwidth - 1
                 else:
                     backend.delete()
+                    report_sat_event(self, k=k, outcome="UNSAT", solve_time_s=solve_time)
                     # UNSAT at k means no solution of bandwidth <= k exists
                     certified_lb = k + 1
                     report_progress(
@@ -268,7 +273,6 @@ class RepeatedSATSolver:
                 last_num_vars = formula.num_variables
                 last_num_clauses = formula.num_clauses
 
-                solve_start = monotonic()
                 backend = get_sat_backend(self.backend_name)
                 backend.append_formula(formula.clauses)
                 report_progress(
@@ -277,13 +281,17 @@ class RepeatedSATSolver:
                     encoding_time_s=total_encoding_time, solving_time_s=total_solving_time,
                     num_variables=last_num_vars, num_clauses=last_num_clauses,
                 )
+                report_sat_event(self, k=mid, outcome="STARTED")
                 sat_calls += 1
                 remaining = None if effective_timeout is None else effective_timeout - (monotonic() - started)
+                solve_start = monotonic()
                 is_sat = backend.solve_with_timeout(remaining)
-                total_solving_time += monotonic() - solve_start
+                solve_time = monotonic() - solve_start
+                total_solving_time += solve_time
 
                 if is_sat is None:
                     backend.delete()
+                    report_sat_event(self, k=mid, outcome="UNKNOWN", solve_time_s=solve_time)
                     timed_out = True
                     break
 
@@ -294,6 +302,8 @@ class RepeatedSATSolver:
                         raise RuntimeError(f"Solver returned SAT but model is None for k={mid}")
                     decoded_perm = self.encoder.decode(graph, model, mid)
                     actual_bw = calculate_bandwidth(graph, decoded_perm)
+                    report_sat_event(self, k=mid, outcome="SAT", solve_time_s=solve_time,
+                                     bandwidth=actual_bw)
                     if actual_bw < best_bandwidth:
                         best_bandwidth = actual_bw
                         best_permutation = decoded_perm
@@ -306,6 +316,7 @@ class RepeatedSATSolver:
                     high = min(mid - 1, actual_bw - 1)
                 else:
                     backend.delete()
+                    report_sat_event(self, k=mid, outcome="UNSAT", solve_time_s=solve_time)
                     low = mid + 1
                     certified_lb = max(certified_lb, low)
                     report_progress(

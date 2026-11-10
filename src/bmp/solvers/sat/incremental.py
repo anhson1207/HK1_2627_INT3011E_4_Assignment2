@@ -14,7 +14,7 @@ from bmp.encodings.order import OrderEncoding
 from bmp.encodings.pairwise import PairwiseEncoding
 from bmp.solvers.sat.backends.base import get_sat_backend
 from bmp.solvers.sat.search import compute_initial_upper_bound, compute_lower_bound
-from bmp.solvers.sat.worker import report_progress
+from bmp.solvers.sat.worker import report_progress, report_sat_event
 
 
 class IncrementalSATSolver:
@@ -200,11 +200,13 @@ class IncrementalSATSolver:
                     break
 
                 solve_start = monotonic()
+                report_sat_event(self, k=k_curr, outcome="STARTED")
                 sat_calls += 1
                 remaining = None if effective_timeout is None else effective_timeout - (monotonic() - started)
                 is_sat = backend.solve_with_timeout(remaining)
                 total_solving_time += monotonic() - solve_start
                 if is_sat is None:
+                    report_sat_event(self, k=k_curr, outcome="UNKNOWN")
                     timed_out = True
                     break
 
@@ -214,6 +216,7 @@ class IncrementalSATSolver:
                         raise RuntimeError(f"Solver returned SAT but model is None for k={k_curr}")
                     decoded = self.encoder.decode(graph, model, k_curr)
                     actual_bw = calculate_bandwidth(graph, decoded)
+                    report_sat_event(self, k=k_curr, outcome="SAT", bandwidth=actual_bw)
                     best_bandwidth = actual_bw
                     best_permutation = decoded
                     report_progress(
@@ -260,6 +263,7 @@ class IncrementalSATSolver:
                     added_clauses += len(new_clauses)
                     k_curr = k_next
                 else:
+                    report_sat_event(self, k=k_curr, outcome="UNSAT")
                     # UNSAT at k_curr proves no bandwidth <= k_curr exists
                     certified_lb = k_curr + 1
                     report_progress(
