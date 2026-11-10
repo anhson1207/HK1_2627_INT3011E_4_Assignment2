@@ -69,6 +69,34 @@ class Graph:
             metadata={} if metadata is None else metadata,
         )
 
+    @classmethod
+    def create(
+        cls,
+        *,
+        name: str = "",
+        n: int | None = None,
+        vertices: Iterable[int] | None = None,
+        edges: Iterable[Edge] = (),
+        metadata: Mapping[str, object] | None = None,
+    ) -> Graph:
+        """Convenience constructor accepting either vertex count n (0..n-1) or vertices."""
+        if vertices is None:
+            if n is None:
+                raise ValueError("Either n or vertices must be provided")
+            if n < 0:
+                raise ValueError(f"Number of vertices n cannot be negative, got {n}")
+            vertices = tuple(range(n))
+        else:
+            vertices = tuple(vertices)
+            if n is not None and len(vertices) != n:
+                raise ValueError(f"Explicit n={n} does not match len(vertices)={len(vertices)}")
+        return cls.from_edges(vertices=vertices, edges=edges, name=name, metadata=metadata)
+
+    @property
+    def n(self) -> int:
+        """Alias for order (number of vertices)."""
+        return len(self.vertices)
+
     @property
     def order(self) -> int:
         """Number of vertices."""
@@ -119,3 +147,7 @@ class Graph:
             "edges": [list(edge) for edge in sorted(self.edges)],
             "metadata": dict(self.metadata),
         }
+
+
+GraphInstance = Graph
+__all__ = ["Edge", "Graph", "GraphInstance"]

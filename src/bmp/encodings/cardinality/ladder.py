@@ -1,170 +1,97 @@
+"""Ladder (implication-chain) At-Most-One (AMO) encoding for BMP SAT formulations.
 
+Ghi chú quan trọng về tương đương toán học:
+    - Với m >= 3 literal, chuỗi implication của Ladder AMO sinh chính xác
+      m - 1 biến phụ và 3m - 4 mệnh đề giống hệt Sequential Counter AMO
+      (``SequentialCounterAMOEncoder`` trên nhánh Leader).
+    - Khác biệt triển khai duy nhất nằm ở trường hợp m == 2:
+      ``SequentialCounterAMOEncoder`` rút gọn đặc biệt thành 0 biến phụ và
+      1 mệnh đề nhị phân [-x0, -x1], trong khi ``LadderAMOEncoder`` /
+      ``encode_ladder_amo`` giữ công thức đồng nhất m - 1 = 1 biến phụ và
+      3m - 4 = 2 mệnh đề để bảo toàn hợp đồng đếm biến/mệnh đề ban đầu.
+    - Do đó không nên trình bày Ladder AMO như một họ nén biến độc lập
+      hoàn toàn với Sequential Counter; nó được giữ lại dưới dạng biến thể/alias
+      để phục vụ đối chứng tái lập bài tập.
 """
-Ladder AMO Encoding cho bài toán BMP
 
-Mục đích:
-    Mã hóa ràng buộc At-Most-One (AMO) thành CNF
+from __future__ import annotations
 
-Ý tưởng:
-    Sử dụng các auxiliary variables s1, s2, ..., s(n-1)
-    để truyền trạng thái theo một chuỗi
+from collections.abc import Sequence
 
-    Nếu xi = True:
-        - Tín hiệu tại vị trí i được kích hoạt
-        - Các biến đứng sau xi không thể cùng True
+from bmp.encodings.cardinality.base import AMOEncoder, VarAllocator, register_amo_encoder
 
-Ghi chú:
-    Đây là biến thể Ladder dạng implication,
-    tương đương với Sequential Counter AMO cơ bản
-    Cần thống nhất với leader về biến thể Ladder
-    chính thức để tránh trùng lặp trong benchmark
 
-Quy ước DIMACS:
-    Biến dương: x
-    Biến âm: NOT x
-    Clause: list[int]
-    CNF: list[list[int]]
-"""
+def _build_ladder_clauses(
+    literals: Sequence[int],
+    auxiliary: Sequence[int],
+) -> list[list[int]]:
+    n = len(literals)
+    clauses: list[list[int]] = [[-literals[0], auxiliary[0]]]
+    for i in range(1, n - 1):
+        current_lit = literals[i]
+        previous_signal = auxiliary[i - 1]
+        current_signal = auxiliary[i]
+        clauses.append([-current_lit, current_signal])
+        clauses.append([-previous_signal, current_signal])
+        clauses.append([-current_lit, -previous_signal])
+    clauses.append([-literals[-1], -auxiliary[-1]])
+    return clauses
 
 
 def encode_ladder_amo(
     variables: list[int],
     top_id: int | None = None,
 ) -> tuple[list[list[int]], int]:
-    """
-    Mã hóa At-Most-One bằng Ladder Encoding
-
-    Args:
-        variables:
-            Danh sách ID biến Boolean cần áp dụng AMO
-            Ví dụ: [1, 2, 3, 4]
-
-        top_id:
-            ID lớn nhất đã được sử dụng trong CNF chung
-            Dùng để tránh trùng auxiliary variable IDs
-
-    Returns:
-        clauses:
-            Danh sách CNF clauses biểu diễn AMO
-
-        new_top_id:
-            ID lớn nhất sau khi cấp phát biến phụ
-
-    Raises:
-        ValueError:
-            Khi biến đầu vào hoặc top_id không hợp lệ
-    """
-
-    # --------------------------------------------------
-    # BƯỚC 1: Kiểm tra dữ liệu đầu vào
-    # --------------------------------------------------
+    """Encode At-Most-One over positive variable IDs using Ladder implication chain."""
 
     if any(type(v) is not int or v <= 0 for v in variables):
-        raise ValueError(
-            "Variable IDs must be positive integers"
-        )
-
+        raise ValueError("Variable IDs must be positive integers")
     if len(set(variables)) != len(variables):
-        raise ValueError(
-            "Variable IDs must be distinct"
-        )
-
-    if top_id is not None and (
-        type(top_id) is not int or top_id < 0
-    ):
-        raise ValueError(
-            "top_id must be a nonnegative integer"
-        )
+        raise ValueError("Variable IDs must be distinct")
+    if top_id is not None and (type(top_id) is not int or top_id < 0):
+        raise ValueError("top_id must be a nonnegative integer")
 
     maximum = max(variables, default=0)
-
     if top_id is not None and top_id < maximum:
-        raise ValueError(
-            "top_id must not be smaller than an input variable ID"
-        )
+        raise ValueError("top_id must not be smaller than an input variable ID")
 
     current_top = max(maximum, top_id or 0)
     n = len(variables)
-
-    # Với 0 hoặc 1 biến, AMO luôn thỏa mãn
     if n <= 1:
         return [], current_top
 
-    # --------------------------------------------------
-    # BƯỚC 2: Cấp phát auxiliary variables
-    # --------------------------------------------------
-
-    # Với n biến gốc, cần n-1 biến phụ
-    # Ví dụ:
-    # variables = [1, 2, 3, 4]
-    # auxiliary = [5, 6, 7]
-
-    auxiliary = list(
-        range(current_top + 1, current_top + n)
-    )
-
+    auxiliary = list(range(current_top + 1, current_top + n))
     current_top += n - 1
+    return _build_ladder_clauses(variables, auxiliary), current_top
 
-    clauses: list[list[int]] = []
 
-    # --------------------------------------------------
-    # BƯỚC 3: Biến đầu tiên kích hoạt chuỗi
-    # --------------------------------------------------
+class LadderAMOEncoder(AMOEncoder):
+    """AMOEncoder adapter for Member 3's Ladder AMO variant."""
 
-    # x1 => s1
-    # NOT x1 OR s1
+    def encode(
+        self,
+        literals: Sequence[int],
+        allocator: VarAllocator,
+    ) -> tuple[list[list[int]], list[int]]:
+        if any(type(lit) is not int or lit == 0 for lit in literals):
+            raise ValueError("Literals must be nonzero integers")
 
-    clauses.append([
-        -variables[0],
-        auxiliary[0],
-    ])
+        n = len(literals)
+        if n <= 1:
+            return [], []
 
-    # --------------------------------------------------
-    # BƯỚC 4: Xử lý các biến ở giữa
-    # --------------------------------------------------
+        used_ids = {abs(lit) for lit in literals}
+        aux_vars = allocator.allocate(n - 1)
+        if len(aux_vars) != n - 1 or any(
+            type(v) is not int or v <= 0 or v in used_ids for v in aux_vars
+        ):
+            raise ValueError("VarAllocator must allocate fresh positive variable IDs")
+        if len(set(aux_vars)) != len(aux_vars):
+            raise ValueError("VarAllocator must allocate distinct auxiliary variable IDs")
 
-    for i in range(1, n - 1):
+        return _build_ladder_clauses(literals, aux_vars), aux_vars
 
-        current_variable = variables[i]
-        previous_signal = auxiliary[i - 1]
-        current_signal = auxiliary[i]
 
-        # Nếu xi True thì si phải True
-        # xi => si
-        clauses.append([
-            -current_variable,
-            current_signal,
-        ])
+register_amo_encoder("ladder", LadderAMOEncoder)
 
-        # Tín hiệu từ trước được truyền tiếp
-        # s(i-1) => si
-        clauses.append([
-            -previous_signal,
-            current_signal,
-        ])
-
-        # Nếu đã có tín hiệu trước đó,
-        # xi không được True
-        # NOT (xi AND s(i-1))
-        clauses.append([
-            -current_variable,
-            -previous_signal,
-        ])
-
-    # --------------------------------------------------
-    # BƯỚC 5: Xử lý biến cuối cùng
-    # --------------------------------------------------
-
-    # Nếu s(n-1) đã True thì xn phải False
-    # NOT xn OR NOT s(n-1)
-
-    clauses.append([
-        -variables[-1],
-        -auxiliary[-1],
-    ])
-
-    # --------------------------------------------------
-    # BƯỚC 6: Trả về kết quả
-    # --------------------------------------------------
-
-    return clauses, current_top
+__all__ = ["LadderAMOEncoder", "encode_ladder_amo"]

@@ -1,0 +1,13 @@
+[benchmark]
+instances = [
+  "../data/samples/path_p5.edgelist",
+  "../data/samples/complete_k5.edgelist",
+  "../data/samples/star_k1_4.edgelist",
+  "../data/samples/cycle_c4.edgelist",
+  "../data/samples/edgeless_5.edgelist",
+]
+output_dir = "../results/member2"
+timeout_seconds = 5.0
+repetitions = 3
+seed = 2026
+amo = ["pairwise", "sequential", "binary", "commander"]

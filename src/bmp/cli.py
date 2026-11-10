@@ -1,4 +1,4 @@
-"""Command-line entry point for Phase 1 workflows."""
+"""Command-line entry point for BMP workflows and SAT solving."""
 
 from __future__ import annotations
 
@@ -17,42 +17,145 @@ from bmp.core.generators import (
     path_graph,
     star_graph,
 )
-from bmp.core.validation import validate_assignment
+from bmp.core.validation import validate_solution
+from bmp.encodings.cardinality import get_amo_encoder
+from bmp.encodings.estimator import ResourceLimits, estimate_cnf_size
+from bmp.encodings.pairwise import PairwiseEncoding
 from bmp.io.readers import read_graph, write_edge_list
 from bmp.solvers.brute_force import BruteForceSolver
+from bmp.solvers.sat.repeated import RepeatedSATSolver
 
 FORMATS = ("auto", "edge-list", "adjacency-matrix", "matrix-market")
 
 
-def _solve(
+def _solve_instance(
     input_path: Path,
     *,
-    graph_format: str,
-    timeout_seconds: float | None,
-    max_vertices: int,
+    graph_format: str = "auto",
+    solver_name: str = "cadical",
+    encoding_name: str = "pairwise",
+    strategy_name: str = "repeated",
+    amo_name: str = "pairwise",
+    search_mode: str = "linear",
+    symmetry_breaking: bool = False,
+    timeout_seconds: float | None = None,
+    max_vertices: int = 10,
+    max_variables: int | None = 500_000,
+    max_clauses: int | None = 2_500_000,
 ) -> dict[str, object]:
     graph = read_graph(input_path, graph_format)  # type: ignore[arg-type]
-    result = BruteForceSolver(max_vertices=max_vertices).solve(
-        graph,
+    limits = ResourceLimits(
+        max_variables=max_variables,
+        max_clauses=max_clauses,
         timeout_seconds=timeout_seconds,
     )
+
+    if strategy_name == "brute-force" or solver_name == "brute-force":
+        solver = BruteForceSolver(max_vertices=max_vertices)
+        result = solver.solve(graph, timeout_seconds=timeout_seconds)
+    elif solver_name == "gurobi":
+        from bmp.solvers.exact.gurobi import GurobiMIPSolver
+
+        result = GurobiMIPSolver().solve(
+            graph,
+            timeout_seconds=timeout_seconds,
+            symmetry_breaking=symmetry_breaking,
+        )
+    elif solver_name == "cplex":
+        from bmp.solvers.exact.cplex import CPLEXMIPSolver
+
+        result = CPLEXMIPSolver().solve(
+            graph,
+            timeout_seconds=timeout_seconds,
+            symmetry_breaking=symmetry_breaking,
+        )
+    elif solver_name == "cp-sat":
+        from bmp.solvers.exact.cpsat import CPSATSolver
+
+        result = CPSATSolver().solve(
+            graph,
+            timeout_seconds=timeout_seconds,
+            symmetry_breaking=symmetry_breaking,
+        )
+    elif solver_name == "cp-optimizer":
+        from bmp.solvers.exact.cp_optimizer import CPOptimizerSolver
+
+        result = CPOptimizerSolver().solve(
+            graph,
+            timeout_seconds=timeout_seconds,
+            symmetry_breaking=symmetry_breaking,
+        )
+    elif solver_name == "rcm":
+        from bmp.heuristics.rcm import RCMSolver
+
+        result = RCMSolver().solve(graph)
+    elif solver_name == "sa":
+        from bmp.heuristics.sa import SimulatedAnnealingSolver
+
+        result = SimulatedAnnealingSolver().solve(graph)
+    elif strategy_name in ("repeated", "repeated_linear", "repeated_binary"):
+        if encoding_name == "pairwise":
+            encoder = PairwiseEncoding(amo=amo_name)
+        elif encoding_name == "order":
+            from bmp.encodings.order import OrderEncoding
+            encoder = OrderEncoding(amo=amo_name)
+        else:
+            raise ValueError(f"Unknown encoding: {encoding_name}")
+
+        mode = "binary" if "binary" in strategy_name or search_mode == "binary" else "linear"
+        sat_solver = RepeatedSATSolver(
+            encoder=encoder,
+            backend_name=solver_name,
+            search_mode=mode,
+        )
+        result = sat_solver.solve(
+            graph,
+            timeout_seconds=timeout_seconds,
+            symmetry_breaking=symmetry_breaking,
+            limits=limits,
+        )
+    elif strategy_name == "incremental":
+        from bmp.solvers.sat.incremental import IncrementalSATSolver
+        if encoding_name == "pairwise":
+            encoder = PairwiseEncoding(amo=amo_name)
+        elif encoding_name == "order":
+            from bmp.encodings.order import OrderEncoding
+            encoder = OrderEncoding(amo=amo_name)
+        else:
+            raise ValueError(f"Unknown encoding: {encoding_name}")
+
+        inc_solver = IncrementalSATSolver(
+            encoder=encoder,
+            backend_name=solver_name,
+        )
+        result = inc_solver.solve(
+            graph,
+            timeout_seconds=timeout_seconds,
+            symmetry_breaking=symmetry_breaking,
+            limits=limits,
+        )
+    else:
+        raise ValueError(f"Unsupported strategy: {strategy_name}")
+
     payload = result.to_dict()
-    payload["instance"] = {
+    payload["instance_info"] = {
         "id": graph.name,
         "n": graph.order,
         "m": graph.size,
         "density": graph.density,
         "source": str(input_path),
     }
-    if result.assignment is not None:
-        validation = validate_assignment(
+
+    if result.permutation is not None:
+        validation = validate_solution(
             graph,
-            result.assignment,
+            result.permutation,
             claimed_bandwidth=result.bandwidth,
         )
         payload["validation"] = validation.to_dict()
         if not validation.valid:
             raise RuntimeError(f"Internal solver validation failed: {validation.errors}")
+
     return payload
 
 
@@ -63,11 +166,44 @@ def _build_parser() -> argparse.ArgumentParser:
     )
     subparsers = parser.add_subparsers(dest="command", required=True)
 
-    solve = subparsers.add_parser("solve", help="solve a tiny instance with the exact oracle")
-    solve.add_argument("input", type=Path)
+    solve = subparsers.add_parser("solve", help="solve an instance using SAT, MIP, CP, heuristics, or brute force")
+    solve.add_argument("input", nargs="?", type=Path, default=None, help="path to input graph file")
+    solve.add_argument("--graph", "-g", type=Path, default=None, dest="graph_opt", help="alias for input path")
     solve.add_argument("--format", choices=FORMATS, default="auto")
+    solve.add_argument(
+        "--solver",
+        choices=(
+            "cadical",
+            "cadical195",
+            "glucose",
+            "glucose4",
+            "gurobi",
+            "cplex",
+            "cp-sat",
+            "cp-optimizer",
+            "rcm",
+            "sa",
+            "brute-force",
+        ),
+        default="cadical",
+    )
+    solve.add_argument("--encoding", choices=("pairwise", "order"), default="pairwise")
+    solve.add_argument("--strategy", choices=("repeated", "incremental", "brute-force"), default="repeated")
+    solve.add_argument("--amo", choices=("pairwise", "sequential", "binary", "commander"), default="pairwise")
+    solve.add_argument("--search-mode", choices=("linear", "binary"), default="linear")
+    solve.add_argument("--symmetry-breaking", action="store_true", default=False)
     solve.add_argument("--timeout", type=float, default=None)
     solve.add_argument("--max-vertices", type=int, default=10)
+    solve.add_argument("--max-variables", type=int, default=500_000, help="safety limit on maximum estimated variables")
+    solve.add_argument("--max-clauses", type=int, default=2_500_000, help="safety limit on maximum estimated clauses")
+
+    estimate = subparsers.add_parser("estimate-cnf", help="analytically estimate CNF formula size without building it")
+    estimate.add_argument("input", type=Path, help="path to input graph file")
+    estimate.add_argument("--format", choices=FORMATS, default="auto")
+    estimate.add_argument("--encoding", choices=("pairwise", "order"), default="pairwise")
+    estimate.add_argument("--amo", choices=("pairwise", "sequential", "binary", "commander"), default="pairwise")
+    estimate.add_argument("--k", "-k", type=int, default=None, help="target bandwidth threshold (default: worst-case k=0)")
+    estimate.add_argument("--symmetry-breaking", action="store_true", default=False)
 
     run_config = subparsers.add_parser("run-config", help="run a TOML solve configuration")
     run_config.add_argument("config", type=Path)
@@ -87,6 +223,16 @@ def _build_parser() -> argparse.ArgumentParser:
     generate.add_argument("output", type=Path)
     generate.add_argument("--probability", type=float, default=0.25)
     generate.add_argument("--seed", type=int, default=0)
+
+    bench = subparsers.add_parser("benchmark-sat", help="run SAT benchmark suite across configurations")
+    bench.add_argument("--output-json", type=Path, default=Path("data/sat_benchmark_results.json"))
+    bench.add_argument("--output-csv", type=Path, default=Path("data/sat_benchmark_results.csv"))
+    bench.add_argument("--timeout", type=float, default=20.0)
+    bench.add_argument("--quick", action="store_true", default=False, help="run small quick suite")
+
+    preflight = subparsers.add_parser("preflight-benchmark", help="check readiness of Harwell-Boeing benchmark dataset")
+    preflight.add_argument("--dir", "-d", type=Path, default=Path("data/benchmarks/raw"), help="path to benchmark directory")
+    preflight.add_argument("--table", choices=("6", "7", "8", "all"), default="all", help="benchmark table to check")
     return parser
 
 
@@ -100,14 +246,25 @@ def _run_config(path: Path) -> dict[str, object]:
         raise ValueError("Config must contain [solve] and solve.input") from error
     if not configured_input.is_absolute():
         configured_input = path.parent / configured_input
-    solver = solve.get("solver", "brute-force")
-    if solver != "brute-force":
-        raise ValueError(f"Phase 1 supports only solver='brute-force', got {solver!r}")
-    return _solve(
+
+    solver_name = solve.get("solver", "cadical")
+    encoding_name = solve.get("encoding", "pairwise")
+    strategy_name = solve.get("strategy", "repeated")
+    amo_name = solve.get("amo", "pairwise")
+
+    return _solve_instance(
         configured_input,
         graph_format=solve.get("format", "auto"),
+        solver_name=solver_name,
+        encoding_name=encoding_name,
+        strategy_name=strategy_name,
+        amo_name=amo_name,
+        search_mode=solve.get("search_mode", "linear"),
+        symmetry_breaking=bool(solve.get("symmetry_breaking", False)),
         timeout_seconds=solve.get("timeout_seconds"),
         max_vertices=solve.get("max_vertices", 10),
+        max_variables=solve.get("max_variables", 500_000),
+        max_clauses=solve.get("max_clauses", 2_500_000),
     )
 
 
@@ -116,12 +273,47 @@ def main(argv: Sequence[str] | None = None) -> int:
     args = parser.parse_args(argv)
     try:
         if args.command == "solve":
-            payload = _solve(
-                args.input,
+            input_file = args.input or args.graph_opt
+            if input_file is None:
+                parser.error("Must specify graph input either as positional argument or via --graph/-g")
+
+            payload = _solve_instance(
+                input_file,
                 graph_format=args.format,
+                solver_name=args.solver,
+                encoding_name=args.encoding,
+                strategy_name=args.strategy,
+                amo_name=args.amo,
+                search_mode=args.search_mode,
+                symmetry_breaking=args.symmetry_breaking,
                 timeout_seconds=args.timeout,
                 max_vertices=args.max_vertices,
+                max_variables=args.max_variables,
+                max_clauses=args.max_clauses,
             )
+        elif args.command == "estimate-cnf":
+            graph = read_graph(args.input, args.format)
+            estimate = estimate_cnf_size(
+                graph,
+                encoding=args.encoding,
+                amo=args.amo,
+                k=args.k,
+                symmetry_breaking=args.symmetry_breaking,
+            )
+            payload = {
+                "instance": {
+                    "id": graph.name,
+                    "n": graph.order,
+                    "m": graph.size,
+                    "density": graph.density,
+                    "source": str(args.input),
+                },
+                "encoding": args.encoding,
+                "amo": args.amo,
+                "k": args.k,
+                "symmetry_breaking": args.symmetry_breaking,
+                "estimate": estimate.to_dict(),
+            }
         elif args.command == "run-config":
             payload = _run_config(args.config)
         elif args.command == "inspect":
@@ -129,12 +321,12 @@ def main(argv: Sequence[str] | None = None) -> int:
         elif args.command == "validate":
             graph = read_graph(args.input, args.format)
             raw = json.loads(args.solution.read_text(encoding="utf-8"))
-            assignment_data = raw.get("assignment", raw)
+            assignment_data = raw.get("permutation", raw.get("assignment", raw))
             if not isinstance(assignment_data, dict):
-                raise ValueError("Solution JSON must contain an assignment object")
+                raise ValueError("Solution JSON must contain an assignment or permutation object")
             assignment = {int(vertex): label for vertex, label in assignment_data.items()}
             claimed = raw.get("bandwidth") if isinstance(raw, dict) else None
-            payload = validate_assignment(
+            payload = validate_solution(
                 graph,
                 assignment,
                 claimed_bandwidth=claimed,
@@ -160,7 +352,78 @@ def main(argv: Sequence[str] | None = None) -> int:
                 )
             write_edge_list(graph, args.output)
             payload = {"output": str(args.output), "graph": graph.to_dict()}
-        else:  # pragma: no cover - argparse enforces a valid command
+        elif args.command == "benchmark-sat":
+            from bmp.solvers.sat.benchmark import export_csv, export_json, run_benchmark
+            if args.quick:
+                suite = [
+                    path_graph(5),
+                    star_graph(4),
+                    cycle_graph(4),
+                    complete_graph(5),
+                    edgeless_graph(5),
+                ]
+            else:
+                suite = [
+                    path_graph(5),
+                    path_graph(7),
+                    cycle_graph(4),
+                    cycle_graph(6),
+                    star_graph(4),
+                    star_graph(6),
+                    complete_graph(5),
+                    edgeless_graph(5),
+                    erdos_renyi_graph(6, 0.35, seed=42),
+                    erdos_renyi_graph(7, 0.4, seed=100),
+                ]
+            records = run_benchmark(suite, timeout_per_instance=args.timeout)
+            if args.output_csv:
+                args.output_csv.parent.mkdir(parents=True, exist_ok=True)
+                export_csv(records, args.output_csv)
+            if args.output_json:
+                args.output_json.parent.mkdir(parents=True, exist_ok=True)
+                export_json(records, args.output_json)
+            payload = {
+                "num_instances": len(suite),
+                "num_records": len(records),
+                "output_json": str(args.output_json),
+                "output_csv": str(args.output_csv),
+            }
+        elif args.command == "preflight-benchmark":
+            from bmp.core.benchmark_catalog import (
+                TABLE_6_INSTANCES,
+                TABLE_7_INSTANCES,
+                TABLE_8_INSTANCES,
+                ALL_INSTANCES,
+                preflight_check_dataset,
+            )
+            if args.table == "6":
+                catalog = TABLE_6_INSTANCES
+            elif args.table == "7":
+                catalog = TABLE_7_INSTANCES
+            elif args.table == "8":
+                catalog = TABLE_8_INSTANCES
+            else:
+                catalog = ALL_INSTANCES
+
+            report = preflight_check_dataset(args.dir, catalog)
+            payload = {
+                "target_directory": str(args.dir),
+                "table": args.table,
+                "total_expected": report.total_expected,
+                "found_count": report.found_count,
+                "missing_count": report.missing_count,
+                "valid_count": report.valid_count,
+                "invalid_count": report.invalid_count,
+                "needs_verification_count": report.needs_verification_count,
+                "ready_for_execution": report.ready_for_execution,
+                "verified_instances": list(report.verified_instances),
+                "needs_verification_instances": list(report.needs_verification_instances),
+                "missing_instances": list(report.missing_instances),
+                "errors": list(report.errors),
+                "dependency_status": "STRUCTURAL_READY" if report.ready_for_execution else "DATA_REVIEW_REQUIRED",
+                "verification_level": "file_parse_and_vertex_count_only; use benchmark_provenance.json for topology audit",
+            }
+        else:  # pragma: no cover
             parser.error("Unknown command")
             return 2
     except (OSError, ValueError, TypeError, json.JSONDecodeError) as error:

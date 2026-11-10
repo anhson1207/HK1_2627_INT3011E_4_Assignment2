@@ -1,47 +1,43 @@
-"""Deterministic Reverse Cuthill–McKee baseline."""
+"""Deterministic Reverse Cuthill-McKee baseline heuristic."""
 
-from collections import deque
+from __future__ import annotations
+
 from time import monotonic
 
+from bmp.core.bounds import cuthill_mckee_order
 from bmp.core.graph import Graph
-from bmp.core.solution import BMPSolution, SolutionStatus
-from bmp.core.validation import compute_bandwidth
+from bmp.core.solution import SolutionStatus, SolverResult
+from bmp.core.validation import calculate_bandwidth, validate_solution
+from bmp.solvers.sat.search import compute_lower_bound
 
 
 class RCMSolver:
-    def solve(self, graph: Graph) -> BMPSolution:
+    """Compute a deterministic Reverse Cuthill-McKee labeling."""
+
+    def solve(self, graph: Graph) -> SolverResult:
         started = monotonic()
-        neighbors = {v: [] for v in graph.vertices}
-        for u, v in graph.edges:
-            neighbors[u].append(v)
-            neighbors[v].append(u)
-
-        def priority(vertex: int) -> tuple[int, int]:
-            return len(neighbors[vertex]), vertex
-
-        order = []
-        visited = set()
-        # BFS theo bậc tăng dần, bắt đầu lại khi gặp thành phần mới.
-        for root in sorted(graph.vertices, key=priority):
-            if root in visited:
-                continue
-            queue = deque([root])
-            visited.add(root)
-            while queue:
-                vertex = queue.popleft()
-                order.append(vertex)
-                for adjacent in sorted(neighbors[vertex], key=priority):
-                    if adjacent not in visited:
-                        visited.add(adjacent)
-                        queue.append(adjacent)
-
+        order = cuthill_mckee_order(graph)
         assignment = {v: i for i, v in enumerate(reversed(order), start=1)}
-        value = compute_bandwidth(graph, assignment)
-        return BMPSolution(
-            SolutionStatus.FEASIBLE,
-            "rcm",
-            monotonic() - started,
-            assignment=assignment,
-            bandwidth=value,
-            upper_bound=value,
+        value = calculate_bandwidth(graph, assignment)
+        report = validate_solution(graph, assignment, claimed_bandwidth=value)
+        if not report.valid or report.actual_bandwidth is None:
+            raise RuntimeError(f"RCM produced an invalid assignment: {report.errors}")
+        lower = min(compute_lower_bound(graph), report.actual_bandwidth)
+        return SolverResult(
+            instance=graph.name,
+            method="HEURISTIC",
+            solver="rcm",
+            status=SolutionStatus.FEASIBLE,
+            runtime_seconds=monotonic() - started,
+            permutation=assignment,
+            bandwidth=report.actual_bandwidth,
+            lower_bound=lower,
+            upper_bound=report.actual_bandwidth,
+            metadata={
+                "incumbent_source": "heuristic",
+                "algorithm": "reverse_cuthill_mckee",
+            },
         )
+
+
+__all__ = ["RCMSolver"]

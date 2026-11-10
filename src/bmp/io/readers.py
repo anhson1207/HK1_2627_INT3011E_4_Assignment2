@@ -3,6 +3,8 @@
 from __future__ import annotations
 
 import csv
+import gzip
+from dataclasses import dataclass
 from pathlib import Path
 from typing import Literal
 
@@ -109,20 +111,41 @@ def read_adjacency_matrix(path: str | Path) -> Graph:
     )
 
 
-def read_matrix_market(path: str | Path) -> Graph:
-    """Read a coordinate Matrix Market file as an unweighted simple graph."""
+@dataclass(frozen=True, slots=True)
+class MatrixMarketAudit:
+    graph: Graph
+    rows: int
+    columns: int
+    declared_entries: int
+    diagonal_entries_removed: int
+    duplicate_entries: int
+    asymmetric_pairs: int
+    symmetry: str
+    status: str
+
+
+def inspect_matrix_market(path: str | Path) -> MatrixMarketAudit:
+    """Audit a raw coordinate matrix and form the undirected off-diagonal pattern.
+
+    An unsymmetric pattern is retained as a candidate graph but marked
+    NEEDS_VERIFICATION because the paper does not state a conversion rule.
+    """
 
     source = Path(path)
-    raw_lines = source.read_text(encoding="utf-8-sig").splitlines()
+    if source.suffix.lower() == ".gz":
+        with gzip.open(source, "rt", encoding="utf-8-sig") as stream:
+            raw_lines = stream.read().splitlines()
+    else:
+        raw_lines = source.read_text(encoding="utf-8-sig").splitlines()
     if not raw_lines:
         raise ValueError("Matrix Market file is empty")
     banner = raw_lines[0].strip().lower().split()
     if len(banner) != 5 or banner[:3] != ["%%matrixmarket", "matrix", "coordinate"]:
         raise ValueError("Only coordinate Matrix Market matrices are supported")
     field, symmetry = banner[3], banner[4]
-    if field not in {"pattern", "integer", "real"}:
+    if field not in {"pattern", "integer", "real", "complex"}:
         raise ValueError(f"Unsupported Matrix Market field: {field}")
-    if symmetry not in {"general", "symmetric"}:
+    if symmetry not in {"general", "symmetric", "hermitian", "skew-symmetric"}:
         raise ValueError(f"Unsupported Matrix Market symmetry: {symmetry}")
 
     data = [line.strip() for line in raw_lines[1:] if line.strip() and not line.lstrip().startswith("%")]
@@ -137,31 +160,55 @@ def read_matrix_market(path: str | Path) -> Graph:
             f"Header declares {declared_entries} entries but file contains {len(records)}"
         )
 
-    edges: list[tuple[int, int]] = []
+    directed: set[tuple[int, int]] = set()
+    diagonal = 0
+    duplicates = 0
     for index, record in enumerate(records, start=1):
         values = record.split()
-        expected = 2 if field == "pattern" else 3
+        expected = 2 if field == "pattern" else (4 if field == "complex" else 3)
         if len(values) != expected:
             raise ValueError(f"Invalid Matrix Market entry {index}: {record}")
         row, column = int(values[0]), int(values[1])
         if not (1 <= row <= rows and 1 <= column <= columns):
             raise ValueError(f"Matrix Market entry outside 1..{rows}: {record}")
-        if field != "pattern" and float(values[2]) == 0:
+        if field != "pattern" and all(float(value) == 0 for value in values[2:]):
             continue
         if row == column:
-            raise ValueError(f"Self-loop at Matrix Market entry {index}: {record}")
-        edges.append((row, column))
+            diagonal += 1
+            continue
+        if (row, column) in directed:
+            duplicates += 1
+        directed.add((row, column))
 
-    return Graph.from_edges(
-        range(1, rows + 1),
-        edges,
-        name=source.stem,
+    asymmetric = 0 if symmetry != "general" else sum(
+        1 for row, column in directed if (column, row) not in directed
+    )
+    edges = {(min(row, column) - 1, max(row, column) - 1) for row, column in directed}
+    status = "READY" if duplicates == 0 and asymmetric == 0 else "NEEDS_VERIFICATION"
+    graph = Graph.from_edges(
+        range(rows), edges,
+        name=source.name.removesuffix(".gz").removesuffix(".mtx"),
         metadata={
             "source": source.name,
             "format": "matrix-market",
             "matrix_market_field": field,
             "matrix_market_symmetry": symmetry,
+            "diagonal_entries_removed": diagonal,
+            "duplicate_entries": duplicates,
+            "asymmetric_pairs": asymmetric,
         },
+    )
+    return MatrixMarketAudit(graph, rows, columns, declared_entries, diagonal, duplicates, asymmetric, symmetry, status)
+
+
+def read_matrix_market(path: str | Path) -> Graph:
+    """Read a Matrix Market matrix using the shared audited parser."""
+    audit = inspect_matrix_market(path)
+    return Graph.from_edges(
+        range(1, audit.rows + 1),
+        ((u + 1, v + 1) for u, v in audit.graph.edges),
+        name=audit.graph.name,
+        metadata=dict(audit.graph.metadata),
     )
 
 
@@ -171,7 +218,7 @@ def read_graph(path: str | Path, graph_format: GraphFormat = "auto") -> Graph:
     source = Path(path)
     if graph_format == "auto":
         suffix = source.suffix.lower()
-        if suffix == ".mtx":
+        if suffix == ".mtx" or source.name.lower().endswith(".mtx.gz"):
             graph_format = "matrix-market"
         elif suffix in {".csv", ".matrix", ".adj"}:
             graph_format = "adjacency-matrix"
