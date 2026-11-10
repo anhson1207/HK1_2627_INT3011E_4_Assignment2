@@ -115,6 +115,11 @@ def _solve_instance(
             limits=limits,
         )
     elif strategy_name == "incremental":
+        if search_mode == "binary":
+            raise ValueError(
+                "Incremental SAT strategy only supports linear search mode; "
+                "use --strategy repeated --search-mode binary"
+            )
         from bmp.solvers.sat.incremental import IncrementalSATSolver
         if encoding_name == "pairwise":
             encoder = PairwiseEncoding(amo=amo_name)
@@ -177,6 +182,8 @@ def _build_parser() -> argparse.ArgumentParser:
             "cadical195",
             "glucose",
             "glucose4",
+            "minisat",
+            "minisat22",
             "gurobi",
             "cplex",
             "cp-sat",
@@ -189,7 +196,11 @@ def _build_parser() -> argparse.ArgumentParser:
     )
     solve.add_argument("--encoding", choices=("pairwise", "order"), default="pairwise")
     solve.add_argument("--strategy", choices=("repeated", "incremental", "brute-force"), default="repeated")
-    solve.add_argument("--amo", choices=("pairwise", "sequential", "binary", "commander"), default="pairwise")
+    solve.add_argument(
+        "--amo",
+        choices=("pairwise", "sequential", "binary", "commander", "product", "ladder"),
+        default="pairwise",
+    )
     solve.add_argument("--search-mode", choices=("linear", "binary"), default="linear")
     solve.add_argument("--symmetry-breaking", action="store_true", default=False)
     solve.add_argument("--timeout", type=float, default=None)
@@ -201,7 +212,11 @@ def _build_parser() -> argparse.ArgumentParser:
     estimate.add_argument("input", type=Path, help="path to input graph file")
     estimate.add_argument("--format", choices=FORMATS, default="auto")
     estimate.add_argument("--encoding", choices=("pairwise", "order"), default="pairwise")
-    estimate.add_argument("--amo", choices=("pairwise", "sequential", "binary", "commander"), default="pairwise")
+    estimate.add_argument(
+        "--amo",
+        choices=("pairwise", "sequential", "binary", "commander", "product", "ladder"),
+        default="pairwise",
+    )
     estimate.add_argument("--k", "-k", type=int, default=None, help="target bandwidth threshold (default: worst-case k=0)")
     estimate.add_argument("--symmetry-breaking", action="store_true", default=False)
 

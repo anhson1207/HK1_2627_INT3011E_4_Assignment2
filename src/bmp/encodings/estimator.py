@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
+from math import isqrt
 from typing import Mapping
 
 from bmp.core.graph import Graph
@@ -87,6 +88,24 @@ def _commander_amo_counts(m: int) -> tuple[int, int]:
     return aux + sub_aux, clauses + sub_clauses
 
 
+def _product_amo_counts(m: int) -> tuple[int, int]:
+    """Return exact (aux_vars, clauses) for 2-Product AMO over m literals."""
+    if m < 2:
+        return 0, 0
+    rows = isqrt(m - 1) + 1
+    cols = (m + rows - 1) // rows
+    aux = rows + cols
+    clauses = 2 * m + rows * (rows - 1) // 2 + cols * (cols - 1) // 2
+    return aux, clauses
+
+
+def _ladder_amo_counts(m: int) -> tuple[int, int]:
+    """Return exact (aux_vars, clauses) for Ladder AMO over m literals."""
+    if m < 2:
+        return 0, 0
+    return m - 1, 3 * m - 4
+
+
 def _single_amo_counts(amo_type: str, m: int, raw_amo: str) -> tuple[int, int]:
     """Return exact (aux_vars, clauses) for a single AMO constraint of width m."""
     if amo_type in ("pairwise", "naive"):
@@ -101,6 +120,10 @@ def _single_amo_counts(amo_type: str, m: int, raw_amo: str) -> tuple[int, int]:
         return _binary_amo_counts(m)
     if amo_type == "commander":
         return _commander_amo_counts(m)
+    if amo_type == "product":
+        return _product_amo_counts(m)
+    if amo_type == "ladder":
+        return _ladder_amo_counts(m)
     raise ValueError(f"Unsupported AMO type for estimation: {raw_amo}")
 
 
@@ -117,7 +140,7 @@ def estimate_cnf_size(
     Parameters:
         graph: Target Graph
         encoding: 'pairwise' or 'order'
-        amo: 'pairwise', 'sequential', 'binary', or 'commander'
+        amo: 'pairwise', 'sequential', 'binary', 'commander', 'product', or 'ladder'
         k: Bandwidth threshold. If None, assumes worst-case (k=0 for maximum clauses)
         symmetry_breaking: Whether anchor vertex symmetry breaking is active
     """
