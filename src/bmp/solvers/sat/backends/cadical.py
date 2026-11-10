@@ -74,6 +74,11 @@ class CadicalBackend(SATBackend):
             raise RuntimeError("Cannot solve with deleted solver")
         return bool(self._solver.solve(assumptions=list(assumptions)))
 
+    def solve_with_timeout(self, seconds: float | None, assumptions: Sequence[int] = ()) -> bool | None:
+        if seconds is not None:
+            raise NotImplementedError("PySAT CaDiCaL has no interruptible solve; use a worker process")
+        return self.solve(assumptions)
+
     def get_model(self) -> list[int] | None:
         if self._deleted:
             raise RuntimeError("Cannot get model from deleted solver")

@@ -9,11 +9,12 @@ from bmp.core.graph import Graph
 from bmp.core.solution import SolutionStatus, SolverResult
 from bmp.core.validation import calculate_bandwidth
 from bmp.encodings.base import BMPEncoder
-from bmp.encodings.estimator import ResourceLimits, estimate_cnf_size
+from bmp.encodings.estimator import ResourceLimits, estimate_cnf_size, estimate_incremental_cnf_size
 from bmp.encodings.order import OrderEncoding
 from bmp.encodings.pairwise import PairwiseEncoding
 from bmp.solvers.sat.backends.base import get_sat_backend
 from bmp.solvers.sat.search import compute_initial_upper_bound, compute_lower_bound
+from bmp.solvers.sat.worker import report_progress
 
 
 class IncrementalSATSolver:
@@ -24,9 +25,13 @@ class IncrementalSATSolver:
         encoder: BMPEncoder | None = None,
         *,
         backend_name: str = "cadical",
+        threshold_policy: str = "adaptive",
     ) -> None:
         self.encoder = encoder if encoder is not None else PairwiseEncoding()
         self.backend_name = backend_name
+        self.threshold_policy = threshold_policy
+        if threshold_policy not in ("adaptive", "unit"):
+            raise ValueError("threshold_policy must be 'adaptive' or 'unit'")
 
     def solve(
         self,
@@ -41,6 +46,14 @@ class IncrementalSATSolver:
         n = graph.order
 
         effective_timeout = timeout_seconds if timeout_seconds is not None else (limits.timeout_seconds if limits else None)
+        limits = limits if limits is not None else ResourceLimits(timeout_seconds=None)
+        if effective_timeout is not None or limits.memory_limit_mb is not None:
+            from bmp.solvers.sat.worker import run_bounded_solver
+            return run_bounded_solver(
+                self, graph, timeout_seconds=effective_timeout if effective_timeout is not None else 300.0,
+                heuristic_permutation=heuristic_permutation,
+                symmetry_breaking=symmetry_breaking, limits=limits,
+            )
 
         # Base case: edgeless or order <= 1
         if n <= 1 or not graph.edges:
@@ -118,8 +131,8 @@ class IncrementalSATSolver:
                     runtime_s=monotonic() - started,
                     encoding_time_s=0.0,
                     solving_time_s=0.0,
-                    num_variables=estimate.num_variables,
-                    num_clauses=estimate.num_clauses,
+                    num_variables=None,
+                    num_clauses=None,
                     sat_calls=0,
                     lower_bound=lb,
                     upper_bound=ub,
@@ -137,6 +150,15 @@ class IncrementalSATSolver:
         total_encoding_time = 0.0
         total_solving_time = 0.0
         timed_out = False
+        resource_reason: str | None = None
+        fixed_clauses = 0
+        added_clauses = 0
+        accumulated_clauses = 0
+        total_variables = 0
+        report_progress(
+            self, bandwidth=best_bandwidth, permutation=best_permutation,
+            lower_bound=certified_lb, sat_calls=0,
+        )
 
         # Initialize persistent SAT solver backend
         backend = get_sat_backend(self.backend_name)
@@ -148,6 +170,7 @@ class IncrementalSATSolver:
 
             backend.append_formula(fixed_formula.clauses)
             accumulated_clauses = len(fixed_formula.clauses)
+            fixed_clauses = accumulated_clauses
             total_variables = fixed_formula.num_variables
 
             # 2. Descending search
@@ -161,6 +184,15 @@ class IncrementalSATSolver:
 
             backend.append_formula(bw_clauses)
             accumulated_clauses += len(bw_clauses)
+            added_clauses += len(bw_clauses)
+            initial_k = k_curr
+            report_progress(
+                self, bandwidth=best_bandwidth, permutation=best_permutation,
+                lower_bound=certified_lb, sat_calls=0,
+                encoding_time_s=total_encoding_time, solving_time_s=total_solving_time,
+                num_variables=total_variables, num_clauses=accumulated_clauses,
+                initial_clauses=fixed_clauses, added_clauses=added_clauses,
+            )
 
             while k_curr >= certified_lb:
                 if effective_timeout is not None and (monotonic() - started) >= effective_timeout:
@@ -169,8 +201,12 @@ class IncrementalSATSolver:
 
                 solve_start = monotonic()
                 sat_calls += 1
-                is_sat = backend.solve()
+                remaining = None if effective_timeout is None else effective_timeout - (monotonic() - started)
+                is_sat = backend.solve_with_timeout(remaining)
                 total_solving_time += monotonic() - solve_start
+                if is_sat is None:
+                    timed_out = True
+                    break
 
                 if is_sat:
                     model = backend.get_model()
@@ -180,14 +216,35 @@ class IncrementalSATSolver:
                     actual_bw = calculate_bandwidth(graph, decoded)
                     best_bandwidth = actual_bw
                     best_permutation = decoded
+                    report_progress(
+                        self, bandwidth=best_bandwidth, permutation=best_permutation,
+                        lower_bound=certified_lb, sat_calls=sat_calls,
+                        encoding_time_s=total_encoding_time, solving_time_s=total_solving_time,
+                        num_variables=total_variables, num_clauses=accumulated_clauses,
+                        initial_clauses=fixed_clauses, added_clauses=added_clauses,
+                    )
 
                     if best_bandwidth <= certified_lb:
                         certified_lb = best_bandwidth
                         break
 
-                    k_next = best_bandwidth - 1
+                    k_next = k_curr - 1 if self.threshold_policy == "unit" else best_bandwidth - 1
                     if k_next < certified_lb:
                         certified_lb = best_bandwidth
+                        break
+
+                    next_estimate = estimate_incremental_cnf_size(
+                        graph,
+                        encoding="order" if isinstance(self.encoder, OrderEncoding) else "pairwise",
+                        amo=getattr(self.encoder, "amo_name", "pairwise"),
+                        initial_k=initial_k, target_k=k_next,
+                        symmetry_breaking=symmetry_breaking,
+                    )
+                    _, resource_reason = limits.check(next_estimate)
+                    if resource_reason:
+                        break
+                    if effective_timeout is not None and monotonic() - started >= effective_timeout:
+                        timed_out = True
                         break
 
                     # Add strengthening clauses for k_next
@@ -200,10 +257,18 @@ class IncrementalSATSolver:
 
                     backend.append_formula(new_clauses)
                     accumulated_clauses += len(new_clauses)
+                    added_clauses += len(new_clauses)
                     k_curr = k_next
                 else:
                     # UNSAT at k_curr proves no bandwidth <= k_curr exists
                     certified_lb = k_curr + 1
+                    report_progress(
+                        self, bandwidth=best_bandwidth, permutation=best_permutation,
+                        lower_bound=certified_lb, sat_calls=sat_calls,
+                        encoding_time_s=total_encoding_time, solving_time_s=total_solving_time,
+                        num_variables=total_variables, num_clauses=accumulated_clauses,
+                        initial_clauses=fixed_clauses, added_clauses=added_clauses,
+                    )
                     break
 
         finally:
@@ -211,7 +276,9 @@ class IncrementalSATSolver:
 
         runtime = monotonic() - started
         status = SolutionStatus.OPTIMAL
-        if timed_out:
+        if resource_reason:
+            status = SolutionStatus.SKIPPED
+        elif timed_out:
             status = SolutionStatus.FEASIBLE if best_permutation is not None else SolutionStatus.TIMEOUT
         elif best_bandwidth is not None and certified_lb == best_bandwidth:
             status = SolutionStatus.OPTIMAL
@@ -235,7 +302,13 @@ class IncrementalSATSolver:
             sat_calls=sat_calls,
             lower_bound=certified_lb,
             upper_bound=best_bandwidth,
-            metadata={"symmetry_breaking": symmetry_breaking},
+            metadata={
+                "symmetry_breaking": symmetry_breaking,
+                "threshold_policy": self.threshold_policy,
+                "initial_clauses": fixed_clauses,
+                "added_clauses": added_clauses,
+                "skipped_reason": resource_reason,
+            },
         )
 
 

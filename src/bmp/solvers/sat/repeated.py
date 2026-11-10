@@ -10,9 +10,11 @@ from bmp.core.solution import SolutionStatus, SolverResult
 from bmp.core.validation import calculate_bandwidth
 from bmp.encodings.base import BMPEncoder
 from bmp.encodings.estimator import ResourceLimits, estimate_cnf_size
+from bmp.encodings.order import OrderEncoding
 from bmp.encodings.pairwise import PairwiseEncoding
 from bmp.solvers.sat.backends.base import get_sat_backend
 from bmp.solvers.sat.search import compute_initial_upper_bound, compute_lower_bound
+from bmp.solvers.sat.worker import report_progress
 
 
 class RepeatedSATSolver:
@@ -24,12 +26,16 @@ class RepeatedSATSolver:
         *,
         backend_name: str = "cadical",
         search_mode: str = "linear",
+        threshold_policy: str = "adaptive",
     ) -> None:
         self.encoder = encoder if encoder is not None else PairwiseEncoding()
         self.backend_name = backend_name
         self.search_mode = search_mode.lower()
         if self.search_mode not in ("linear", "binary"):
             raise ValueError(f"Unknown search mode: {search_mode}. Choose 'linear' or 'binary'.")
+        self.threshold_policy = threshold_policy
+        if threshold_policy not in ("adaptive", "unit"):
+            raise ValueError("threshold_policy must be 'adaptive' or 'unit'")
 
     def solve(
         self,
@@ -44,6 +50,14 @@ class RepeatedSATSolver:
         n = graph.order
 
         effective_timeout = timeout_seconds if timeout_seconds is not None else (limits.timeout_seconds if limits else None)
+        limits = limits if limits is not None else ResourceLimits(timeout_seconds=None)
+        if effective_timeout is not None or limits.memory_limit_mb is not None:
+            from bmp.solvers.sat.worker import run_bounded_solver
+            return run_bounded_solver(
+                self, graph, timeout_seconds=effective_timeout if effective_timeout is not None else 300.0,
+                heuristic_permutation=heuristic_permutation,
+                symmetry_breaking=symmetry_breaking, limits=limits,
+            )
 
         # Base case: edgeless or order <= 1
         if n <= 1 or not graph.edges:
@@ -122,8 +136,8 @@ class RepeatedSATSolver:
                     runtime_s=monotonic() - started,
                     encoding_time_s=0.0,
                     solving_time_s=0.0,
-                    num_variables=estimate.num_variables,
-                    num_clauses=estimate.num_clauses,
+                    num_variables=None,
+                    num_clauses=None,
                     sat_calls=0,
                     lower_bound=lb,
                     upper_bound=ub,
@@ -143,6 +157,11 @@ class RepeatedSATSolver:
         last_num_vars = 0
         last_num_clauses = 0
         timed_out = False
+        resource_reason: str | None = None
+        report_progress(
+            self, bandwidth=best_bandwidth, permutation=best_permutation,
+            lower_bound=certified_lb, sat_calls=0,
+        )
 
         if self.search_mode == "linear":
             # Descending search: test k = best_bandwidth - 1
@@ -150,6 +169,15 @@ class RepeatedSATSolver:
             while k >= certified_lb:
                 if effective_timeout is not None and (monotonic() - started) >= effective_timeout:
                     timed_out = True
+                    break
+
+                estimate = estimate_cnf_size(
+                    graph, encoding="order" if isinstance(self.encoder, OrderEncoding) else "pairwise",
+                    amo=getattr(self.encoder, "amo_name", "pairwise"), k=k,
+                    symmetry_breaking=symmetry_breaking,
+                )
+                _, resource_reason = limits.check(estimate)
+                if resource_reason:
                     break
 
                 # Encode
@@ -164,10 +192,22 @@ class RepeatedSATSolver:
                 solve_start = monotonic()
                 backend = get_sat_backend(self.backend_name)
                 backend.append_formula(formula.clauses)
+                report_progress(
+                    self, bandwidth=best_bandwidth, permutation=best_permutation,
+                    lower_bound=certified_lb, sat_calls=sat_calls,
+                    encoding_time_s=total_encoding_time, solving_time_s=total_solving_time,
+                    num_variables=last_num_vars, num_clauses=last_num_clauses,
+                )
                 sat_calls += 1
-                is_sat = backend.solve()
+                remaining = None if effective_timeout is None else effective_timeout - (monotonic() - started)
+                is_sat = backend.solve_with_timeout(remaining)
                 solve_time = monotonic() - solve_start
                 total_solving_time += solve_time
+
+                if is_sat is None:
+                    backend.delete()
+                    timed_out = True
+                    break
 
                 if is_sat:
                     model = backend.get_model()
@@ -178,16 +218,28 @@ class RepeatedSATSolver:
                     actual_bw = calculate_bandwidth(graph, decoded_perm)
                     best_bandwidth = actual_bw
                     best_permutation = decoded_perm
+                    report_progress(
+                        self, bandwidth=best_bandwidth, permutation=best_permutation,
+                        lower_bound=certified_lb, sat_calls=sat_calls,
+                        encoding_time_s=total_encoding_time, solving_time_s=total_solving_time,
+                        num_variables=last_num_vars, num_clauses=last_num_clauses,
+                    )
 
                     if best_bandwidth <= certified_lb:
                         # Optimum reached certified lower bound
                         certified_lb = best_bandwidth
                         break
-                    k = best_bandwidth - 1
+                    k = k - 1 if self.threshold_policy == "unit" else best_bandwidth - 1
                 else:
                     backend.delete()
                     # UNSAT at k means no solution of bandwidth <= k exists
                     certified_lb = k + 1
+                    report_progress(
+                        self, bandwidth=best_bandwidth, permutation=best_permutation,
+                        lower_bound=certified_lb, sat_calls=sat_calls,
+                        encoding_time_s=total_encoding_time, solving_time_s=total_solving_time,
+                        num_variables=last_num_vars, num_clauses=last_num_clauses,
+                    )
                     break
 
         elif self.search_mode == "binary":
@@ -201,6 +253,15 @@ class RepeatedSATSolver:
 
                 mid = (low + high) // 2
 
+                estimate = estimate_cnf_size(
+                    graph, encoding="order" if isinstance(self.encoder, OrderEncoding) else "pairwise",
+                    amo=getattr(self.encoder, "amo_name", "pairwise"), k=mid,
+                    symmetry_breaking=symmetry_breaking,
+                )
+                _, resource_reason = limits.check(estimate)
+                if resource_reason:
+                    break
+
                 enc_start = monotonic()
                 formula = self.encoder.encode(graph, mid, symmetry_breaking=symmetry_breaking)
                 total_encoding_time += monotonic() - enc_start
@@ -210,9 +271,21 @@ class RepeatedSATSolver:
                 solve_start = monotonic()
                 backend = get_sat_backend(self.backend_name)
                 backend.append_formula(formula.clauses)
+                report_progress(
+                    self, bandwidth=best_bandwidth, permutation=best_permutation,
+                    lower_bound=certified_lb, sat_calls=sat_calls,
+                    encoding_time_s=total_encoding_time, solving_time_s=total_solving_time,
+                    num_variables=last_num_vars, num_clauses=last_num_clauses,
+                )
                 sat_calls += 1
-                is_sat = backend.solve()
+                remaining = None if effective_timeout is None else effective_timeout - (monotonic() - started)
+                is_sat = backend.solve_with_timeout(remaining)
                 total_solving_time += monotonic() - solve_start
+
+                if is_sat is None:
+                    backend.delete()
+                    timed_out = True
+                    break
 
                 if is_sat:
                     model = backend.get_model()
@@ -224,15 +297,29 @@ class RepeatedSATSolver:
                     if actual_bw < best_bandwidth:
                         best_bandwidth = actual_bw
                         best_permutation = decoded_perm
+                        report_progress(
+                            self, bandwidth=best_bandwidth, permutation=best_permutation,
+                            lower_bound=certified_lb, sat_calls=sat_calls,
+                            encoding_time_s=total_encoding_time, solving_time_s=total_solving_time,
+                            num_variables=last_num_vars, num_clauses=last_num_clauses,
+                        )
                     high = min(mid - 1, actual_bw - 1)
                 else:
                     backend.delete()
                     low = mid + 1
                     certified_lb = max(certified_lb, low)
+                    report_progress(
+                        self, bandwidth=best_bandwidth, permutation=best_permutation,
+                        lower_bound=certified_lb, sat_calls=sat_calls,
+                        encoding_time_s=total_encoding_time, solving_time_s=total_solving_time,
+                        num_variables=last_num_vars, num_clauses=last_num_clauses,
+                    )
 
         runtime = monotonic() - started
         status = SolutionStatus.OPTIMAL
-        if timed_out:
+        if resource_reason:
+            status = SolutionStatus.SKIPPED
+        elif timed_out:
             status = SolutionStatus.FEASIBLE if best_permutation is not None else SolutionStatus.TIMEOUT
         elif best_bandwidth is not None and certified_lb == best_bandwidth:
             status = SolutionStatus.OPTIMAL
@@ -260,6 +347,8 @@ class RepeatedSATSolver:
             metadata={
                 "symmetry_breaking": symmetry_breaking,
                 "search_mode": self.search_mode,
+                "threshold_policy": self.threshold_policy,
+                "skipped_reason": resource_reason,
             },
         )
 

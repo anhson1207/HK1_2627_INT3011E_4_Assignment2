@@ -4,7 +4,7 @@ import unittest
 
 from bmp.core.generators import cycle_graph, erdos_renyi_graph, path_graph, star_graph
 from bmp.core.solution import SolutionStatus
-from bmp.encodings.estimator import ResourceLimits, estimate_cnf_size
+from bmp.encodings.estimator import ResourceLimits, estimate_cnf_size, estimate_incremental_cnf_size
 from bmp.encodings.order import OrderEncoding
 from bmp.encodings.pairwise import PairwiseEncoding
 from bmp.solvers.sat.incremental import IncrementalSATSolver
@@ -12,6 +12,72 @@ from bmp.solvers.sat.repeated import RepeatedSATSolver
 
 
 class EstimatorAndResourceGuardTests(unittest.TestCase):
+    def test_paper_scale_bandwidth_formula_uses_edge_count(self) -> None:
+        from bmp.core.graph import Graph
+        for n, m, expected in ((500, 2500, 623_750_000), (1000, 5000, 4_995_000_000)):
+            edges = ((u, (u + distance) % n) for u in range(n) for distance in range(1, 6))
+            graph = Graph.create(n=n, edges=edges)
+            self.assertEqual(graph.size, m)
+            estimate = estimate_cnf_size(graph, encoding="pairwise", k=0)
+            self.assertEqual(estimate.num_bandwidth_clauses, expected)
+            self.assertEqual(estimate.num_clauses, estimate.num_fixed_clauses + expected)
+            self.assertFalse(ResourceLimits().check(estimate)[0])
+
+    def test_pairwise_single_vertex_and_incremental_cumulative(self) -> None:
+        from bmp.core.graph import Graph
+        single = Graph.create(n=1)
+        formula = PairwiseEncoding().encode(single, 0)
+        estimate = estimate_cnf_size(single, encoding="pairwise", k=0)
+        self.assertEqual((estimate.num_variables, estimate.num_clauses),
+                         (formula.num_variables, formula.num_clauses))
+
+        graph = cycle_graph(5)
+        for encoder, family in ((PairwiseEncoding(), "pairwise"), (OrderEncoding(), "order")):
+            initial, target = 3, 1
+            fixed = encoder.encode_fixed(graph)
+            accumulated = fixed.num_clauses
+            for k in range(initial, target - 1, -1):
+                if family == "pairwise" and k < initial:
+                    accumulated += len(encoder.encode_bandwidth_diff(graph, k, k + 1))
+                else:
+                    accumulated += len(encoder.encode_bandwidth_step(graph, k))
+            estimate = estimate_incremental_cnf_size(
+                graph, encoding=family, amo="pairwise",
+                initial_k=initial, target_k=target,
+            )
+            self.assertEqual(estimate.num_clauses, accumulated)
+
+    def test_worker_deadline_keeps_feasible_solution(self) -> None:
+        from bmp.core.validation import validate_solution
+        graph = cycle_graph(5)
+        for solver in (RepeatedSATSolver(), IncrementalSATSolver()):
+            result = solver.solve(graph, timeout_seconds=0)
+            self.assertEqual(result.status, SolutionStatus.TIMEOUT)
+            self.assertTrue(validate_solution(graph, result).valid)
+            self.assertEqual(result.sat_calls, 0)
+
+    def test_unit_threshold_policy_preserves_optimality(self) -> None:
+        graph = erdos_renyi_graph(6, 0.4, seed=42)
+        repeated = RepeatedSATSolver(OrderEncoding("sequential"), threshold_policy="unit").solve(graph)
+        incremental = IncrementalSATSolver(OrderEncoding("sequential"), threshold_policy="unit").solve(graph)
+        self.assertEqual(repeated.status, SolutionStatus.OPTIMAL)
+        self.assertEqual(incremental.status, SolutionStatus.OPTIMAL)
+        self.assertEqual(repeated.bandwidth, incremental.bandwidth)
+
+    def test_later_threshold_resource_guard_retains_incumbent(self) -> None:
+        from bmp.core.validation import validate_solution
+        graph = erdos_renyi_graph(7, 0.4, seed=19)
+        for family, encoder in (("pairwise", PairwiseEncoding()), ("order", OrderEncoding())):
+            initial = estimate_cnf_size(graph, encoding=family, k=4)
+            limits = ResourceLimits(max_clauses=initial.num_clauses, timeout_seconds=None)
+            for solver in (RepeatedSATSolver(encoder), IncrementalSATSolver(encoder)):
+                with self.subTest(family=family, strategy=type(solver).__name__):
+                    result = solver.solve(graph, limits=limits)
+                    self.assertEqual(result.status, SolutionStatus.SKIPPED)
+                    self.assertEqual(result.bandwidth, 4)
+                    self.assertGreaterEqual(result.sat_calls, 1)
+                    self.assertTrue(validate_solution(graph, result).valid)
+
     def test_estimate_exactness_pairwise_and_order(self) -> None:
         """Verify that analytical estimation exactly matches actual CNF formula counts."""
         test_graphs = [

@@ -36,6 +36,12 @@ class SATBackend(ABC):
         """Solve formula with optional assumptions. Returns True if SAT, False if UNSAT."""
         ...
 
+    def solve_with_timeout(self, seconds: float | None, assumptions: Sequence[int] = ()) -> bool | None:
+        """Return None on timeout. Backends must implement interruptible solving."""
+        if seconds is not None:
+            raise NotImplementedError(f"{self.name} does not support interruptible solving")
+        return self.solve(assumptions)
+
     @abstractmethod
     def get_model(self) -> list[int] | None:
         """Return satisfying variable assignment (literals) if SAT, else None."""

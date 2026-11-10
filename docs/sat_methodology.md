@@ -139,14 +139,14 @@ Introduces $m - 1$ auxiliary register variables $s_1, \dots, s_{m-1}$ representi
 
 ### 5.1 Repeated SAT
 1. Compute certified lower bound $LB = \max(LB_{degree}, LB_{component})$.
-2. Compute initial upper bound $UB$ (from identity permutation or heuristic).
+2. Compute initial upper bound $UB$ from independently checked identity, Cuthill-McKee, or supplied heuristic permutations.
 3. If $LB == UB$, return $UB$ as certified optimal.
 4. Set $k = UB - 1$.
 5. In each iteration:
    - Construct a fresh CNF formula for $(G, k)$.
    - Initialize a fresh SAT solver instance (`cadical195`).
    - Solve:
-     - If SAT: decode model $\to$ actual bandwidth $B \le k$. If $B \le LB$, stop with OPTIMAL. Else $k = B - 1$.
+     - If SAT: decode model $\to$ actual bandwidth $B \le k$. If $B \le LB$, stop with OPTIMAL. Otherwise the adaptive policy tests $B-1$ next; the unit policy tests $k-1$ next.
      - If UNSAT: $k+1$ is proved to be the optimal bandwidth $B^*(G)$.
    - Free native solver memory.
 
@@ -162,7 +162,7 @@ Introduces $m - 1$ auxiliary register variables $s_1, \dots, s_{m-1}$ representi
    - For **Order Encoding**:
      Add the new threshold clauses for $k_{next}$:
      $$\{\neg y_{u, t+k_{next}} \lor y_{v, t}, \; \neg y_{v, t+k_{next}} \lor y_{u, t} \mid (u, v) \in E, \; 2 \le t \le n - k_{next}\}$$
-   - Because $k$ decreases monotonically, each added clause set strictly strengthens the formula.
+   - The current Order implementation adds the full bandwidth clause set at each tested threshold, so cumulative counts include duplicates. Pairwise adds only the difference. Decreasing $k$ strengthens the logical constraint.
    - Retains all learned conflict clauses across iterations.
    - Terminates with status OPTIMAL when solver returns UNSAT at $B - 1$.
 

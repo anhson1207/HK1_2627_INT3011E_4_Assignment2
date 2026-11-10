@@ -81,7 +81,7 @@ def estimate_cnf_size(
     n = graph.order
     m = graph.size
 
-    if n <= 1:
+    if n == 0 or (n == 1 and encoding.lower() == "order"):
         return CNFSizeEstimate(
             num_variables=0,
             num_original_vars=0,
@@ -93,7 +93,9 @@ def estimate_cnf_size(
             formula_breakdown={"empty": 0},
         )
 
-    eval_k = 0 if k is None else max(0, min(k, n - 1))
+    if k is not None and k < 0:
+        raise ValueError("Bandwidth threshold k cannot be negative")
+    eval_k = 0 if k is None else min(k, n - 1)
     enc_family = encoding.lower()
     amo_type = amo.lower()
 
@@ -202,8 +204,48 @@ def estimate_cnf_size(
         raise ValueError(f"Unknown encoding family: {encoding}")
 
 
+def estimate_incremental_cnf_size(
+    graph: Graph,
+    *,
+    encoding: str,
+    amo: str,
+    initial_k: int,
+    target_k: int,
+    symmetry_breaking: bool = False,
+) -> CNFSizeEstimate:
+    """Cumulative count for unit steps; safe upper bound for adaptive jumps.
+
+    Pairwise adds only new distance clauses. Order currently adds the full
+    bandwidth formula at every tested threshold, including duplicate clauses.
+    Summing the entire range overestimates Order when adaptive search jumps.
+    """
+    if target_k > initial_k or target_k < 0:
+        raise ValueError("Require 0 <= target_k <= initial_k")
+    current = estimate_cnf_size(
+        graph, encoding=encoding, amo=amo, k=target_k,
+        symmetry_breaking=symmetry_breaking,
+    )
+    if encoding.lower() != "order":
+        return current
+    added = sum(
+        estimate_cnf_size(graph, encoding="order", amo=amo, k=step).num_bandwidth_clauses
+        for step in range(target_k, initial_k + 1)
+    )
+    return CNFSizeEstimate(
+        num_variables=current.num_variables,
+        num_original_vars=current.num_original_vars,
+        num_channeling_vars=current.num_channeling_vars,
+        num_aux_vars=current.num_aux_vars,
+        num_clauses=current.num_fixed_clauses + added,
+        num_fixed_clauses=current.num_fixed_clauses,
+        num_bandwidth_clauses=added,
+        formula_breakdown={**current.formula_breakdown, "bandwidth": added},
+    )
+
+
 __all__ = [
     "CNFSizeEstimate",
     "ResourceLimits",
     "estimate_cnf_size",
+    "estimate_incremental_cnf_size",
 ]
