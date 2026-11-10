@@ -1,0 +1,1904 @@
+[
+  {
+    "stage": "3s",
+    "timeout_s": 3.0,
+    "instance": "bcspwr01",
+    "encoding": "pairwise",
+    "cardinality": "pairwise",
+    "strategy": "repeated",
+    "n": 39,
+    "m": 46,
+    "backend": "CaDiCaL",
+    "backend_version": "cadical195 (PySAT 1.9.dev17)",
+    "raw_sha256": "6006f0ec5241cea77352113417adefe929f077dc615eaf184fc109729247cf8a",
+    "initial_ub": 8,
+    "initial_lb": 4,
+    "final_ub": 5,
+    "final_lb": 4,
+    "best_bandwidth": 5,
+    "published_lb": 5,
+    "published_best": 5,
+    "sat_found_improvement": true,
+    "optimality_status": "UNPROVED",
+    "status": "TIMEOUT",
+    "validated_solution": true,
+    "encoding_time_s": 0.10573420699802227,
+    "solving_time_s": 0.9328512080101063,
+    "runtime_s": 3.003721500004758,
+    "peak_memory_mb": 143.734375,
+    "memory_limit_mb": 4096.0,
+    "sat_calls": 3,
+    "cnf_variables": 1521,
+    "cnf_clauses": 112577,
+    "sat_trace": [
+      {
+        "k": 7,
+        "outcome": "SAT",
+        "solve_time_s": 0.0012228330015204847,
+        "bandwidth": 7
+      },
+      {
+        "k": 6,
+        "outcome": "SAT",
+        "solve_time_s": 0.9282851250027306,
+        "bandwidth": 6
+      },
+      {
+        "k": 5,
+        "outcome": "SAT",
+        "solve_time_s": 0.003343250005855225,
+        "bandwidth": 5
+      },
+      {
+        "k": 4,
+        "outcome": "UNKNOWN",
+        "solve_time_s": null,
+        "bandwidth": null
+      }
+    ],
+    "worker_reason": "Wall clock deadline exceeded; worker terminated",
+    "skipped_reason": null
+  },
+  {
+    "stage": "3s",
+    "timeout_s": 3.0,
+    "instance": "bcspwr01",
+    "encoding": "pairwise",
+    "cardinality": "pairwise",
+    "strategy": "incremental",
+    "n": 39,
+    "m": 46,
+    "backend": "CaDiCaL",
+    "backend_version": "cadical195 (PySAT 1.9.dev17)",
+    "raw_sha256": "6006f0ec5241cea77352113417adefe929f077dc615eaf184fc109729247cf8a",
+    "initial_ub": 8,
+    "initial_lb": 4,
+    "final_ub": 6,
+    "final_lb": 4,
+    "best_bandwidth": 6,
+    "published_lb": 5,
+    "published_best": 5,
+    "sat_found_improvement": true,
+    "optimality_status": "UNPROVED",
+    "status": "TIMEOUT",
+    "validated_solution": true,
+    "encoding_time_s": 0.022251040980336256,
+    "solving_time_s": 1.0353811660024803,
+    "runtime_s": 3.0194505830004346,
+    "peak_memory_mb": 111.34375,
+    "memory_limit_mb": 4096.0,
+    "sat_calls": 2,
+    "cnf_variables": 1521,
+    "cnf_clauses": 106413,
+    "sat_trace": [
+      {
+        "k": 7,
+        "outcome": "SAT",
+        "solve_time_s": null,
+        "bandwidth": 7
+      },
+      {
+        "k": 6,
+        "outcome": "SAT",
+        "solve_time_s": null,
+        "bandwidth": 6
+      },
+      {
+        "k": 5,
+        "outcome": "UNKNOWN",
+        "solve_time_s": null,
+        "bandwidth": null
+      }
+    ],
+    "worker_reason": "Wall clock deadline exceeded; worker terminated",
+    "skipped_reason": null
+  },
+  {
+    "stage": "3s",
+    "timeout_s": 3.0,
+    "instance": "bcspwr01",
+    "encoding": "pairwise",
+    "cardinality": "sequential",
+    "strategy": "repeated",
+    "n": 39,
+    "m": 46,
+    "backend": "CaDiCaL",
+    "backend_version": "cadical195 (PySAT 1.9.dev17)",
+    "raw_sha256": "6006f0ec5241cea77352113417adefe929f077dc615eaf184fc109729247cf8a",
+    "initial_ub": 8,
+    "initial_lb": 4,
+    "final_ub": 6,
+    "final_lb": 4,
+    "best_bandwidth": 6,
+    "published_lb": 5,
+    "published_best": 5,
+    "sat_found_improvement": true,
+    "optimality_status": "UNPROVED",
+    "status": "TIMEOUT",
+    "validated_solution": true,
+    "encoding_time_s": 0.06803945801220834,
+    "solving_time_s": 2.3333639170014067,
+    "runtime_s": 3.003386333002709,
+    "peak_memory_mb": 92.359375,
+    "memory_limit_mb": 4096.0,
+    "sat_calls": 2,
+    "cnf_variables": 4485,
+    "cnf_clauses": 60465,
+    "sat_trace": [
+      {
+        "k": 7,
+        "outcome": "SAT",
+        "solve_time_s": 0.936845958000049,
+        "bandwidth": 7
+      },
+      {
+        "k": 6,
+        "outcome": "SAT",
+        "solve_time_s": 1.3965179590013577,
+        "bandwidth": 6
+      },
+      {
+        "k": 5,
+        "outcome": "UNKNOWN",
+        "solve_time_s": null,
+        "bandwidth": null
+      }
+    ],
+    "worker_reason": "Wall clock deadline exceeded; worker terminated",
+    "skipped_reason": null
+  },
+  {
+    "stage": "3s",
+    "timeout_s": 3.0,
+    "instance": "bcspwr01",
+    "encoding": "pairwise",
+    "cardinality": "sequential",
+    "strategy": "incremental",
+    "n": 39,
+    "m": 46,
+    "backend": "CaDiCaL",
+    "backend_version": "cadical195 (PySAT 1.9.dev17)",
+    "raw_sha256": "6006f0ec5241cea77352113417adefe929f077dc615eaf184fc109729247cf8a",
+    "initial_ub": 8,
+    "initial_lb": 4,
+    "final_ub": 6,
+    "final_lb": 4,
+    "best_bandwidth": 6,
+    "published_lb": 5,
+    "published_best": 5,
+    "sat_found_improvement": true,
+    "optimality_status": "UNPROVED",
+    "status": "TIMEOUT",
+    "validated_solution": true,
+    "encoding_time_s": 0.018630459991982207,
+    "solving_time_s": 0.921260249990155,
+    "runtime_s": 3.002884166999138,
+    "peak_memory_mb": 84.03125,
+    "memory_limit_mb": 4096.0,
+    "sat_calls": 2,
+    "cnf_variables": 4485,
+    "cnf_clauses": 57429,
+    "sat_trace": [
+      {
+        "k": 7,
+        "outcome": "SAT",
+        "solve_time_s": null,
+        "bandwidth": 7
+      },
+      {
+        "k": 6,
+        "outcome": "SAT",
+        "solve_time_s": null,
+        "bandwidth": 6
+      },
+      {
+        "k": 5,
+        "outcome": "UNKNOWN",
+        "solve_time_s": null,
+        "bandwidth": null
+      }
+    ],
+    "worker_reason": "Wall clock deadline exceeded; worker terminated",
+    "skipped_reason": null
+  },
+  {
+    "stage": "3s",
+    "timeout_s": 3.0,
+    "instance": "bcspwr01",
+    "encoding": "order",
+    "cardinality": "pairwise",
+    "strategy": "repeated",
+    "n": 39,
+    "m": 46,
+    "backend": "CaDiCaL",
+    "backend_version": "cadical195 (PySAT 1.9.dev17)",
+    "raw_sha256": "6006f0ec5241cea77352113417adefe929f077dc615eaf184fc109729247cf8a",
+    "initial_ub": 8,
+    "initial_lb": 4,
+    "final_ub": 5,
+    "final_lb": 4,
+    "best_bandwidth": 5,
+    "published_lb": 5,
+    "published_best": 5,
+    "sat_found_improvement": true,
+    "optimality_status": "UNPROVED",
+    "status": "TIMEOUT",
+    "validated_solution": true,
+    "encoding_time_s": 0.023649498980375938,
+    "solving_time_s": 0.019754499982809648,
+    "runtime_s": 3.003410208009882,
+    "peak_memory_mb": 73.890625,
+    "memory_limit_mb": 4096.0,
+    "sat_calls": 3,
+    "cnf_variables": 3003,
+    "cnf_clauses": 37955,
+    "sat_trace": [
+      {
+        "k": 7,
+        "outcome": "SAT",
+        "solve_time_s": 0.0011542919964995235,
+        "bandwidth": 7
+      },
+      {
+        "k": 6,
+        "outcome": "SAT",
+        "solve_time_s": 0.017455582987167872,
+        "bandwidth": 6
+      },
+      {
+        "k": 5,
+        "outcome": "SAT",
+        "solve_time_s": 0.001144624999142252,
+        "bandwidth": 5
+      },
+      {
+        "k": 4,
+        "outcome": "UNKNOWN",
+        "solve_time_s": null,
+        "bandwidth": null
+      }
+    ],
+    "worker_reason": "Wall clock deadline exceeded; worker terminated",
+    "skipped_reason": null
+  },
+  {
+    "stage": "3s",
+    "timeout_s": 3.0,
+    "instance": "bcspwr01",
+    "encoding": "order",
+    "cardinality": "pairwise",
+    "strategy": "incremental",
+    "n": 39,
+    "m": 46,
+    "backend": "CaDiCaL",
+    "backend_version": "cadical195 (PySAT 1.9.dev17)",
+    "raw_sha256": "6006f0ec5241cea77352113417adefe929f077dc615eaf184fc109729247cf8a",
+    "initial_ub": 8,
+    "initial_lb": 4,
+    "final_ub": 5,
+    "final_lb": 4,
+    "best_bandwidth": 5,
+    "published_lb": 5,
+    "published_best": 5,
+    "sat_found_improvement": true,
+    "optimality_status": "UNPROVED",
+    "status": "TIMEOUT",
+    "validated_solution": true,
+    "encoding_time_s": 0.0060214989935047925,
+    "solving_time_s": 0.7988885010126978,
+    "runtime_s": 3.0027875829982804,
+    "peak_memory_mb": 73.640625,
+    "memory_limit_mb": 4096.0,
+    "sat_calls": 3,
+    "cnf_variables": 3003,
+    "cnf_clauses": 43659,
+    "sat_trace": [
+      {
+        "k": 7,
+        "outcome": "SAT",
+        "solve_time_s": null,
+        "bandwidth": 7
+      },
+      {
+        "k": 6,
+        "outcome": "SAT",
+        "solve_time_s": null,
+        "bandwidth": 6
+      },
+      {
+        "k": 5,
+        "outcome": "SAT",
+        "solve_time_s": null,
+        "bandwidth": 5
+      },
+      {
+        "k": 4,
+        "outcome": "UNKNOWN",
+        "solve_time_s": null,
+        "bandwidth": null
+      }
+    ],
+    "worker_reason": "Wall clock deadline exceeded; worker terminated",
+    "skipped_reason": null
+  },
+  {
+    "stage": "3s",
+    "timeout_s": 3.0,
+    "instance": "bcspwr01",
+    "encoding": "order",
+    "cardinality": "sequential",
+    "strategy": "repeated",
+    "n": 39,
+    "m": 46,
+    "backend": "CaDiCaL",
+    "backend_version": "cadical195 (PySAT 1.9.dev17)",
+    "raw_sha256": "6006f0ec5241cea77352113417adefe929f077dc615eaf184fc109729247cf8a",
+    "initial_ub": 8,
+    "initial_lb": 4,
+    "final_ub": 5,
+    "final_lb": 4,
+    "best_bandwidth": 5,
+    "published_lb": 5,
+    "published_best": 5,
+    "sat_found_improvement": true,
+    "optimality_status": "UNPROVED",
+    "status": "TIMEOUT",
+    "validated_solution": true,
+    "encoding_time_s": 0.013473291997797787,
+    "solving_time_s": 0.39394479199836496,
+    "runtime_s": 3.003497541998513,
+    "peak_memory_mb": 41.796875,
+    "memory_limit_mb": 4096.0,
+    "sat_calls": 3,
+    "cnf_variables": 4485,
+    "cnf_clauses": 13463,
+    "sat_trace": [
+      {
+        "k": 7,
+        "outcome": "SAT",
+        "solve_time_s": 0.01685587500105612,
+        "bandwidth": 7
+      },
+      {
+        "k": 6,
+        "outcome": "SAT",
+        "solve_time_s": 0.17378974999883212,
+        "bandwidth": 6
+      },
+      {
+        "k": 5,
+        "outcome": "SAT",
+        "solve_time_s": 0.20329916699847672,
+        "bandwidth": 5
+      },
+      {
+        "k": 4,
+        "outcome": "UNKNOWN",
+        "solve_time_s": null,
+        "bandwidth": null
+      }
+    ],
+    "worker_reason": "Wall clock deadline exceeded; worker terminated",
+    "skipped_reason": null
+  },
+  {
+    "stage": "3s",
+    "timeout_s": 3.0,
+    "instance": "bcspwr01",
+    "encoding": "order",
+    "cardinality": "sequential",
+    "strategy": "incremental",
+    "n": 39,
+    "m": 46,
+    "backend": "CaDiCaL",
+    "backend_version": "cadical195 (PySAT 1.9.dev17)",
+    "raw_sha256": "6006f0ec5241cea77352113417adefe929f077dc615eaf184fc109729247cf8a",
+    "initial_ub": 8,
+    "initial_lb": 4,
+    "final_ub": 5,
+    "final_lb": 4,
+    "best_bandwidth": 5,
+    "published_lb": 5,
+    "published_best": 5,
+    "sat_found_improvement": true,
+    "optimality_status": "UNPROVED",
+    "status": "TIMEOUT",
+    "validated_solution": true,
+    "encoding_time_s": 0.004141792000154965,
+    "solving_time_s": 0.4646426249964861,
+    "runtime_s": 3.002560207998613,
+    "peak_memory_mb": 46.390625,
+    "memory_limit_mb": 4096.0,
+    "sat_calls": 3,
+    "cnf_variables": 4485,
+    "cnf_clauses": 19167,
+    "sat_trace": [
+      {
+        "k": 7,
+        "outcome": "SAT",
+        "solve_time_s": null,
+        "bandwidth": 7
+      },
+      {
+        "k": 6,
+        "outcome": "SAT",
+        "solve_time_s": null,
+        "bandwidth": 6
+      },
+      {
+        "k": 5,
+        "outcome": "SAT",
+        "solve_time_s": null,
+        "bandwidth": 5
+      },
+      {
+        "k": 4,
+        "outcome": "UNKNOWN",
+        "solve_time_s": null,
+        "bandwidth": null
+      }
+    ],
+    "worker_reason": "Wall clock deadline exceeded; worker terminated",
+    "skipped_reason": null
+  },
+  {
+    "stage": "3s",
+    "timeout_s": 3.0,
+    "instance": "bcsstk01",
+    "encoding": "pairwise",
+    "cardinality": "pairwise",
+    "strategy": "repeated",
+    "n": 48,
+    "m": 176,
+    "backend": "CaDiCaL",
+    "backend_version": "cadical195 (PySAT 1.9.dev17)",
+    "raw_sha256": "567560f75b952d9c14c0d193ded5d80370d7ca26fe49f9e67deee55f22e55699",
+    "initial_ub": 27,
+    "initial_lb": 12,
+    "final_ub": 26,
+    "final_lb": 12,
+    "best_bandwidth": 26,
+    "published_lb": 16,
+    "published_best": 16,
+    "sat_found_improvement": true,
+    "optimality_status": "UNPROVED",
+    "status": "TIMEOUT",
+    "validated_solution": true,
+    "encoding_time_s": 0.11931129099684767,
+    "solving_time_s": 0.16289079199486878,
+    "runtime_s": 3.005122417001985,
+    "peak_memory_mb": 186.171875,
+    "memory_limit_mb": 4096.0,
+    "sat_calls": 1,
+    "cnf_variables": 2304,
+    "cnf_clauses": 197392,
+    "sat_trace": [
+      {
+        "k": 26,
+        "outcome": "SAT",
+        "solve_time_s": 0.16289079199486878,
+        "bandwidth": 26
+      },
+      {
+        "k": 25,
+        "outcome": "UNKNOWN",
+        "solve_time_s": null,
+        "bandwidth": null
+      }
+    ],
+    "worker_reason": "Wall clock deadline exceeded; worker terminated",
+    "skipped_reason": null
+  },
+  {
+    "stage": "3s",
+    "timeout_s": 3.0,
+    "instance": "bcsstk01",
+    "encoding": "pairwise",
+    "cardinality": "pairwise",
+    "strategy": "incremental",
+    "n": 48,
+    "m": 176,
+    "backend": "CaDiCaL",
+    "backend_version": "cadical195 (PySAT 1.9.dev17)",
+    "raw_sha256": "567560f75b952d9c14c0d193ded5d80370d7ca26fe49f9e67deee55f22e55699",
+    "initial_ub": 27,
+    "initial_lb": 12,
+    "final_ub": 23,
+    "final_lb": 12,
+    "best_bandwidth": 23,
+    "published_lb": 16,
+    "published_best": 16,
+    "sat_found_improvement": true,
+    "optimality_status": "UNPROVED",
+    "status": "TIMEOUT",
+    "validated_solution": true,
+    "encoding_time_s": 0.08120179201068822,
+    "solving_time_s": 2.66179441800341,
+    "runtime_s": 3.005960166992736,
+    "peak_memory_mb": 187.34375,
+    "memory_limit_mb": 4096.0,
+    "sat_calls": 4,
+    "cnf_variables": 2304,
+    "cnf_clauses": 213936,
+    "sat_trace": [
+      {
+        "k": 26,
+        "outcome": "SAT",
+        "solve_time_s": null,
+        "bandwidth": 26
+      },
+      {
+        "k": 25,
+        "outcome": "SAT",
+        "solve_time_s": null,
+        "bandwidth": 25
+      },
+      {
+        "k": 24,
+        "outcome": "SAT",
+        "solve_time_s": null,
+        "bandwidth": 24
+      },
+      {
+        "k": 23,
+        "outcome": "SAT",
+        "solve_time_s": null,
+        "bandwidth": 23
+      },
+      {
+        "k": 22,
+        "outcome": "UNKNOWN",
+        "solve_time_s": null,
+        "bandwidth": null
+      }
+    ],
+    "worker_reason": "Wall clock deadline exceeded; worker terminated",
+    "skipped_reason": null
+  },
+  {
+    "stage": "3s",
+    "timeout_s": 3.0,
+    "instance": "bcsstk01",
+    "encoding": "pairwise",
+    "cardinality": "sequential",
+    "strategy": "repeated",
+    "n": 48,
+    "m": 176,
+    "backend": "CaDiCaL",
+    "backend_version": "cadical195 (PySAT 1.9.dev17)",
+    "raw_sha256": "567560f75b952d9c14c0d193ded5d80370d7ca26fe49f9e67deee55f22e55699",
+    "initial_ub": 27,
+    "initial_lb": 12,
+    "final_ub": 26,
+    "final_lb": 12,
+    "best_bandwidth": 26,
+    "published_lb": 16,
+    "published_best": 16,
+    "sat_found_improvement": true,
+    "optimality_status": "UNPROVED",
+    "status": "TIMEOUT",
+    "validated_solution": true,
+    "encoding_time_s": 0.07865170900186058,
+    "solving_time_s": 1.2831723330018576,
+    "runtime_s": 3.0032094579946715,
+    "peak_memory_mb": 119.359375,
+    "memory_limit_mb": 4096.0,
+    "sat_calls": 1,
+    "cnf_variables": 6816,
+    "cnf_clauses": 102544,
+    "sat_trace": [
+      {
+        "k": 26,
+        "outcome": "SAT",
+        "solve_time_s": 1.2831723330018576,
+        "bandwidth": 26
+      },
+      {
+        "k": 25,
+        "outcome": "UNKNOWN",
+        "solve_time_s": null,
+        "bandwidth": null
+      }
+    ],
+    "worker_reason": "Wall clock deadline exceeded; worker terminated",
+    "skipped_reason": null
+  },
+  {
+    "stage": "3s",
+    "timeout_s": 3.0,
+    "instance": "bcsstk01",
+    "encoding": "pairwise",
+    "cardinality": "sequential",
+    "strategy": "incremental",
+    "n": 48,
+    "m": 176,
+    "backend": "CaDiCaL",
+    "backend_version": "cadical195 (PySAT 1.9.dev17)",
+    "raw_sha256": "567560f75b952d9c14c0d193ded5d80370d7ca26fe49f9e67deee55f22e55699",
+    "initial_ub": 27,
+    "initial_lb": 12,
+    "final_ub": 23,
+    "final_lb": 12,
+    "best_bandwidth": 23,
+    "published_lb": 16,
+    "published_best": 16,
+    "sat_found_improvement": true,
+    "optimality_status": "UNPROVED",
+    "status": "TIMEOUT",
+    "validated_solution": true,
+    "encoding_time_s": 0.0758857489854563,
+    "solving_time_s": 2.5971279999939725,
+    "runtime_s": 3.0036738750059158,
+    "peak_memory_mb": 126.453125,
+    "memory_limit_mb": 4096.0,
+    "sat_calls": 4,
+    "cnf_variables": 6816,
+    "cnf_clauses": 119088,
+    "sat_trace": [
+      {
+        "k": 26,
+        "outcome": "SAT",
+        "solve_time_s": null,
+        "bandwidth": 26
+      },
+      {
+        "k": 25,
+        "outcome": "SAT",
+        "solve_time_s": null,
+        "bandwidth": 25
+      },
+      {
+        "k": 24,
+        "outcome": "SAT",
+        "solve_time_s": null,
+        "bandwidth": 24
+      },
+      {
+        "k": 23,
+        "outcome": "SAT",
+        "solve_time_s": null,
+        "bandwidth": 23
+      },
+      {
+        "k": 22,
+        "outcome": "UNKNOWN",
+        "solve_time_s": null,
+        "bandwidth": null
+      }
+    ],
+    "worker_reason": "Wall clock deadline exceeded; worker terminated",
+    "skipped_reason": null
+  },
+  {
+    "stage": "3s",
+    "timeout_s": 3.0,
+    "instance": "bcsstk01",
+    "encoding": "order",
+    "cardinality": "pairwise",
+    "strategy": "repeated",
+    "n": 48,
+    "m": 176,
+    "backend": "CaDiCaL",
+    "backend_version": "cadical195 (PySAT 1.9.dev17)",
+    "raw_sha256": "567560f75b952d9c14c0d193ded5d80370d7ca26fe49f9e67deee55f22e55699",
+    "initial_ub": 27,
+    "initial_lb": 12,
+    "final_ub": 24,
+    "final_lb": 12,
+    "best_bandwidth": 24,
+    "published_lb": 16,
+    "published_best": 16,
+    "sat_found_improvement": true,
+    "optimality_status": "UNPROVED",
+    "status": "TIMEOUT",
+    "validated_solution": true,
+    "encoding_time_s": 0.03529841700219549,
+    "solving_time_s": 2.855864125012886,
+    "runtime_s": 3.0052767919987673,
+    "peak_memory_mb": 100.6875,
+    "memory_limit_mb": 4096.0,
+    "sat_calls": 3,
+    "cnf_variables": 4560,
+    "cnf_clauses": 71264,
+    "sat_trace": [
+      {
+        "k": 26,
+        "outcome": "SAT",
+        "solve_time_s": 0.001702292007394135,
+        "bandwidth": 26
+      },
+      {
+        "k": 25,
+        "outcome": "SAT",
+        "solve_time_s": 2.639018500005477,
+        "bandwidth": 25
+      },
+      {
+        "k": 24,
+        "outcome": "SAT",
+        "solve_time_s": 0.21514333300001454,
+        "bandwidth": 24
+      }
+    ],
+    "worker_reason": "Wall clock deadline exceeded; worker terminated",
+    "skipped_reason": null
+  },
+  {
+    "stage": "3s",
+    "timeout_s": 3.0,
+    "instance": "bcsstk01",
+    "encoding": "order",
+    "cardinality": "pairwise",
+    "strategy": "incremental",
+    "n": 48,
+    "m": 176,
+    "backend": "CaDiCaL",
+    "backend_version": "cadical195 (PySAT 1.9.dev17)",
+    "raw_sha256": "567560f75b952d9c14c0d193ded5d80370d7ca26fe49f9e67deee55f22e55699",
+    "initial_ub": 27,
+    "initial_lb": 12,
+    "final_ub": 24,
+    "final_lb": 12,
+    "best_bandwidth": 24,
+    "published_lb": 16,
+    "published_best": 16,
+    "sat_found_improvement": true,
+    "optimality_status": "UNPROVED",
+    "status": "TIMEOUT",
+    "validated_solution": true,
+    "encoding_time_s": 0.014645290997577831,
+    "solving_time_s": 1.8231023340194952,
+    "runtime_s": 3.0032482920069015,
+    "peak_memory_mb": 97.625,
+    "memory_limit_mb": 4096.0,
+    "sat_calls": 3,
+    "cnf_variables": 4560,
+    "cnf_clauses": 86400,
+    "sat_trace": [
+      {
+        "k": 26,
+        "outcome": "SAT",
+        "solve_time_s": null,
+        "bandwidth": 26
+      },
+      {
+        "k": 25,
+        "outcome": "SAT",
+        "solve_time_s": null,
+        "bandwidth": 25
+      },
+      {
+        "k": 24,
+        "outcome": "SAT",
+        "solve_time_s": null,
+        "bandwidth": 24
+      },
+      {
+        "k": 23,
+        "outcome": "UNKNOWN",
+        "solve_time_s": null,
+        "bandwidth": null
+      }
+    ],
+    "worker_reason": "Wall clock deadline exceeded; worker terminated",
+    "skipped_reason": null
+  },
+  {
+    "stage": "3s",
+    "timeout_s": 3.0,
+    "instance": "bcsstk01",
+    "encoding": "order",
+    "cardinality": "sequential",
+    "strategy": "repeated",
+    "n": 48,
+    "m": 176,
+    "backend": "CaDiCaL",
+    "backend_version": "cadical195 (PySAT 1.9.dev17)",
+    "raw_sha256": "567560f75b952d9c14c0d193ded5d80370d7ca26fe49f9e67deee55f22e55699",
+    "initial_ub": 27,
+    "initial_lb": 12,
+    "final_ub": 21,
+    "final_lb": 12,
+    "best_bandwidth": 21,
+    "published_lb": 16,
+    "published_best": 16,
+    "sat_found_improvement": true,
+    "optimality_status": "UNPROVED",
+    "status": "TIMEOUT",
+    "validated_solution": true,
+    "encoding_time_s": 0.03267912498267833,
+    "solving_time_s": 2.8923793340072734,
+    "runtime_s": 3.0030570829985663,
+    "peak_memory_mb": 53.21875,
+    "memory_limit_mb": 4096.0,
+    "sat_calls": 6,
+    "cnf_variables": 6816,
+    "cnf_clauses": 24896,
+    "sat_trace": [
+      {
+        "k": 26,
+        "outcome": "SAT",
+        "solve_time_s": 0.18709604200557806,
+        "bandwidth": 26
+      },
+      {
+        "k": 25,
+        "outcome": "SAT",
+        "solve_time_s": 0.1501782080013072,
+        "bandwidth": 25
+      },
+      {
+        "k": 24,
+        "outcome": "SAT",
+        "solve_time_s": 0.2128002500103321,
+        "bandwidth": 24
+      },
+      {
+        "k": 23,
+        "outcome": "SAT",
+        "solve_time_s": 0.8462139579933137,
+        "bandwidth": 23
+      },
+      {
+        "k": 22,
+        "outcome": "SAT",
+        "solve_time_s": 0.5676961669960292,
+        "bandwidth": 22
+      },
+      {
+        "k": 21,
+        "outcome": "SAT",
+        "solve_time_s": 0.9283947090007132,
+        "bandwidth": 21
+      }
+    ],
+    "worker_reason": "Wall clock deadline exceeded; worker terminated",
+    "skipped_reason": null
+  },
+  {
+    "stage": "3s",
+    "timeout_s": 3.0,
+    "instance": "bcsstk01",
+    "encoding": "order",
+    "cardinality": "sequential",
+    "strategy": "incremental",
+    "n": 48,
+    "m": 176,
+    "backend": "CaDiCaL",
+    "backend_version": "cadical195 (PySAT 1.9.dev17)",
+    "raw_sha256": "567560f75b952d9c14c0d193ded5d80370d7ca26fe49f9e67deee55f22e55699",
+    "initial_ub": 27,
+    "initial_lb": 12,
+    "final_ub": 20,
+    "final_lb": 12,
+    "best_bandwidth": 20,
+    "published_lb": 16,
+    "published_best": 16,
+    "sat_found_improvement": true,
+    "optimality_status": "UNPROVED",
+    "status": "TIMEOUT",
+    "validated_solution": true,
+    "encoding_time_s": 0.015774416009662673,
+    "solving_time_s": 2.893396166997263,
+    "runtime_s": 3.0033671250130283,
+    "peak_memory_mb": 67.734375,
+    "memory_limit_mb": 4096.0,
+    "sat_calls": 7,
+    "cnf_variables": 6816,
+    "cnf_clauses": 74880,
+    "sat_trace": [
+      {
+        "k": 26,
+        "outcome": "SAT",
+        "solve_time_s": null,
+        "bandwidth": 26
+      },
+      {
+        "k": 25,
+        "outcome": "SAT",
+        "solve_time_s": null,
+        "bandwidth": 25
+      },
+      {
+        "k": 24,
+        "outcome": "SAT",
+        "solve_time_s": null,
+        "bandwidth": 24
+      },
+      {
+        "k": 23,
+        "outcome": "SAT",
+        "solve_time_s": null,
+        "bandwidth": 23
+      },
+      {
+        "k": 22,
+        "outcome": "SAT",
+        "solve_time_s": null,
+        "bandwidth": 22
+      },
+      {
+        "k": 21,
+        "outcome": "SAT",
+        "solve_time_s": null,
+        "bandwidth": 21
+      },
+      {
+        "k": 20,
+        "outcome": "SAT",
+        "solve_time_s": null,
+        "bandwidth": 20
+      },
+      {
+        "k": 19,
+        "outcome": "UNKNOWN",
+        "solve_time_s": null,
+        "bandwidth": null
+      }
+    ],
+    "worker_reason": "Wall clock deadline exceeded; worker terminated",
+    "skipped_reason": null
+  },
+  {
+    "stage": "30s",
+    "timeout_s": 30.0,
+    "instance": "bcspwr01",
+    "encoding": "pairwise",
+    "cardinality": "pairwise",
+    "strategy": "repeated",
+    "n": 39,
+    "m": 46,
+    "backend": "CaDiCaL",
+    "backend_version": "cadical195 (PySAT 1.9.dev17)",
+    "raw_sha256": "6006f0ec5241cea77352113417adefe929f077dc615eaf184fc109729247cf8a",
+    "initial_ub": 8,
+    "initial_lb": 4,
+    "final_ub": 5,
+    "final_lb": 4,
+    "best_bandwidth": 5,
+    "published_lb": 5,
+    "published_best": 5,
+    "sat_found_improvement": true,
+    "optimality_status": "UNPROVED",
+    "status": "TIMEOUT",
+    "validated_solution": true,
+    "encoding_time_s": 0.09426770798745565,
+    "solving_time_s": 0.9131295829865849,
+    "runtime_s": 30.01955016699503,
+    "peak_memory_mb": 132.03125,
+    "memory_limit_mb": 4096.0,
+    "sat_calls": 3,
+    "cnf_variables": 1521,
+    "cnf_clauses": 112577,
+    "sat_trace": [
+      {
+        "k": 7,
+        "outcome": "SAT",
+        "solve_time_s": 0.0010032079881057143,
+        "bandwidth": 7
+      },
+      {
+        "k": 6,
+        "outcome": "SAT",
+        "solve_time_s": 0.908854875000543,
+        "bandwidth": 6
+      },
+      {
+        "k": 5,
+        "outcome": "SAT",
+        "solve_time_s": 0.003271499997936189,
+        "bandwidth": 5
+      },
+      {
+        "k": 4,
+        "outcome": "UNKNOWN",
+        "solve_time_s": null,
+        "bandwidth": null
+      }
+    ],
+    "worker_reason": "Wall clock deadline exceeded; worker terminated",
+    "skipped_reason": null
+  },
+  {
+    "stage": "30s",
+    "timeout_s": 30.0,
+    "instance": "bcspwr01",
+    "encoding": "pairwise",
+    "cardinality": "pairwise",
+    "strategy": "incremental",
+    "n": 39,
+    "m": 46,
+    "backend": "CaDiCaL",
+    "backend_version": "cadical195 (PySAT 1.9.dev17)",
+    "raw_sha256": "6006f0ec5241cea77352113417adefe929f077dc615eaf184fc109729247cf8a",
+    "initial_ub": 8,
+    "initial_lb": 4,
+    "final_ub": 5,
+    "final_lb": 4,
+    "best_bandwidth": 5,
+    "published_lb": 5,
+    "published_best": 5,
+    "sat_found_improvement": true,
+    "optimality_status": "UNPROVED",
+    "status": "TIMEOUT",
+    "validated_solution": true,
+    "encoding_time_s": 0.032598625009995885,
+    "solving_time_s": 12.303493749001063,
+    "runtime_s": 30.020664750001743,
+    "peak_memory_mb": 176.265625,
+    "memory_limit_mb": 4096.0,
+    "sat_calls": 3,
+    "cnf_variables": 1521,
+    "cnf_clauses": 109449,
+    "sat_trace": [
+      {
+        "k": 7,
+        "outcome": "SAT",
+        "solve_time_s": null,
+        "bandwidth": 7
+      },
+      {
+        "k": 6,
+        "outcome": "SAT",
+        "solve_time_s": null,
+        "bandwidth": 6
+      },
+      {
+        "k": 5,
+        "outcome": "SAT",
+        "solve_time_s": null,
+        "bandwidth": 5
+      },
+      {
+        "k": 4,
+        "outcome": "UNKNOWN",
+        "solve_time_s": null,
+        "bandwidth": null
+      }
+    ],
+    "worker_reason": "Wall clock deadline exceeded; worker terminated",
+    "skipped_reason": null
+  },
+  {
+    "stage": "30s",
+    "timeout_s": 30.0,
+    "instance": "bcspwr01",
+    "encoding": "pairwise",
+    "cardinality": "sequential",
+    "strategy": "repeated",
+    "n": 39,
+    "m": 46,
+    "backend": "CaDiCaL",
+    "backend_version": "cadical195 (PySAT 1.9.dev17)",
+    "raw_sha256": "6006f0ec5241cea77352113417adefe929f077dc615eaf184fc109729247cf8a",
+    "initial_ub": 8,
+    "initial_lb": 4,
+    "final_ub": 5,
+    "final_lb": 4,
+    "best_bandwidth": 5,
+    "published_lb": 5,
+    "published_best": 5,
+    "sat_found_improvement": true,
+    "optimality_status": "UNPROVED",
+    "status": "TIMEOUT",
+    "validated_solution": true,
+    "encoding_time_s": 0.11098704200412612,
+    "solving_time_s": 4.070939624987659,
+    "runtime_s": 30.00860637500591,
+    "peak_memory_mb": 89.609375,
+    "memory_limit_mb": 4096.0,
+    "sat_calls": 3,
+    "cnf_variables": 4485,
+    "cnf_clauses": 63593,
+    "sat_trace": [
+      {
+        "k": 7,
+        "outcome": "SAT",
+        "solve_time_s": 0.9311230830062414,
+        "bandwidth": 7
+      },
+      {
+        "k": 6,
+        "outcome": "SAT",
+        "solve_time_s": 1.7707894169870997,
+        "bandwidth": 6
+      },
+      {
+        "k": 5,
+        "outcome": "SAT",
+        "solve_time_s": 1.369027124994318,
+        "bandwidth": 5
+      },
+      {
+        "k": 4,
+        "outcome": "UNKNOWN",
+        "solve_time_s": null,
+        "bandwidth": null
+      }
+    ],
+    "worker_reason": "Wall clock deadline exceeded; worker terminated",
+    "skipped_reason": null
+  },
+  {
+    "stage": "30s",
+    "timeout_s": 30.0,
+    "instance": "bcspwr01",
+    "encoding": "pairwise",
+    "cardinality": "sequential",
+    "strategy": "incremental",
+    "n": 39,
+    "m": 46,
+    "backend": "CaDiCaL",
+    "backend_version": "cadical195 (PySAT 1.9.dev17)",
+    "raw_sha256": "6006f0ec5241cea77352113417adefe929f077dc615eaf184fc109729247cf8a",
+    "initial_ub": 8,
+    "initial_lb": 4,
+    "final_ub": 5,
+    "final_lb": 4,
+    "best_bandwidth": 5,
+    "published_lb": 5,
+    "published_best": 5,
+    "sat_found_improvement": true,
+    "optimality_status": "UNPROVED",
+    "status": "TIMEOUT",
+    "validated_solution": true,
+    "encoding_time_s": 0.02092729101423174,
+    "solving_time_s": 5.632091000006767,
+    "runtime_s": 30.005769375013188,
+    "peak_memory_mb": 139.703125,
+    "memory_limit_mb": 4096.0,
+    "sat_calls": 3,
+    "cnf_variables": 4485,
+    "cnf_clauses": 60465,
+    "sat_trace": [
+      {
+        "k": 7,
+        "outcome": "SAT",
+        "solve_time_s": null,
+        "bandwidth": 7
+      },
+      {
+        "k": 6,
+        "outcome": "SAT",
+        "solve_time_s": null,
+        "bandwidth": 6
+      },
+      {
+        "k": 5,
+        "outcome": "SAT",
+        "solve_time_s": null,
+        "bandwidth": 5
+      },
+      {
+        "k": 4,
+        "outcome": "UNKNOWN",
+        "solve_time_s": null,
+        "bandwidth": null
+      }
+    ],
+    "worker_reason": "Wall clock deadline exceeded; worker terminated",
+    "skipped_reason": null
+  },
+  {
+    "stage": "30s",
+    "timeout_s": 30.0,
+    "instance": "bcspwr01",
+    "encoding": "order",
+    "cardinality": "pairwise",
+    "strategy": "repeated",
+    "n": 39,
+    "m": 46,
+    "backend": "CaDiCaL",
+    "backend_version": "cadical195 (PySAT 1.9.dev17)",
+    "raw_sha256": "6006f0ec5241cea77352113417adefe929f077dc615eaf184fc109729247cf8a",
+    "initial_ub": 8,
+    "initial_lb": 4,
+    "final_ub": 5,
+    "final_lb": 5,
+    "best_bandwidth": 5,
+    "published_lb": 5,
+    "published_best": 5,
+    "sat_found_improvement": true,
+    "optimality_status": "PROVED",
+    "status": "OPTIMAL",
+    "validated_solution": true,
+    "encoding_time_s": 0.02470870700199157,
+    "solving_time_s": 22.596186958006,
+    "runtime_s": 22.68310295799165,
+    "peak_memory_mb": 72.390625,
+    "memory_limit_mb": 4096.0,
+    "sat_calls": 4,
+    "cnf_variables": 3003,
+    "cnf_clauses": 37955,
+    "sat_trace": [
+      {
+        "k": 7,
+        "outcome": "SAT",
+        "solve_time_s": 0.0012075840058969334,
+        "bandwidth": 7
+      },
+      {
+        "k": 6,
+        "outcome": "SAT",
+        "solve_time_s": 0.01810470799682662,
+        "bandwidth": 6
+      },
+      {
+        "k": 5,
+        "outcome": "SAT",
+        "solve_time_s": 0.001112958008889109,
+        "bandwidth": 5
+      },
+      {
+        "k": 4,
+        "outcome": "UNSAT",
+        "solve_time_s": 22.57576170799439,
+        "bandwidth": null
+      }
+    ],
+    "worker_reason": null,
+    "skipped_reason": null
+  },
+  {
+    "stage": "30s",
+    "timeout_s": 30.0,
+    "instance": "bcspwr01",
+    "encoding": "order",
+    "cardinality": "pairwise",
+    "strategy": "incremental",
+    "n": 39,
+    "m": 46,
+    "backend": "CaDiCaL",
+    "backend_version": "cadical195 (PySAT 1.9.dev17)",
+    "raw_sha256": "6006f0ec5241cea77352113417adefe929f077dc615eaf184fc109729247cf8a",
+    "initial_ub": 8,
+    "initial_lb": 4,
+    "final_ub": 5,
+    "final_lb": 5,
+    "best_bandwidth": 5,
+    "published_lb": 5,
+    "published_best": 5,
+    "sat_found_improvement": true,
+    "optimality_status": "PROVED",
+    "status": "OPTIMAL",
+    "validated_solution": true,
+    "encoding_time_s": 0.009187751013087109,
+    "solving_time_s": 16.7481413330097,
+    "runtime_s": 16.804826542007504,
+    "peak_memory_mb": 88.828125,
+    "memory_limit_mb": 4096.0,
+    "sat_calls": 4,
+    "cnf_variables": 3003,
+    "cnf_clauses": 46787,
+    "sat_trace": [
+      {
+        "k": 7,
+        "outcome": "SAT",
+        "solve_time_s": null,
+        "bandwidth": 7
+      },
+      {
+        "k": 6,
+        "outcome": "SAT",
+        "solve_time_s": null,
+        "bandwidth": 6
+      },
+      {
+        "k": 5,
+        "outcome": "SAT",
+        "solve_time_s": null,
+        "bandwidth": 5
+      },
+      {
+        "k": 4,
+        "outcome": "UNSAT",
+        "solve_time_s": null,
+        "bandwidth": null
+      }
+    ],
+    "worker_reason": null,
+    "skipped_reason": null
+  },
+  {
+    "stage": "30s",
+    "timeout_s": 30.0,
+    "instance": "bcspwr01",
+    "encoding": "order",
+    "cardinality": "sequential",
+    "strategy": "repeated",
+    "n": 39,
+    "m": 46,
+    "backend": "CaDiCaL",
+    "backend_version": "cadical195 (PySAT 1.9.dev17)",
+    "raw_sha256": "6006f0ec5241cea77352113417adefe929f077dc615eaf184fc109729247cf8a",
+    "initial_ub": 8,
+    "initial_lb": 4,
+    "final_ub": 5,
+    "final_lb": 5,
+    "best_bandwidth": 5,
+    "published_lb": 5,
+    "published_best": 5,
+    "sat_found_improvement": true,
+    "optimality_status": "PROVED",
+    "status": "OPTIMAL",
+    "validated_solution": true,
+    "encoding_time_s": 0.01526591699803248,
+    "solving_time_s": 18.843767333994037,
+    "runtime_s": 18.89721254199685,
+    "peak_memory_mb": 66.21875,
+    "memory_limit_mb": 4096.0,
+    "sat_calls": 4,
+    "cnf_variables": 4485,
+    "cnf_clauses": 13463,
+    "sat_trace": [
+      {
+        "k": 7,
+        "outcome": "SAT",
+        "solve_time_s": 0.01764424999419134,
+        "bandwidth": 7
+      },
+      {
+        "k": 6,
+        "outcome": "SAT",
+        "solve_time_s": 0.1806240840087412,
+        "bandwidth": 6
+      },
+      {
+        "k": 5,
+        "outcome": "SAT",
+        "solve_time_s": 0.22539058300026227,
+        "bandwidth": 5
+      },
+      {
+        "k": 4,
+        "outcome": "UNSAT",
+        "solve_time_s": 18.420108416990843,
+        "bandwidth": null
+      }
+    ],
+    "worker_reason": null,
+    "skipped_reason": null
+  },
+  {
+    "stage": "30s",
+    "timeout_s": 30.0,
+    "instance": "bcspwr01",
+    "encoding": "order",
+    "cardinality": "sequential",
+    "strategy": "incremental",
+    "n": 39,
+    "m": 46,
+    "backend": "CaDiCaL",
+    "backend_version": "cadical195 (PySAT 1.9.dev17)",
+    "raw_sha256": "6006f0ec5241cea77352113417adefe929f077dc615eaf184fc109729247cf8a",
+    "initial_ub": 8,
+    "initial_lb": 4,
+    "final_ub": 5,
+    "final_lb": 5,
+    "best_bandwidth": 5,
+    "published_lb": 5,
+    "published_best": 5,
+    "sat_found_improvement": true,
+    "optimality_status": "PROVED",
+    "status": "OPTIMAL",
+    "validated_solution": true,
+    "encoding_time_s": 0.004597874998580664,
+    "solving_time_s": 21.94220633301302,
+    "runtime_s": 21.968432541994844,
+    "peak_memory_mb": 65.890625,
+    "memory_limit_mb": 4096.0,
+    "sat_calls": 4,
+    "cnf_variables": 4485,
+    "cnf_clauses": 22295,
+    "sat_trace": [
+      {
+        "k": 7,
+        "outcome": "SAT",
+        "solve_time_s": null,
+        "bandwidth": 7
+      },
+      {
+        "k": 6,
+        "outcome": "SAT",
+        "solve_time_s": null,
+        "bandwidth": 6
+      },
+      {
+        "k": 5,
+        "outcome": "SAT",
+        "solve_time_s": null,
+        "bandwidth": 5
+      },
+      {
+        "k": 4,
+        "outcome": "UNSAT",
+        "solve_time_s": null,
+        "bandwidth": null
+      }
+    ],
+    "worker_reason": null,
+    "skipped_reason": null
+  },
+  {
+    "stage": "30s",
+    "timeout_s": 30.0,
+    "instance": "bcsstk01",
+    "encoding": "pairwise",
+    "cardinality": "sequential",
+    "strategy": "repeated",
+    "n": 48,
+    "m": 176,
+    "backend": "CaDiCaL",
+    "backend_version": "cadical195 (PySAT 1.9.dev17)",
+    "raw_sha256": "567560f75b952d9c14c0d193ded5d80370d7ca26fe49f9e67deee55f22e55699",
+    "initial_ub": 27,
+    "initial_lb": 12,
+    "final_ub": 21,
+    "final_lb": 12,
+    "best_bandwidth": 21,
+    "published_lb": 16,
+    "published_best": 16,
+    "sat_found_improvement": true,
+    "optimality_status": "UNPROVED",
+    "status": "TIMEOUT",
+    "validated_solution": true,
+    "encoding_time_s": 0.3266862499876879,
+    "solving_time_s": 22.340651499995147,
+    "runtime_s": 30.00447716700728,
+    "peak_memory_mb": 193.578125,
+    "memory_limit_mb": 4096.0,
+    "sat_calls": 6,
+    "cnf_variables": 6816,
+    "cnf_clauses": 146544,
+    "sat_trace": [
+      {
+        "k": 26,
+        "outcome": "SAT",
+        "solve_time_s": 1.2194212920003338,
+        "bandwidth": 26
+      },
+      {
+        "k": 25,
+        "outcome": "SAT",
+        "solve_time_s": 4.601967790993513,
+        "bandwidth": 25
+      },
+      {
+        "k": 24,
+        "outcome": "SAT",
+        "solve_time_s": 0.7907275830075378,
+        "bandwidth": 24
+      },
+      {
+        "k": 23,
+        "outcome": "SAT",
+        "solve_time_s": 1.5250414999900386,
+        "bandwidth": 23
+      },
+      {
+        "k": 22,
+        "outcome": "SAT",
+        "solve_time_s": 12.512453041999834,
+        "bandwidth": 22
+      },
+      {
+        "k": 21,
+        "outcome": "SAT",
+        "solve_time_s": 1.6910402920038905,
+        "bandwidth": 21
+      },
+      {
+        "k": 20,
+        "outcome": "UNKNOWN",
+        "solve_time_s": null,
+        "bandwidth": null
+      }
+    ],
+    "worker_reason": "Wall clock deadline exceeded; worker terminated",
+    "skipped_reason": null
+  },
+  {
+    "stage": "30s",
+    "timeout_s": 30.0,
+    "instance": "bcsstk01",
+    "encoding": "pairwise",
+    "cardinality": "sequential",
+    "strategy": "incremental",
+    "n": 48,
+    "m": 176,
+    "backend": "CaDiCaL",
+    "backend_version": "cadical195 (PySAT 1.9.dev17)",
+    "raw_sha256": "567560f75b952d9c14c0d193ded5d80370d7ca26fe49f9e67deee55f22e55699",
+    "initial_ub": 27,
+    "initial_lb": 12,
+    "final_ub": 19,
+    "final_lb": 12,
+    "best_bandwidth": 19,
+    "published_lb": 16,
+    "published_best": 16,
+    "sat_found_improvement": true,
+    "optimality_status": "UNPROVED",
+    "status": "TIMEOUT",
+    "validated_solution": true,
+    "encoding_time_s": 0.1586228329979349,
+    "solving_time_s": 11.057185501980712,
+    "runtime_s": 30.01366662500368,
+    "peak_memory_mb": 162.046875,
+    "memory_limit_mb": 4096.0,
+    "sat_calls": 8,
+    "cnf_variables": 6816,
+    "cnf_clauses": 156400,
+    "sat_trace": [
+      {
+        "k": 26,
+        "outcome": "SAT",
+        "solve_time_s": null,
+        "bandwidth": 26
+      },
+      {
+        "k": 25,
+        "outcome": "SAT",
+        "solve_time_s": null,
+        "bandwidth": 25
+      },
+      {
+        "k": 24,
+        "outcome": "SAT",
+        "solve_time_s": null,
+        "bandwidth": 24
+      },
+      {
+        "k": 23,
+        "outcome": "SAT",
+        "solve_time_s": null,
+        "bandwidth": 23
+      },
+      {
+        "k": 22,
+        "outcome": "SAT",
+        "solve_time_s": null,
+        "bandwidth": 22
+      },
+      {
+        "k": 21,
+        "outcome": "SAT",
+        "solve_time_s": null,
+        "bandwidth": 21
+      },
+      {
+        "k": 20,
+        "outcome": "SAT",
+        "solve_time_s": null,
+        "bandwidth": 20
+      },
+      {
+        "k": 19,
+        "outcome": "SAT",
+        "solve_time_s": null,
+        "bandwidth": 19
+      },
+      {
+        "k": 18,
+        "outcome": "UNKNOWN",
+        "solve_time_s": null,
+        "bandwidth": null
+      }
+    ],
+    "worker_reason": "Wall clock deadline exceeded; worker terminated",
+    "skipped_reason": null
+  },
+  {
+    "stage": "30s",
+    "timeout_s": 30.0,
+    "instance": "bcsstk01",
+    "encoding": "order",
+    "cardinality": "sequential",
+    "strategy": "repeated",
+    "n": 48,
+    "m": 176,
+    "backend": "CaDiCaL",
+    "backend_version": "cadical195 (PySAT 1.9.dev17)",
+    "raw_sha256": "567560f75b952d9c14c0d193ded5d80370d7ca26fe49f9e67deee55f22e55699",
+    "initial_ub": 27,
+    "initial_lb": 12,
+    "final_ub": 19,
+    "final_lb": 12,
+    "best_bandwidth": 19,
+    "published_lb": 16,
+    "published_best": 16,
+    "sat_found_improvement": true,
+    "optimality_status": "UNPROVED",
+    "status": "TIMEOUT",
+    "validated_solution": true,
+    "encoding_time_s": 0.05443850002484396,
+    "solving_time_s": 12.097580708999885,
+    "runtime_s": 30.004994000002625,
+    "peak_memory_mb": 117.40625,
+    "memory_limit_mb": 4096.0,
+    "sat_calls": 8,
+    "cnf_variables": 6816,
+    "cnf_clauses": 25952,
+    "sat_trace": [
+      {
+        "k": 26,
+        "outcome": "SAT",
+        "solve_time_s": 0.22131595900282264,
+        "bandwidth": 26
+      },
+      {
+        "k": 25,
+        "outcome": "SAT",
+        "solve_time_s": 0.13996983399556484,
+        "bandwidth": 25
+      },
+      {
+        "k": 24,
+        "outcome": "SAT",
+        "solve_time_s": 0.2128654580010334,
+        "bandwidth": 24
+      },
+      {
+        "k": 23,
+        "outcome": "SAT",
+        "solve_time_s": 0.8502410000073723,
+        "bandwidth": 23
+      },
+      {
+        "k": 22,
+        "outcome": "SAT",
+        "solve_time_s": 0.548183249993599,
+        "bandwidth": 22
+      },
+      {
+        "k": 21,
+        "outcome": "SAT",
+        "solve_time_s": 0.8883270829974208,
+        "bandwidth": 21
+      },
+      {
+        "k": 20,
+        "outcome": "SAT",
+        "solve_time_s": 4.09628050000174,
+        "bandwidth": 20
+      },
+      {
+        "k": 19,
+        "outcome": "SAT",
+        "solve_time_s": 5.1403976250003325,
+        "bandwidth": 19
+      },
+      {
+        "k": 18,
+        "outcome": "UNKNOWN",
+        "solve_time_s": null,
+        "bandwidth": null
+      }
+    ],
+    "worker_reason": "Wall clock deadline exceeded; worker terminated",
+    "skipped_reason": null
+  },
+  {
+    "stage": "30s",
+    "timeout_s": 30.0,
+    "instance": "bcsstk01",
+    "encoding": "order",
+    "cardinality": "sequential",
+    "strategy": "incremental",
+    "n": 48,
+    "m": 176,
+    "backend": "CaDiCaL",
+    "backend_version": "cadical195 (PySAT 1.9.dev17)",
+    "raw_sha256": "567560f75b952d9c14c0d193ded5d80370d7ca26fe49f9e67deee55f22e55699",
+    "initial_ub": 27,
+    "initial_lb": 12,
+    "final_ub": 17,
+    "final_lb": 12,
+    "best_bandwidth": 17,
+    "published_lb": 16,
+    "published_best": 16,
+    "sat_found_improvement": true,
+    "optimality_status": "UNPROVED",
+    "status": "TIMEOUT",
+    "validated_solution": true,
+    "encoding_time_s": 0.02651854298892431,
+    "solving_time_s": 18.015012123971246,
+    "runtime_s": 30.006194750007126,
+    "peak_memory_mb": 106.890625,
+    "memory_limit_mb": 4096.0,
+    "sat_calls": 10,
+    "cnf_variables": 6816,
+    "cnf_clauses": 105504,
+    "sat_trace": [
+      {
+        "k": 26,
+        "outcome": "SAT",
+        "solve_time_s": null,
+        "bandwidth": 26
+      },
+      {
+        "k": 25,
+        "outcome": "SAT",
+        "solve_time_s": null,
+        "bandwidth": 25
+      },
+      {
+        "k": 24,
+        "outcome": "SAT",
+        "solve_time_s": null,
+        "bandwidth": 24
+      },
+      {
+        "k": 23,
+        "outcome": "SAT",
+        "solve_time_s": null,
+        "bandwidth": 23
+      },
+      {
+        "k": 22,
+        "outcome": "SAT",
+        "solve_time_s": null,
+        "bandwidth": 22
+      },
+      {
+        "k": 21,
+        "outcome": "SAT",
+        "solve_time_s": null,
+        "bandwidth": 21
+      },
+      {
+        "k": 20,
+        "outcome": "SAT",
+        "solve_time_s": null,
+        "bandwidth": 20
+      },
+      {
+        "k": 19,
+        "outcome": "SAT",
+        "solve_time_s": null,
+        "bandwidth": 19
+      },
+      {
+        "k": 18,
+        "outcome": "SAT",
+        "solve_time_s": null,
+        "bandwidth": 18
+      },
+      {
+        "k": 17,
+        "outcome": "SAT",
+        "solve_time_s": null,
+        "bandwidth": 17
+      },
+      {
+        "k": 16,
+        "outcome": "UNKNOWN",
+        "solve_time_s": null,
+        "bandwidth": null
+      }
+    ],
+    "worker_reason": "Wall clock deadline exceeded; worker terminated",
+    "skipped_reason": null
+  },
+  {
+    "stage": "120s",
+    "timeout_s": 120.0,
+    "instance": "bcsstk01",
+    "encoding": "order",
+    "cardinality": "sequential",
+    "strategy": "incremental",
+    "n": 48,
+    "m": 176,
+    "backend": "CaDiCaL",
+    "backend_version": "cadical195 (PySAT 1.9.dev17)",
+    "raw_sha256": "567560f75b952d9c14c0d193ded5d80370d7ca26fe49f9e67deee55f22e55699",
+    "initial_ub": 27,
+    "initial_lb": 12,
+    "final_ub": 17,
+    "final_lb": 12,
+    "best_bandwidth": 17,
+    "published_lb": 16,
+    "published_best": 16,
+    "sat_found_improvement": true,
+    "optimality_status": "UNPROVED",
+    "status": "TIMEOUT",
+    "validated_solution": true,
+    "encoding_time_s": 0.02625250199344009,
+    "solving_time_s": 18.680738832001225,
+    "runtime_s": 120.0089877499995,
+    "peak_memory_mb": 144.515625,
+    "memory_limit_mb": 4096.0,
+    "sat_calls": 10,
+    "cnf_variables": 6816,
+    "cnf_clauses": 105504,
+    "sat_trace": [
+      {
+        "k": 26,
+        "outcome": "SAT",
+        "solve_time_s": null,
+        "bandwidth": 26
+      },
+      {
+        "k": 25,
+        "outcome": "SAT",
+        "solve_time_s": null,
+        "bandwidth": 25
+      },
+      {
+        "k": 24,
+        "outcome": "SAT",
+        "solve_time_s": null,
+        "bandwidth": 24
+      },
+      {
+        "k": 23,
+        "outcome": "SAT",
+        "solve_time_s": null,
+        "bandwidth": 23
+      },
+      {
+        "k": 22,
+        "outcome": "SAT",
+        "solve_time_s": null,
+        "bandwidth": 22
+      },
+      {
+        "k": 21,
+        "outcome": "SAT",
+        "solve_time_s": null,
+        "bandwidth": 21
+      },
+      {
+        "k": 20,
+        "outcome": "SAT",
+        "solve_time_s": null,
+        "bandwidth": 20
+      },
+      {
+        "k": 19,
+        "outcome": "SAT",
+        "solve_time_s": null,
+        "bandwidth": 19
+      },
+      {
+        "k": 18,
+        "outcome": "SAT",
+        "solve_time_s": null,
+        "bandwidth": 18
+      },
+      {
+        "k": 17,
+        "outcome": "SAT",
+        "solve_time_s": null,
+        "bandwidth": 17
+      },
+      {
+        "k": 16,
+        "outcome": "UNKNOWN",
+        "solve_time_s": null,
+        "bandwidth": null
+      }
+    ],
+    "worker_reason": "Wall clock deadline exceeded; worker terminated",
+    "skipped_reason": null
+  }
+]

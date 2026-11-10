@@ -1,0 +1,5 @@
+instance,n,m,encoding,cardinality,strategy,symmetry_breaking,timeout_limit_s,status,bandwidth,lower_bound,sat_calls,total_wall_time_s,actual_variables,actual_clauses,validated_solution
+bcspwr01,39,46,pairwise,sequential,repeated,False,3.0,TIMEOUT,6,4,2,3.003401333000511,4485,60465,True
+bcspwr01,39,46,pairwise,sequential,repeated,True,3.0,TIMEOUT,6,4,2,3.0032828749972396,4485,60484,True
+bcspwr01,39,46,order,sequential,repeated,False,3.0,TIMEOUT,5,4,3,3.0026467080024304,4485,13463,True
+bcspwr01,39,46,order,sequential,repeated,True,3.0,TIMEOUT,5,4,3,3.001810541987652,4485,13464,True

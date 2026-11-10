@@ -32,14 +32,14 @@ class Member2GlucoseIntegrationTests(unittest.TestCase):
                     created.append(backend)
                     return backend
 
-                # A weaker valid lower bound forces the strategy to visit K=2,
-                # then K=1; the actual graph and Glucose backend remain real.
+                # An explicit identity permutation (bw=3) and weaker valid lower bound
+                # force the incremental strategy to visit K=2, then K=1 with one backend.
                 with patch("bmp.solvers.sat.incremental.compute_lower_bound", return_value=1), patch(
                     "bmp.solvers.sat.incremental.get_sat_backend", side_effect=tracked_factory
                 ):
                     result = IncrementalSATSolver(
                         encoding_type(amo="pairwise"), backend_name="glucose"
-                    ).solve(graph)
+                    ).solve(graph, heuristic_permutation={1: 1, 2: 2, 3: 3, 4: 4})
                 self.assertEqual(result.sat_calls, 2)
                 self.assertEqual(len(created), 1)
                 self.assertEqual(result.status, SolutionStatus.OPTIMAL)

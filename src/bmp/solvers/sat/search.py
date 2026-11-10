@@ -115,6 +115,28 @@ def compute_initial_upper_bound(
         bw = calculate_bandwidth(graph, perm)
     else:
         bw, perm = identity_upper_bound(graph)
+        # Cuthill-McKee and its reverse are inexpensive deterministic incumbents.
+        # Both are checked on the exact graph before becoming upper bounds.
+        from bmp.core.validation import calculate_bandwidth
+        remaining = set(graph.vertices)
+        order: list[int] = []
+        degrees = {v: graph.degree(v) for v in graph.vertices}
+        adjacency = {v: graph.neighbors(v) for v in graph.vertices}
+        while remaining:
+            root = min(remaining, key=lambda v: (degrees[v], v))
+            remaining.remove(root)
+            queue = deque([root])
+            while queue:
+                vertex = queue.popleft()
+                order.append(vertex)
+                for neighbor in sorted(adjacency[vertex] & remaining, key=lambda v: (degrees[v], v)):
+                    remaining.remove(neighbor)
+                    queue.append(neighbor)
+        for candidate_order in (order, list(reversed(order))):
+            candidate = {v: label for label, v in enumerate(candidate_order, start=1)}
+            candidate_bw = calculate_bandwidth(graph, candidate)
+            if candidate_bw < bw:
+                bw, perm = candidate_bw, candidate
 
     if symmetry_breaking and graph.order >= 2:
         anchor = select_anchor_vertex(graph)

@@ -8,8 +8,6 @@ from bmp.solvers.sat.backends.base import (
 from bmp.solvers.sat.backends.cadical import CadicalBackend
 from bmp.solvers.sat.backends.glucose import GlucoseBackend
 
-register_sat_backend("glucose", GlucoseBackend)
-
 __all__ = [
     "CadicalBackend",
     "GlucoseBackend",
@@ -17,4 +15,3 @@ __all__ = [
     "get_sat_backend",
     "register_sat_backend",
 ]
-
