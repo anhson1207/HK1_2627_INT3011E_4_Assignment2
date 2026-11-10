@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from time import monotonic
-from typing import Mapping
+from typing import Callable, Mapping
 
 from bmp.core.graph import Graph
 from bmp.core.solution import SolutionStatus, SolverResult
@@ -37,6 +37,7 @@ class RepeatedSATSolver:
         timeout_seconds: float | None = None,
         heuristic_permutation: Mapping[int, int] | None = None,
         symmetry_breaking: bool = False,
+        on_incumbent: Callable[[Mapping[int, int], int], None] | None = None,
     ) -> SolverResult:
         started = monotonic()
         n = graph.order
@@ -95,6 +96,8 @@ class RepeatedSATSolver:
 
         best_bandwidth = ub
         best_permutation: dict[int, int] | None = dict(init_perm) if init_perm else None
+        if on_incumbent is not None and best_permutation is not None:
+            on_incumbent(best_permutation, best_bandwidth)
         certified_lb = lb
         sat_calls = 0
         total_encoding_time = 0.0
@@ -137,6 +140,8 @@ class RepeatedSATSolver:
                     actual_bw = calculate_bandwidth(graph, decoded_perm)
                     best_bandwidth = actual_bw
                     best_permutation = decoded_perm
+                    if on_incumbent is not None:
+                        on_incumbent(best_permutation, best_bandwidth)
 
                     if best_bandwidth <= certified_lb:
                         # Optimum reached certified lower bound
@@ -183,6 +188,8 @@ class RepeatedSATSolver:
                     if actual_bw < best_bandwidth:
                         best_bandwidth = actual_bw
                         best_permutation = decoded_perm
+                        if on_incumbent is not None:
+                            on_incumbent(best_permutation, best_bandwidth)
                     high = min(mid - 1, actual_bw - 1)
                 else:
                     backend.delete()

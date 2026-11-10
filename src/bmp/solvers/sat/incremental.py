@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from time import monotonic
-from typing import Mapping
+from typing import Callable, Mapping
 
 from bmp.core.graph import Graph
 from bmp.core.solution import SolutionStatus, SolverResult
@@ -34,6 +34,7 @@ class IncrementalSATSolver:
         timeout_seconds: float | None = None,
         heuristic_permutation: Mapping[int, int] | None = None,
         symmetry_breaking: bool = False,
+        on_incumbent: Callable[[Mapping[int, int], int], None] | None = None,
     ) -> SolverResult:
         started = monotonic()
         n = graph.order
@@ -91,6 +92,8 @@ class IncrementalSATSolver:
 
         best_bandwidth = ub
         best_permutation: dict[int, int] | None = dict(init_perm) if init_perm else None
+        if on_incumbent is not None and best_permutation is not None:
+            on_incumbent(best_permutation, best_bandwidth)
         certified_lb = lb
         sat_calls = 0
         total_encoding_time = 0.0
@@ -139,6 +142,8 @@ class IncrementalSATSolver:
                     actual_bw = calculate_bandwidth(graph, decoded)
                     best_bandwidth = actual_bw
                     best_permutation = decoded
+                    if on_incumbent is not None:
+                        on_incumbent(best_permutation, best_bandwidth)
 
                     if best_bandwidth <= certified_lb:
                         certified_lb = best_bandwidth
