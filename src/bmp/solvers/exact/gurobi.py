@@ -29,6 +29,7 @@ class GurobiMIPSolver:
         *,
         timeout_seconds: float | None = None,
         symmetry_breaking: bool = False,
+        threads: int | None = None,
     ) -> BMPSolution:
         if timeout_seconds is not None and (not math.isfinite(timeout_seconds) or timeout_seconds < 0):
             raise ValueError("timeout_seconds must be finite and non-negative")
@@ -114,6 +115,8 @@ class GurobiMIPSolver:
                 bandwidth.Start = best_bandwidth
                 if timeout_seconds is not None:
                     model.Params.TimeLimit = max(0.0, timeout_seconds - (monotonic() - started))
+                if threads is not None:
+                    model.Params.Threads = int(threads)
                 model.optimize()
             except gp.GurobiError as error:
                 if _is_license_error(error):
@@ -124,11 +127,18 @@ class GurobiMIPSolver:
                     )
                 raise RuntimeError(f"Gurobi model or optimization failed: {error}") from error
 
+            try:
+                version_str = ".".join(map(str, gp.gurobi.version()))
+            except Exception:
+                version_str = "gurobipy"
+
             code = model.Status
             metadata: dict[str, object] = {
                 "gurobi_status": int(code),
+                "solver_version": version_str,
                 "symmetry_breaking": symmetry_breaking,
                 "anchor_vertex": anchor,
+                "threads": threads,
             }
             if model.SolCount:
                 candidate = {

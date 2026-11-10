@@ -30,6 +30,7 @@ class CPLEXMIPSolver:
         *,
         timeout_seconds: float | None = None,
         symmetry_breaking: bool = False,
+        threads: int | None = None,
     ) -> BMPSolution:
         if timeout_seconds is not None and (not math.isfinite(timeout_seconds) or timeout_seconds < 0):
             raise ValueError("timeout_seconds must be finite and non-negative")
@@ -142,6 +143,8 @@ class CPLEXMIPSolver:
                 )
                 if timeout_seconds is not None:
                     model.parameters.timelimit.set(max(1e-6, timeout_seconds - (monotonic() - started)))
+                if threads is not None:
+                    model.parameters.threads.set(int(threads))
                 model.solve()
             except cplex.exceptions.CplexError as error:
                 if _is_availability_error(error):
@@ -152,12 +155,19 @@ class CPLEXMIPSolver:
                     )
                 raise RuntimeError(f"CPLEX model or optimization failed: {error}") from error
 
+            try:
+                version_str = str(model.get_version())
+            except Exception:
+                version_str = "cplex"
+
             code = model.solution.get_status()
             metadata: dict[str, object] = {
                 "cplex_status": code,
                 "cplex_status_string": model.solution.get_status_string(),
+                "solver_version": version_str,
                 "symmetry_breaking": symmetry_breaking,
                 "anchor_vertex": anchor,
+                "threads": threads,
             }
             primal_feasible = bool(model.solution.is_primal_feasible())
             if primal_feasible:
