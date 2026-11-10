@@ -1,6 +1,6 @@
 # Leader SAT Experiments & Empirical Evaluation
 
-This document presents experimental results evaluating the SAT encodings, solving strategies, cardinality constraints, and symmetry-breaking techniques implemented for the Leader role on the **Bandwidth Minimization Problem (BMP)**.
+This document records the earlier small synthetic-graph benchmark. The official paper dataset audit and bounded SAT run are in [Leader L7 Audit](leader_l7_audit.md). These microsecond-scale figures are historical observations, not a ranking of methods on the official instances.
 
 All experiments were executed on an Apple Silicon M-series system using **Python 3.14**, **PySAT 1.9.dev17**, and the **CaDiCaL 1.9.5** backend solver. All returned labelings were independently verified using the strict certificate validator.
 
@@ -21,7 +21,7 @@ All experiments were executed on an Apple Silicon M-series system using **Python
 ### Benchmark Instances
 - **Canonical Graphs**: Path $P_5$, Path $P_7$, Star $K_{1, 4}$, Star $K_{1, 6}$, Cycle $C_4$, Cycle $C_6$, Complete $K_5$, Edgeless $E_5$.
 - **Random Graphs**: $G(6, 0.35)$ (seed 42), $G(7, 0.40)$ (seed 100).
-- **Harwell-Boeing / Sample Graphs**: `data/samples/` (`star_k1_4`, `path_p5`, `cycle_c4`, `complete_k5`, `edgeless_5`).
+- **Sample Graphs**: `data/samples/` (`star_k1_4`, `path_p5`, `cycle_c4`, `complete_k5`, `edgeless_5`); these are synthetic, not Harwell-Boeing matrices.
 
 ---
 
@@ -45,13 +45,13 @@ All experiments were executed on an Apple Silicon M-series system using **Python
 ## 3. Analysis & Key Insights
 
 ### 3.1 Incremental SAT vs. Repeated SAT
-- **Solving Time**: Incremental SAT achieves up to a **10x to 50x speedup** in solving time on individual instances compared to Repeated SAT.
-- **Learned Clause Reuse**: Because CaDiCaL preserves learned conflict clauses across incremental calls, the solver prunes substantial portions of the search space at tighter bandwidth thresholds that were already resolved during earlier calls.
+- **Solving Time**: The small synthetic runs show differences, but they do not establish that Incremental SAT is generally faster than Repeated SAT.
+- **Learned Clause Reuse**: The incremental solver keeps one CaDiCaL instance and its learned clauses. The size of any benefit requires a controlled experiment on the same threshold sequence.
 - **Overhead**: For tiny instances ($n \le 5$), the solver initialization overhead in Repeated SAT is noticeable; Incremental SAT avoids re-creating the native solver state.
 
 ### 3.2 Pairwise Encoding vs. Order Encoding
 - **Bandwidth Clauses**: For an edge $(u, v)$, Pairwise encoding generates $O(n^2)$ binary exclusion clauses, whereas Order encoding generates only $2(n - k - 1) = O(n)$ binary clauses.
-- **Solving Efficiency**: On larger instances, Order Encoding produces fewer bandwidth clauses, leading to faster propagation in CDCL conflict analysis.
+- **Solving Efficiency**: Order has fewer bandwidth clauses at a fixed k, but total clause count, variables, propagation, and proof search all affect runtime. No speed conclusion follows from size alone.
 - **Variable Count Tradeoff**: Order encoding introduces $n(n - 1)$ threshold variables plus channeling variables, whereas Pairwise uses $n^2$ variables.
 
 ### 3.3 Cardinality Encoding: Pairwise AMO vs. Sequential Counter
@@ -62,8 +62,8 @@ All experiments were executed on an Apple Silicon M-series system using **Python
 
 ### 3.4 Impact of Reversal Symmetry Breaking
 - **Search Space Reduction**: Enforcing $p(\text{anchor}) \le \lceil n / 2 \rceil$ cuts the permutation search space in half.
-- **Speedup**: Across all benchmark graphs, symmetry breaking reduced total runtime by an average of **3.5x to 6.7x** on instances requiring search.
-- **Correctness**: Verified across all 100 benchmark runs; every instance reached the certified global optimum without loss of feasible optima.
+- **Speedup**: The historical synthetic runs show lower times with symmetry on several tiny cases. The short official `bcspwr01` ablation found the same bandwidth with symmetry on and off and did not establish a speed advantage.
+- **Correctness**: The synthetic benchmark solutions were independently validated; exhaustive and random small-graph tests check that reversal symmetry preserves optima.
 
 ---
 

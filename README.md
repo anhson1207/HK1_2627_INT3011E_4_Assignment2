@@ -181,9 +181,11 @@ python -m bmp benchmark-sat --output-json data/leader_sat_benchmark.json --outpu
 
 ---
 
-## 6. Real Experimental Results (Leader SAT Evaluation)
+## 6. Earlier Synthetic Experimental Results (Leader SAT Evaluation)
 
 Benchmark summary across 10 instances (100 runs total) from `data/leader_sat_benchmark.csv`:
+
+These are small synthetic graphs. The [official 113-instance dataset audit and bounded SAT attempt](docs/leader_l7_audit.md) provide the current Leader status; no general encoding or strategy ranking is inferred from the table below.
 
 | Encoding | Strategy | Symmetry Breaking | Avg Total Runtime (s) | Avg Solver Time (s) | Avg Clauses | Avg SAT Calls |
 | :--- | :--- | :---: | :---: | :---: | :---: |
