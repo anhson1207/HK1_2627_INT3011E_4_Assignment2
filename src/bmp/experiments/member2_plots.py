@@ -316,9 +316,18 @@ def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("csv", type=Path)
     parser.add_argument("--m2-2", action="store_true", help="Generate full M2.2 visualization suite")
+    parser.add_argument("--m2-3", action="store_true", help="Generate full M2.3 visualization suite")
+    parser.add_argument("--preflight", type=Path, default=None, help="Optional preflight_54.csv path for --m2-3")
     parser.add_argument("--out-dir", type=Path, default=None)
     args = parser.parse_args()
-    paths = create_m2_2_plots(args.csv, args.out_dir) if args.m2_2 else create_plots(args.csv)
+    if args.m2_3:
+        from bmp.experiments.member2_m2_3_plots import create_m2_3_plots
+
+        paths = create_m2_3_plots(args.csv, args.preflight, args.out_dir)
+    elif args.m2_2:
+        paths = create_m2_2_plots(args.csv, args.out_dir)
+    else:
+        paths = create_plots(args.csv)
     for path in paths:
         print(path)
 
