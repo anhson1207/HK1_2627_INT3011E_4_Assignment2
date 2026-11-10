@@ -1,0 +1,16 @@
+[benchmark]
+name = "member3-m3.3-cp-pilot"
+provenance = "data/benchmark_provenance.json"
+raw_dir = "data/hb_table6_7/raw"
+fallback_raw_dir = "data/benchmarks/raw"
+output_dir = "results/member3_m3_3"
+timeout_seconds = 20.0
+threads = 1
+seed = 17
+max_cp_vars = 2000
+max_cp_constraints = 25000
+memory_limit_mb = 4096.0
+
+# Verified READY pilot instances (5 from Table 6 + 1 from Table 7, all tracked in data/hb_table6_7/raw)
+pilot_instances = ["bcspwr01", "bcspwr02", "bcsstk01", "ash85", "nos4", "dwt_209"]
+ablation_instances = ["bcspwr01", "bcspwr02", "bcsstk01"]

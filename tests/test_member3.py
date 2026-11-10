@@ -110,8 +110,10 @@ def _has_docplex() -> bool:
 
 
 def _has_cpo_runtime() -> bool:
+    from bmp.solvers.exact.cp_optimizer import _resolve_executable
+
     exe = os.environ.get("BMP_CPO_EXECUTABLE", "cpoptimizer")
-    return _has_docplex() and which(exe) is not None
+    return _has_docplex() and _resolve_executable(exe) is not None
 
 
 class SolverTests(unittest.TestCase):

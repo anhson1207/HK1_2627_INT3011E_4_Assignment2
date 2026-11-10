@@ -84,11 +84,17 @@ def select_anchor_vertex(graph: Graph) -> int:
     if not graph.vertices:
         raise ValueError("Cannot select anchor on an empty graph")
 
+    adjacency: dict[int, list[int]] = {v: [] for v in graph.vertices}
+    for u, v in graph.edges:
+        adjacency[u].append(v)
+        adjacency[v].append(u)
+    degrees = {v: len(adjacency[v]) for v in graph.vertices}
+
     return max(
         graph.vertices,
         key=lambda v: (
-            graph.degree(v),
-            sum(graph.degree(nbr) for nbr in graph.neighbors(v)),
+            degrees[v],
+            sum(degrees[nbr] for nbr in adjacency[v]),
             -v,
         ),
     )

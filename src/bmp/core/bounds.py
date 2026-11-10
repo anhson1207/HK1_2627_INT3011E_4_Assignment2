@@ -17,7 +17,11 @@ def degree_lower_bound(graph: Graph) -> int:
 
     if not graph.edges:
         return 0
-    maximum_degree = max(graph.degree(vertex) for vertex in graph.vertices)
+    degrees: dict[int, int] = {vertex: 0 for vertex in graph.vertices}
+    for u, v in graph.edges:
+        degrees[u] += 1
+        degrees[v] += 1
+    maximum_degree = max(degrees.values(), default=0)
     return (maximum_degree + 1) // 2
 
 
@@ -31,8 +35,11 @@ def identity_upper_bound(graph: Graph) -> tuple[int, dict[int, int]]:
 def cuthill_mckee_order(graph: Graph) -> list[int]:
     """Return deterministic Cuthill-McKee BFS traversal order over all components."""
 
-    degrees = {vertex: graph.degree(vertex) for vertex in graph.vertices}
-    adjacency = {vertex: graph.neighbors(vertex) for vertex in graph.vertices}
+    adjacency: dict[int, set[int]] = {vertex: set() for vertex in graph.vertices}
+    for u, v in graph.edges:
+        adjacency[u].add(v)
+        adjacency[v].add(u)
+    degrees = {vertex: len(adjacency[vertex]) for vertex in graph.vertices}
     remaining = set(graph.vertices)
     order: list[int] = []
 
