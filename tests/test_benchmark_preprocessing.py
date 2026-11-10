@@ -25,3 +25,17 @@ def test_unsymmetric_and_duplicate_source_needs_verification(tmp_path: Path) -> 
     assert audit.asymmetric_pairs == 2
     assert audit.duplicate_entries == 1
     assert audit.graph.edges == {(0, 1), (1, 2)}
+
+
+def test_general_value_asymmetry_with_symmetric_pattern_is_ready(tmp_path: Path) -> None:
+    path = tmp_path / "mirrored.mtx"
+    path.write_text(
+        "%%MatrixMarket matrix coordinate real general\n"
+        "3 3 3\n1 2 2\n2 1 3\n3 3 7\n"
+    )
+    audit = inspect_matrix_market(path)
+    assert audit.status == "READY"
+    assert audit.asymmetric_pairs == 0
+    assert audit.diagonal_entries_removed == 1
+    assert audit.graph.vertices == (0, 1, 2)
+    assert audit.graph.edges == {(0, 1)}
