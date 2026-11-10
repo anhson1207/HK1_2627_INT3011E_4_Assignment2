@@ -219,6 +219,6 @@ pytest -v
 ## 8. Ongoing Development & Member Responsibilities
 
 - **`dev/leader`**: SAT Position & Order Encodings, Pairwise & Sequential AMO, Repeated & Incremental CaDiCaL SAT, Symmetry Breaking, L6–L8 CNF Estimator/ResourceLimits/Worker & 113-instance Audit (`54 READY / 58 NEEDS_VERIFICATION / 1 INVALID_DATA`).
-- **`dev/member-2` (Integrated with Leader L8)**: Binary & Commander Cardinality Encodings, Glucose 4 SAT Backend (`SATBackend` contract), Gurobi & CPLEX Assignment MIPs, Member 2 Experiment Runners (`configs/member2.toml`, `configs/member2_hb_table6_7.toml` using the 113-instance `READY`-filtered catalog) & `cnsplots` Visualization.
+- **`dev/member-2` (Integrated with Leader L8 & M2.2 Validated)**: Binary & Commander Cardinality Encodings, Glucose 4 SAT Backend (`SATBackend` contract), Live-Verified Gurobi (`13.0.3`) & CPLEX (`22.2.0.0`) Assignment MIPs, Member 2 Experiment Runners (`configs/member2.toml`, `configs/member2_m2_2.toml` using the 113-instance `READY`-filtered catalog), `cnsplots` Visualization, and [Member 2 Phase M2.2 Report](docs/member2-m2_2-report.md).
 - **`dev/member-3` (In Development by Member 3)**: Product & Ladder Cardinality Encodings, MiniSat Solver, CP-SAT, CP Optimizer, Harwell-Boeing Dataset Pipeline, Metaheuristics (RCM, SA, DRSA).
 
