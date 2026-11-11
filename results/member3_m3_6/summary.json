@@ -1,6 +1,6 @@
 {
   "experiment_id": "m3_6_unified_v1",
-  "git_commit": "eca71ac",
+  "git_commit": "b01ff9b",
   "validator_version": "m3.5",
   "planned_total_runs": 500,
   "completed_total_runs": 500,
@@ -138,7 +138,7 @@
       "median_wall_time_executed_s": 15.7485,
       "peak_rss_max_mb": 317.41,
       "median_optimality_gap": 0.4667,
-      "runtime_scope_note": "opt_n=2, exec_n=14, censored_or_blocked=1"
+      "runtime_scope_note": "opt_n=2, exec_n=14, censored_or_blocked=1; budgets_s=[15.0, 60.0]"
     },
     {
       "method_key": "CP::cp-sat(SHARED_RCM_WARM)",
@@ -178,7 +178,7 @@
       "median_wall_time_executed_s": 0.8412,
       "peak_rss_max_mb": 300.97,
       "median_optimality_gap": 0.5,
-      "runtime_scope_note": "opt_n=0, exec_n=78, censored_or_blocked=0"
+      "runtime_scope_note": "opt_n=0, exec_n=78, censored_or_blocked=0; budgets_s=[0.8, 5.0]"
     },
     {
       "method_key": "Heuristic::drsa_paper_faithful",
@@ -418,7 +418,7 @@
       "median_wall_time_executed_s": 15.0117,
       "peak_rss_max_mb": 385.08,
       "median_optimality_gap": 0.3333,
-      "runtime_scope_note": "opt_n=0, exec_n=61, censored_or_blocked=61"
+      "runtime_scope_note": "opt_n=0, exec_n=61, censored_or_blocked=61; budgets_s=[10.0, 15.0, 60.0]"
     },
     {
       "method_key": "SAT::cadical(order/sequential/repeated)",

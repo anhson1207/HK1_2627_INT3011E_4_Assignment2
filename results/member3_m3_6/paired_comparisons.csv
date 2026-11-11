@@ -1,8 +1,8 @@
 comparison,n_pairs,left_wins_bw,ties_bw,right_wins_bw,mean_bw_diff_left_minus_right,median_bw_diff,std_bw_diff,min_bw_diff,max_bw_diff,mean_wall_diff_s,median_wall_diff_s
 RCM_vs_SA_54_seed17,54,0,52,2,0.1852,0.0,1.1172,0,8,-0.788,-0.7978
-SA_vs_DRSA_Warm_54_seed17,54,0,51,3,0.1111,0.0,0.5016,0,3,-0.3144,-0.0012
-DRSA_PaperBounded_vs_DRSA_Warm_54_seed17,54,0,0,54,395.537,319.0,295.2596,17,1006,-0.3032,0.0009
+SA_vs_DRSA_Warm_54_seed17,54,0,51,3,0.0741,0.0,0.3281,0,2,-0.0038,-0.0011
+DRSA_PaperBounded_vs_DRSA_Warm_54_seed17,54,0,0,54,395.5,319.0,295.3076,17,1006,0.0073,0.0011
 CP_SAT_vs_CP_Optimizer_StageC_RCMWarm,7,0,2,5,3.5714,4,3.3094,0,8,-3.17,-0.1516
 CP_SAT_NoWarm_vs_DRSAWarm_StageC,8,1,6,1,-0.125,0.0,0.8345,-2,1,-0.6884,-0.5105
-SAT_CaDiCaL_vs_Glucose_OrderSeqInc,6,0,4,2,0.5,0.0,0.8367,0,2,-0.0003,-0.0009
-SAT_CaDiCaL_vs_MiniSat_OrderSeqInc,6,0,6,0,0,0.0,0.0,0,0,-0.0006,-0.001
+SAT_CaDiCaL_vs_Glucose_OrderSeqInc,6,0,4,2,0.8333,0.0,1.3292,0,3,0.0103,0.0017
+SAT_CaDiCaL_vs_MiniSat_OrderSeqInc,6,0,5,1,0.3333,0.0,0.8165,0,2,0.01,0.0016
