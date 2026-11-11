@@ -1,0 +1,10 @@
+method_label,catalog_instances,dataset_loaded,preflight_evaluated,solver_attempted,valid_solution_found,optimal_proved,feasible_solution_found,timeout_with_incumbent,timeout_no_incumbent,resource_limit,blocked_license,error_count,tier1_ready_valid,tier2_exploratory_valid,median_wall_time_s
+RCM (primary 113),113,113,113,113,113,0,113,0,0,0,0,0,54,59,0.0106
+SA (primary 113),113,113,113,113,113,0,113,0,0,0,0,0,54,59,0.8072
+DRSA Warm MODIFIED (113),113,113,113,113,113,0,113,0,0,0,0,0,54,59,0.8105
+DRSA Paper-Bounded (113),113,113,113,113,113,0,113,0,0,0,0,0,54,59,0.8144
+CP-SAT Best Across Passes (113),113,113,113,113,78,4,74,0,35,0,0,0,40,38,3.8799
+SAT Order+Product+Inc CaDiCaL (113),113,113,113,54,54,0,0,54,0,59,0,0,25,29,6.015
+Gurobi Eval (113),113,113,113,3,3,0,0,3,0,0,110,0,1,2,15.8432
+CPLEX CE (113),113,113,113,1,1,0,0,1,0,0,112,0,0,1,15.9326
+IBM CP Optimizer CE (113),113,113,113,20,20,0,20,0,0,0,93,0,8,12,10.1726

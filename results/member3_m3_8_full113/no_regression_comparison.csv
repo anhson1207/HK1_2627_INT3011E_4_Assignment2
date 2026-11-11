@@ -1,0 +1,37 @@
+era,method,dataset_available,solver_attempts,valid_feasible_solutions,optimal_proofs,timeout_with_incumbent,resource_blocks,license_blocks,execution_errors,notes
+Before_M3_1_Original_72,rcm,72,72,72,0,0,0,0,0,Historical 72 Table 6-7 (nonzero_union); SA iters=2000; CP 2.0s; CPO on Windows full binary
+Before_M3_1_Original_72,sa,72,72,72,0,0,0,0,0,Historical 72 Table 6-7 (nonzero_union); SA iters=2000; CP 2.0s; CPO on Windows full binary
+Before_M3_1_Original_72,cp-sat,72,72,48,1,0,0,0,0,Historical 72 Table 6-7 (nonzero_union); SA iters=2000; CP 2.0s; CPO on Windows full binary
+Before_M3_1_Original_72,cp-optimizer,72,72,72,0,0,0,0,0,Historical 72 Table 6-7 (nonzero_union); SA iters=2000; CP 2.0s; CPO on Windows full binary
+After_M3_7_54_READY,CP::cp-optimizer,54,7,7,0,0,0,3,0,"M3.6 canonical 54 READY (opt_n=0, exec_n=7, censored_or_blocked=3)"
+After_M3_7_54_READY,CP::cp-optimizer(SHARED_RCM_WARM),54,7,7,0,0,0,3,0,"M3.6 canonical 54 READY (opt_n=0, exec_n=7, censored_or_blocked=3)"
+After_M3_7_54_READY,CP::cp-sat,54,10,9,2,0,0,0,0,"M3.6 canonical 54 READY (opt_n=2, exec_n=10, censored_or_blocked=1)"
+After_M3_7_54_READY,CP::cp-sat(SHARED_DRSA_WARM),54,14,13,2,0,0,0,0,"M3.6 canonical 54 READY (opt_n=2, exec_n=14, censored_or_blocked=1; budgets_s=[15.0, 60.0])"
+After_M3_7_54_READY,CP::cp-sat(SHARED_RCM_WARM),54,10,10,2,0,0,0,0,"M3.6 canonical 54 READY (opt_n=2, exec_n=10, censored_or_blocked=0)"
+After_M3_7_54_READY,Heuristic::drsa_modified_variant,54,78,78,0,0,0,0,0,"M3.6 canonical 54 READY (opt_n=0, exec_n=78, censored_or_blocked=0; budgets_s=[0.8, 5.0])"
+After_M3_7_54_READY,Heuristic::drsa_paper_faithful,54,74,74,0,0,0,0,0,"M3.6 canonical 54 READY (opt_n=0, exec_n=74, censored_or_blocked=0)"
+After_M3_7_54_READY,Heuristic::rcm,54,54,54,0,0,0,0,0,"M3.6 canonical 54 READY (opt_n=0, exec_n=54, censored_or_blocked=0)"
+After_M3_7_54_READY,Heuristic::sa,54,74,74,0,0,0,0,0,"M3.6 canonical 54 READY (opt_n=0, exec_n=74, censored_or_blocked=0)"
+After_M3_7_54_READY,MIP::cplex,54,0,0,0,0,0,10,0,"M3.6 canonical 54 READY (opt_n=0, exec_n=0, censored_or_blocked=10)"
+After_M3_7_54_READY,MIP::gurobi,54,1,1,0,1,0,9,0,"M3.6 canonical 54 READY (opt_n=0, exec_n=1, censored_or_blocked=10)"
+After_M3_7_54_READY,MIP::gurobi(SHARED_DRSA_WARM),54,1,1,0,1,0,0,0,"M3.6 canonical 54 READY (opt_n=0, exec_n=1, censored_or_blocked=1)"
+After_M3_7_54_READY,SAT::cadical(order/binary/incremental),54,4,4,0,4,0,0,0,"M3.6 canonical 54 READY (opt_n=0, exec_n=4, censored_or_blocked=4)"
+After_M3_7_54_READY,SAT::cadical(order/commander/incremental),54,4,4,0,4,0,0,0,"M3.6 canonical 54 READY (opt_n=0, exec_n=4, censored_or_blocked=4)"
+After_M3_7_54_READY,SAT::cadical(order/ladder/incremental),54,4,4,0,4,0,0,0,"M3.6 canonical 54 READY (opt_n=0, exec_n=4, censored_or_blocked=4)"
+After_M3_7_54_READY,SAT::cadical(order/pairwise/incremental),54,4,4,0,4,0,0,0,"M3.6 canonical 54 READY (opt_n=0, exec_n=4, censored_or_blocked=4)"
+After_M3_7_54_READY,SAT::cadical(order/product/incremental),54,4,4,0,4,0,0,0,"M3.6 canonical 54 READY (opt_n=0, exec_n=4, censored_or_blocked=4)"
+After_M3_7_54_READY,SAT::cadical(order/sequential/incremental),54,61,61,0,61,0,0,0,"M3.6 canonical 54 READY (opt_n=0, exec_n=61, censored_or_blocked=61; budgets_s=[10.0, 15.0, 60.0])"
+After_M3_7_54_READY,SAT::cadical(order/sequential/repeated),54,6,6,0,6,0,0,0,"M3.6 canonical 54 READY (opt_n=0, exec_n=6, censored_or_blocked=6)"
+After_M3_7_54_READY,SAT::cadical(pairwise/sequential/incremental),54,4,4,0,4,2,0,0,"M3.6 canonical 54 READY (opt_n=0, exec_n=4, censored_or_blocked=6)"
+After_M3_7_54_READY,SAT::glucose(order/sequential/incremental),54,6,6,0,6,0,0,0,"M3.6 canonical 54 READY (opt_n=0, exec_n=6, censored_or_blocked=6)"
+After_M3_7_54_READY,SAT::minisat(order/sequential/incremental),54,6,6,0,6,0,0,0,"M3.6 canonical 54 READY (opt_n=0, exec_n=6, censored_or_blocked=6)"
+After_M3_8_Full_113,RCM (primary 113),113,113,113,0,0,0,0,0,Tier1=54/54 + Tier2=59/59
+After_M3_8_Full_113,SA (primary 113),113,113,113,0,0,0,0,0,Tier1=54/54 + Tier2=59/59
+After_M3_8_Full_113,DRSA Warm MODIFIED (113),113,113,113,0,0,0,0,0,Tier1=54/54 + Tier2=59/59
+After_M3_8_Full_113,DRSA Paper-Bounded (113),113,113,113,0,0,0,0,0,Tier1=54/54 + Tier2=59/59
+After_M3_8_Full_113,CP-SAT Best Across Passes (113),113,113,78,4,0,0,0,0,Tier1=40/54 + Tier2=38/59
+After_M3_8_Full_113,SAT Order+Product+Inc CaDiCaL (113),113,54,54,0,54,59,0,0,Tier1=25/54 + Tier2=29/59
+After_M3_8_Full_113,Gurobi Eval (113),113,3,3,0,3,0,110,0,Tier1=1/54 + Tier2=2/59
+After_M3_8_Full_113,CPLEX CE (113),113,1,1,0,1,0,112,0,Tier1=0/54 + Tier2=1/59
+After_M3_8_Full_113,IBM CP Optimizer CE (113),113,20,20,0,0,0,93,0,Tier1=8/54 + Tier2=12/59
+After_M3_8_Legacy72_Compat,sa_legacy_2000 (nonzero_union seed=17),72,72,72,0,0,0,0,0,Direct 72/72 backward compatibility check vs historical results/member3-harwell-boeing.csv
