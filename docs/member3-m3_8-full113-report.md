@@ -73,7 +73,7 @@ From [`results/member3_m3_8_full113/method_coverage_113.csv`](../results/member3
 
 ### 4.1 Heuristics (`RCM`, `SA`, `DRSA`) across All 113 Instances
 
-- **RCM**: `131.82` mean bandwidth (`Tier 1`: mean gap `+21.06`, median `14.0`; `Tier 2`: mean gap `+96.37`, median `51.0`), achieving exact match with `paper_best` on 6 instances (`lund_a`, `lund_b`, `jagmesh1`, `nos7`, `saylr1`, `gre_216a`, `gre_343`, `gre_512`, `steam2`, `steam3` across RCM wins).
+- **RCM**: `131.82` mean bandwidth (`Tier 1`: mean gap `+21.06`, median `14.0`; `Tier 2`: mean gap `+96.37`, median `51.0`), achieving exact `best_method == "rcm"` match with `paper_best` on **10 instances** (`lund_a`, `lund_b`, `jagmesh1`, `nos7`, `saylr1`, `gre_216a`, `gre_343`, `gre_512`, `steam2`, `steam3`).
 - **SA (`0.8s` incremental delta)**: `130.06` mean bandwidth (`Tier 1`: mean gap `+21.02`, median `14.0`; `Tier 2`: mean gap `+93.03`, median `38.0`), strictly improving RCM on `8/113`.
 - **DRSA Warm (`MODIFIED_VARIANT`, `0.8s`)**: `130.92` mean bandwidth (`Tier 1`: mean gap **`+20.96`**, median `14.0`; `Tier 2`: mean gap `+94.73`, median `47.0`), matching or beating SA on `106/113`, strictly beating SA on `5/113`, and strictly beating RCM on `9/113`.
 - **DRSA Paper-Bounded (`PAPER_FAITHFUL`, `0.8s`, random init, `T0=1000`)**: `432.69` mean bandwidth (`Tier 1` mean gap `+418.78`; `Tier 2` mean gap `+308.59`), isolating why unseeded high-temperature cooling requires longer runtimes on large Harwell–Boeing matrices compared to warm-started schedules.
