@@ -221,8 +221,8 @@ class EstimatorProductLadderTests(unittest.TestCase):
 
 class MiniSatFullIntegrationTests(unittest.TestCase):
     def test_minisat_live_timer_interrupt_and_reuse(self) -> None:
-        # Guarded Pigeonhole PHP(8, 7): slow when sel=True, trivial SAT when -sel=True
-        n_p, n_h = 8, 7
+        # Guarded Pigeonhole PHP(11, 10): exponentially hard UNSAT when sel=True, trivial SAT when -sel=True
+        n_p, n_h = 11, 10
         sel = 1000
         def pvar(i: int, j: int) -> int:
             return i * n_h + j + 1

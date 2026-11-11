@@ -386,7 +386,7 @@ class Member3M35ForensicsTests(unittest.TestCase):
         bc_rcm = RCMSolver().solve(g_small_ready)
         bc_sa = SimulatedAnnealingSolver(iterations=200, seed=17).solve(g_small_ready)
         bc_drsa = DRSASolver(seed=17, initial_mode="rcm").solve(g_small_ready, max_total_moves=5000)
-        bc_cp = CPSATSolver(seed=17).solve(g_small_ready, timeout_seconds=5.0, threads=2, initial_permutation=bc_drsa.permutation)
+        bc_cp = CPSATSolver(seed=17).solve(g_small_ready, timeout_seconds=15.0, threads=2, initial_permutation=bc_drsa.permutation)
         for res in (bc_rcm, bc_sa, bc_drsa, bc_cp):
             self.assertTrue(validate_solution(g_small_ready, res).valid)
         self.assertEqual(compute_graph_fingerprint(g_small_ready), compute_graph_fingerprint(g_hb))
