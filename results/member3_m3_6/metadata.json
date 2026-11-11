@@ -1,0 +1,102 @@
+{
+  "timestamp": "2026-11-11T04:09:32+00:00",
+  "git_commit": "eca71ac",
+  "python_version": "3.14.3",
+  "platform": "macOS-14.0-arm64-arm-64bit-Mach-O",
+  "machine": "arm64",
+  "cpu_model": "Apple M2",
+  "cpu_cores": 8,
+  "ram_gb": 16.0,
+  "packages": {
+    "python-sat": "1.9.dev17",
+    "ortools": "9.15.6755",
+    "gurobipy": "13.0.3",
+    "cplex": "22.2.0.1",
+    "docplex": "2.32.264",
+    "cnsplots": "0.8.0",
+    "matplotlib": "3.11.2",
+    "pandas": "2.3.3",
+    "numpy": "2.4.6",
+    "scipy": "1.18.1",
+    "pytest": "9.1.1"
+  },
+  "solvers": {
+    "cadical": {
+      "available": true,
+      "classification": "SOLVER_VERIFIED",
+      "license_type": "OPEN_SOURCE_PYTHON_SAT",
+      "version": "cadical195 (PySAT 1.9.dev17)",
+      "note": "python-sat backend cadical verified on C5 oracle"
+    },
+    "glucose": {
+      "available": true,
+      "classification": "SOLVER_VERIFIED",
+      "license_type": "OPEN_SOURCE_PYTHON_SAT",
+      "version": "glucose4 (PySAT 1.9.dev17)",
+      "note": "python-sat backend glucose verified on C5 oracle"
+    },
+    "minisat": {
+      "available": true,
+      "classification": "SOLVER_VERIFIED",
+      "license_type": "OPEN_SOURCE_PYTHON_SAT",
+      "version": "minisat22 (PySAT 1.9.dev17)",
+      "note": "python-sat backend minisat verified on C5 oracle"
+    },
+    "gurobi": {
+      "available": true,
+      "classification": "SOLVER_AVAILABLE_WITH_LIMITATIONS",
+      "license_type": "SIZE_LIMITED_EVAL",
+      "max_variables": 2000,
+      "max_constraints": 2000,
+      "version": "13.0.3",
+      "note": "PyPI embedded size-limited evaluation license (max 2,000 vars & 2,000 constrs)"
+    },
+    "cplex": {
+      "available": true,
+      "classification": "SOLVER_AVAILABLE_WITH_LIMITATIONS",
+      "license_type": "COMMUNITY_EDITION",
+      "max_variables": 1000,
+      "max_constraints": 1000,
+      "version": "22.2.0.0",
+      "note": "IBM CPLEX Community Edition (Error 1016 above 1,000 vars or 1,000 constrs)"
+    },
+    "cp-sat": {
+      "available": true,
+      "classification": "SOLVER_VERIFIED",
+      "license_type": "OPEN_SOURCE_APACHE2",
+      "version": "9.15.6755",
+      "note": "OR-Tools CP-SAT verified on C5 oracle"
+    },
+    "cp-optimizer": {
+      "available": true,
+      "classification": "SOLVER_AVAILABLE_WITH_LIMITATIONS",
+      "license_type": "COMMUNITY_EDITION_2P1000",
+      "version": "22.2.0.0",
+      "docplex_version": "2.32.264",
+      "executable_path": "/Users/nguyenanhson/BMP/.venv/bin/cpoptimizer",
+      "max_log2_search_space": 1000.0,
+      "note": "IBM CP Optimizer Community Edition (2^1000 search space limit; approx. n*log2(n) <= 1000)"
+    },
+    "rcm": {
+      "available": true,
+      "classification": "SOLVER_VERIFIED",
+      "license_type": "BUILTIN_PROJECT",
+      "version": "m3.5",
+      "note": "Deterministic Reverse Cuthill-McKee baseline"
+    },
+    "sa": {
+      "available": true,
+      "classification": "SOLVER_VERIFIED",
+      "license_type": "BUILTIN_PROJECT",
+      "version": "m3.5",
+      "note": "Incremental-delta REX Simulated Annealing baseline"
+    },
+    "drsa": {
+      "available": true,
+      "classification": "SOLVER_VERIFIED",
+      "license_type": "BUILTIN_PROJECT",
+      "version": "m3.5",
+      "note": "Dual Representation Simulated Annealing (Torres-Jimenez et al. 2015)"
+    }
+  }
+}

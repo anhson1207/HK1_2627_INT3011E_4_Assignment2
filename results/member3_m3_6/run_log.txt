@@ -1,0 +1,5 @@
+Phase M3.6 Unified Benchmark run log (batch_id=batch_20261111_042714)
+Git HEAD: eca71ac | OS: macOS-14.0-arm64-arm-64bit-Mach-O | CPU: Apple M2 (8 cores, 16.0 GB)
+Completed total runs: 500 / 500 (executed this batch: 0, pending: 0)
+Status counts: {'FEASIBLE': 332, 'OPTIMAL': 34, 'RESOURCE_LIMIT': 2, 'TIMEOUT': 107, 'UNAVAILABLE': 25}
+Validation: valid=471, failed=0, anomalies=0
