@@ -42,6 +42,11 @@ def _solve_instance(
     max_vertices: int = 10,
     max_variables: int | None = 500_000,
     max_clauses: int | None = 2_500_000,
+    seed: int = 0,
+    initial_solution: str = "auto",
+    iterations: int | None = None,
+    max_moves: int | None = None,
+    drsa_variant: str = "paper",
 ) -> dict[str, object]:
     graph = read_graph(input_path, graph_format)  # type: ignore[arg-type]
     limits = ResourceLimits(
@@ -88,11 +93,45 @@ def _solve_instance(
     elif solver_name == "rcm":
         from bmp.heuristics.rcm import RCMSolver
 
-        result = RCMSolver().solve(graph)
+        result = RCMSolver().solve(graph, timeout_seconds=timeout_seconds)
     elif solver_name == "sa":
         from bmp.heuristics.sa import SimulatedAnnealingSolver
 
-        result = SimulatedAnnealingSolver().solve(graph)
+        sa_init = "rcm" if initial_solution == "auto" else initial_solution
+        sa_kwargs: dict[str, object] = {"seed": seed, "initial_mode": sa_init}
+        if iterations is not None:
+            sa_kwargs["iterations"] = iterations
+        result = SimulatedAnnealingSolver(**sa_kwargs).solve(  # type: ignore[arg-type]
+            graph,
+            timeout_seconds=timeout_seconds,
+        )
+    elif solver_name == "drsa":
+        from bmp.heuristics.drsa import DRSASolver
+
+        if drsa_variant == "paper":
+            drsa_init = "random" if initial_solution == "auto" else initial_solution
+            drsa = DRSASolver(seed=seed, initial_mode=drsa_init)
+        elif drsa_variant == "bandwidth_only":
+            drsa_init = "random" if initial_solution == "auto" else initial_solution
+            drsa = DRSASolver(
+                seed=seed,
+                initial_mode=drsa_init,
+                evaluation_mode="bandwidth_only",
+                variant="MODIFIED_VARIANT",
+            )
+        else:
+            drsa_init = "rcm" if initial_solution == "auto" else initial_solution
+            drsa = DRSASolver(
+                seed=seed,
+                initial_temperature=2.0,
+                initial_mode=drsa_init,
+                variant="MODIFIED_VARIANT",
+            )
+        result = drsa.solve(
+            graph,
+            timeout_seconds=timeout_seconds,
+            max_total_moves=max_moves,
+        )
     elif strategy_name in ("repeated", "repeated_linear", "repeated_binary"):
         if encoding_name == "pairwise":
             encoder = PairwiseEncoding(amo=amo_name)
@@ -190,6 +229,7 @@ def _build_parser() -> argparse.ArgumentParser:
             "cp-optimizer",
             "rcm",
             "sa",
+            "drsa",
             "brute-force",
         ),
         default="cadical",
@@ -204,6 +244,19 @@ def _build_parser() -> argparse.ArgumentParser:
     solve.add_argument("--search-mode", choices=("linear", "binary"), default="linear")
     solve.add_argument("--symmetry-breaking", action="store_true", default=False)
     solve.add_argument("--timeout", type=float, default=None)
+    solve.add_argument("--seed", type=int, default=0)
+    solve.add_argument(
+        "--initial-solution",
+        choices=("auto", "random", "identity", "cm", "rcm", "best_initial"),
+        default="auto",
+    )
+    solve.add_argument("--iterations", type=int, default=None)
+    solve.add_argument("--max-moves", type=int, default=None)
+    solve.add_argument(
+        "--drsa-variant",
+        choices=("paper", "bandwidth_only", "modified_warm"),
+        default="paper",
+    )
     solve.add_argument("--max-vertices", type=int, default=10)
     solve.add_argument("--max-variables", type=int, default=500_000, help="safety limit on maximum estimated variables")
     solve.add_argument("--max-clauses", type=int, default=2_500_000, help="safety limit on maximum estimated clauses")
@@ -305,6 +358,11 @@ def main(argv: Sequence[str] | None = None) -> int:
                 max_vertices=args.max_vertices,
                 max_variables=args.max_variables,
                 max_clauses=args.max_clauses,
+                seed=args.seed,
+                initial_solution=args.initial_solution,
+                iterations=args.iterations,
+                max_moves=args.max_moves,
+                drsa_variant=args.drsa_variant,
             )
         elif args.command == "estimate-cnf":
             graph = read_graph(args.input, args.format)

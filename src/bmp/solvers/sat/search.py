@@ -3,54 +3,75 @@
 from __future__ import annotations
 
 from collections import deque
+from functools import lru_cache
 from typing import Mapping
 
 from bmp.core.bounds import cuthill_mckee_order, degree_lower_bound, identity_upper_bound
-from bmp.core.graph import Graph
+from bmp.core.graph import Edge, Graph
+
+
+@lru_cache(maxsize=256)
+def _cached_component_diameters(
+    vertices: tuple[int, ...], edges: frozenset[Edge]
+) -> tuple[tuple[int, int], ...]:
+    n = len(vertices)
+    if n < 2 or not edges:
+        return ()
+
+    v_to_idx = {v: i for i, v in enumerate(vertices)}
+    adj: list[list[int]] = [[] for _ in range(n)]
+    for u, v in edges:
+        ui = v_to_idx[u]
+        vi = v_to_idx[v]
+        adj[ui].append(vi)
+        adj[vi].append(ui)
+
+    comp_visited = [False] * n
+    seen_stamp = [0] * n
+    stamp = 0
+    components: list[tuple[int, int]] = []
+
+    for root in range(n):
+        if comp_visited[root]:
+            continue
+        comp_visited[root] = True
+        comp_nodes = [root]
+        head = 0
+        while head < len(comp_nodes):
+            curr = comp_nodes[head]
+            head += 1
+            for nbr in adj[curr]:
+                if not comp_visited[nbr]:
+                    comp_visited[nbr] = True
+                    comp_nodes.append(nbr)
+
+        c_size = len(comp_nodes)
+        if c_size >= 2:
+            c_diam = 0
+            for start in comp_nodes:
+                stamp += 1
+                seen_stamp[start] = stamp
+                frontier = [start]
+                depth = -1
+                while frontier:
+                    depth += 1
+                    next_frontier: list[int] = []
+                    for u in frontier:
+                        for v in adj[u]:
+                            if seen_stamp[v] != stamp:
+                                seen_stamp[v] = stamp
+                                next_frontier.append(v)
+                    frontier = next_frontier
+                if depth > c_diam:
+                    c_diam = depth
+            components.append((c_size, max(1, c_diam)))
+
+    return tuple(components)
 
 
 def compute_component_diameters(graph: Graph) -> list[tuple[int, int]]:
     """Compute (component_size, component_diameter) for all components with >= 2 vertices."""
-    visited: set[int] = set()
-    components: list[tuple[int, int]] = []
-
-    adj: dict[int, list[int]] = {v: [] for v in graph.vertices}
-    for u, v in graph.edges:
-        adj[u].append(v)
-        adj[v].append(u)
-
-    for root in graph.vertices:
-        if root in visited:
-            continue
-        comp_nodes: list[int] = []
-        queue = deque([root])
-        visited.add(root)
-        while queue:
-            curr = queue.popleft()
-            comp_nodes.append(curr)
-            for neighbor in adj[curr]:
-                if neighbor not in visited:
-                    visited.add(neighbor)
-                    queue.append(neighbor)
-
-        c_size = len(comp_nodes)
-        if c_size >= 2:
-            # Compute diameter of this component via all-pairs BFS
-            c_diam = 0
-            for start in comp_nodes:
-                dist: dict[int, int] = {start: 0}
-                q = deque([start])
-                while q:
-                    u = q.popleft()
-                    d = dist[u]
-                    c_diam = max(c_diam, d)
-                    for v in adj[u]:
-                        if v not in dist:
-                            dist[v] = d + 1
-                            q.append(v)
-            components.append((c_size, max(1, c_diam)))
-
-    return components
+    return list(_cached_component_diameters(graph.vertices, graph.edges))
 
 
 def compute_lower_bound(graph: Graph) -> int:

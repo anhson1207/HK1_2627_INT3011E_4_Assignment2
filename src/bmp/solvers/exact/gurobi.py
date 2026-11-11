@@ -5,6 +5,7 @@ from __future__ import annotations
 import math
 from dataclasses import dataclass
 from time import monotonic
+from typing import Mapping
 
 from bmp.core.graph import Graph
 from bmp.core.solution import BMPSolution, SolutionStatus
@@ -30,14 +31,18 @@ class GurobiMIPSolver:
         timeout_seconds: float | None = None,
         symmetry_breaking: bool = False,
         threads: int | None = None,
+        initial_permutation: Mapping[int, int] | None = None,
     ) -> BMPSolution:
         if timeout_seconds is not None and (not math.isfinite(timeout_seconds) or timeout_seconds < 0):
             raise ValueError("timeout_seconds must be finite and non-negative")
 
         started = monotonic()
         lower, best_bandwidth, best_assignment, anchor = prepare_mip_bounds(
-            graph, symmetry_breaking=symmetry_breaking
+            graph,
+            symmetry_breaking=symmetry_breaking,
+            initial_permutation=initial_permutation,
         )
+        warm_start_bw = best_bandwidth if initial_permutation is not None else None
 
         def make_result(status: SolutionStatus, *, metadata: dict[str, object], bound: int) -> BMPSolution:
             return build_mip_result(
@@ -139,6 +144,9 @@ class GurobiMIPSolver:
                 "symmetry_breaking": symmetry_breaking,
                 "anchor_vertex": anchor,
                 "threads": threads,
+                "warm_start_provided": initial_permutation is not None,
+                "warm_start_bandwidth": warm_start_bw,
+                "improved_over_warm_start": False,
             }
             if model.SolCount:
                 candidate = {
@@ -151,6 +159,8 @@ class GurobiMIPSolver:
                 if report.actual_bandwidth < best_bandwidth:
                     best_assignment = candidate
                     best_bandwidth = report.actual_bandwidth
+                    if warm_start_bw is not None:
+                        metadata["improved_over_warm_start"] = True
 
             bound = lower
             for key, getter in (

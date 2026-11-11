@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import math
 from time import monotonic
 
 from bmp.core.bounds import cuthill_mckee_order
@@ -14,7 +15,17 @@ from bmp.solvers.sat.search import compute_lower_bound
 class RCMSolver:
     """Compute a deterministic Reverse Cuthill-McKee labeling."""
 
-    def solve(self, graph: Graph) -> SolverResult:
+    def solve(
+        self,
+        graph: Graph,
+        *,
+        timeout_seconds: float | None = None,
+    ) -> SolverResult:
+        if timeout_seconds is not None and (
+            not math.isfinite(timeout_seconds) or timeout_seconds < 0
+        ):
+            raise ValueError("timeout_seconds must be finite and non-negative")
+
         started = monotonic()
         order = cuthill_mckee_order(graph)
         assignment = {v: i for i, v in enumerate(reversed(order), start=1)}
@@ -34,8 +45,11 @@ class RCMSolver:
             lower_bound=lower,
             upper_bound=report.actual_bandwidth,
             metadata={
+                "variant": "BASELINE",
                 "incumbent_source": "heuristic",
                 "algorithm": "reverse_cuthill_mckee",
+                "initial_bandwidth": report.actual_bandwidth,
+                "stop_reason": "completed",
             },
         )
 

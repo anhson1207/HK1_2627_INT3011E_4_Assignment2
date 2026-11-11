@@ -20,17 +20,27 @@ from bmp.solvers.sat.search import (
 
 
 def prepare_mip_bounds(
-    graph: Graph, *, symmetry_breaking: bool = False
+    graph: Graph,
+    *,
+    symmetry_breaking: bool = False,
+    initial_permutation: Mapping[int, int] | None = None,
 ) -> tuple[int, int, dict[int, int], int | None]:
-    """Compute certified lower bound, identity upper bound, and symmetry anchor.
+    """Compute certified lower bound, initial upper bound (identity or warm-start), and anchor.
 
     When ``symmetry_breaking`` is enabled on a graph with at least two vertices,
     the anchor vertex is chosen with ``select_anchor_vertex`` (matching SAT) and
-    the initial identity permutation is reversed if needed so ``p(anchor) <= ceil(n/2)``
+    the initial permutation is reversed if needed so ``p(anchor) <= ceil(n/2)``
     while preserving the exact initial bandwidth.
     """
     lower = compute_lower_bound(graph)
-    best_bandwidth, best_assignment = identity_upper_bound(graph)
+    if initial_permutation is not None:
+        report = validate_assignment(graph, initial_permutation)
+        if not report.valid or report.actual_bandwidth is None:
+            raise ValueError(f"Invalid initial_permutation: {'; '.join(report.errors)}")
+        best_assignment = dict(initial_permutation)
+        best_bandwidth = report.actual_bandwidth
+    else:
+        best_bandwidth, best_assignment = identity_upper_bound(graph)
     anchor: int | None = None
 
     if symmetry_breaking and graph.order >= 2:
