@@ -198,6 +198,77 @@ class Member3M36UnifiedTests(unittest.TestCase):
             figs = list((out_dir / "figures").glob("*.svg"))
             self.assertGreaterEqual(len(figs), 4)
 
+    def test_paired_comparisons_strict_stage_and_study_scoping_and_drsa_regime(self) -> None:
+        from bmp.core.generators import erdos_renyi_graph
+        from bmp.heuristics import DRSASolver
+
+        g_small = erdos_renyi_graph(12, 0.5, seed=7)
+        bounded = DRSASolver(seed=17, variant="PAPER_FAITHFUL").solve(g_small, max_total_moves=5)
+        self.assertTrue(bounded.metadata["bounded_execution"])
+        self.assertEqual(bounded.metadata["execution_regime"], "BOUNDED_MAX_TOTAL_MOVES")
+
+        with TemporaryDirectory() as tmp:
+            out_dir = Path(tmp)
+            ready_map = {
+                "bcsstk01": {
+                    "source_table": "Table 6",
+                    "n": 48,
+                    "m": 176,
+                    "topology_sha256": "abc",
+                    "graph_fingerprint": "def",
+                    "topology_duplicate_of": None,
+                    "paper_best": 16,
+                    "paper_lb": 16,
+                    "initial_lb": 12,
+                }
+            }
+            base = {
+                "run_id": "id",
+                "timestamp": "t",
+                "git_commit": "h",
+                "instance": "bcsstk01",
+                "table": "Table 6",
+                "n": 48,
+                "m": 176,
+                "family": "Heuristic",
+                "backend": "drsa",
+                "main_encoding": None,
+                "amo_encoding": None,
+                "strategy": None,
+                "symmetry_breaking": False,
+                "warm_start_mode": "RCM_INIT",
+                "seed": 17,
+                "status": "FEASIBLE",
+                "proof_status": "UNPROVED",
+                "optimality_gap": 0.1,
+                "validation": True,
+                "peak_rss_mb": 100.0,
+                "comparison_status": "ABOVE_PUBLISHED_BEST",
+                "paper_lb": 16,
+                "paper_best": 16,
+                "lower_bound": 12,
+                "upper_bound": 19,
+                "graph_fingerprint": "def",
+                "topology_sha256": "abc",
+                "topology_duplicate_of": None,
+            }
+            rows = [
+                {**base, "run_id": "1", "stage": "Stage_B_Heuristic_54", "study": "heur", "method": "sa", "bandwidth": 19, "total_wall_time_s": 0.85, "time_limit_seconds": 0.8},
+                {**base, "run_id": "2", "stage": "Stage_B_Heuristic_54", "study": "heur", "method": "drsa_modified_variant", "bandwidth": 18, "total_wall_time_s": 0.85, "time_limit_seconds": 0.8},
+                # Stage E 5.0s must NOT overwrite Stage B 0.8s in paired comparisons
+                {**base, "run_id": "3", "stage": "Stage_E_Extended", "study": "ext", "method": "drsa_modified_variant", "bandwidth": 16, "total_wall_time_s": 5.01, "time_limit_seconds": 5.0},
+                # SAT_A_Backends vs SAT_E_Symmetry: SAT_E must NOT overwrite SAT_A CaDiCaL
+                {**base, "run_id": "4", "stage": "Stage_D_SAT_Studies", "study": "SAT_A_Backends", "family": "SAT", "method": "cadical", "backend": "cadical", "main_encoding": "order", "amo_encoding": "sequential", "strategy": "incremental", "symmetry_breaking": True, "warm_start_mode": "NO_WARM_START", "bandwidth": 25, "status": "TIMEOUT", "total_wall_time_s": 10.0, "time_limit_seconds": 10.0},
+                {**base, "run_id": "5", "stage": "Stage_D_SAT_Studies", "study": "SAT_A_Backends", "family": "SAT", "method": "minisat", "backend": "minisat", "main_encoding": "order", "amo_encoding": "sequential", "strategy": "incremental", "symmetry_breaking": True, "warm_start_mode": "NO_WARM_START", "bandwidth": 23, "status": "TIMEOUT", "total_wall_time_s": 10.0, "time_limit_seconds": 10.0},
+                {**base, "run_id": "6", "stage": "Stage_D_SAT_Studies", "study": "SAT_E_Symmetry", "family": "SAT", "method": "cadical", "backend": "cadical", "main_encoding": "order", "amo_encoding": "sequential", "strategy": "incremental", "symmetry_breaking": True, "warm_start_mode": "NO_WARM_START", "bandwidth": 23, "status": "TIMEOUT", "total_wall_time_s": 10.0, "time_limit_seconds": 10.0},
+            ]
+            compute_m3_6_statistics(rows, ready_map, out_dir)
+            with (out_dir / "paired_comparisons.csv").open(encoding="utf-8", newline="") as stream:
+                paired = {r["comparison"]: r for r in csv.DictReader(stream)}
+            self.assertEqual(float(paired["SA_vs_DRSA_Warm_54_seed17"]["mean_bw_diff_left_minus_right"]), 1.0)
+            self.assertEqual(float(paired["SA_vs_DRSA_Warm_54_seed17"]["mean_wall_diff_s"]), 0.0)
+            self.assertEqual(float(paired["SAT_CaDiCaL_vs_MiniSat_OrderSeqInc"]["mean_bw_diff_left_minus_right"]), 2.0)
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -14,7 +14,7 @@ import statistics
 import subprocess
 import sys
 import tomllib
-from collections import defaultdict, deque
+from collections import defaultdict
 from pathlib import Path
 from time import monotonic
 from typing import Any
@@ -1301,6 +1301,8 @@ def compute_m3_6_statistics(
         rss_vals = [float(r["peak_rss_mb"]) for r in grp if r["peak_rss_mb"] is not None]
         gaps = [float(r["optimality_gap"]) for r in grp if r["optimality_gap"] is not None]
         matched_best = sum("MATCHED_BEST" in str(r["comparison_status"]) for r in grp)
+        distinct_budgets = sorted({float(r["time_limit_seconds"]) for r in grp if r.get("time_limit_seconds") is not None})
+        budget_note = f"; budgets_s={distinct_budgets}" if len(distinct_budgets) > 1 else ""
         method_summary_rows.append({
             "method_key": key,
             "family": grp[0]["family"],
@@ -1319,7 +1321,7 @@ def compute_m3_6_statistics(
             "median_wall_time_executed_s": round(statistics.median(exec_times), 4) if exec_times else None,
             "peak_rss_max_mb": round(max(rss_vals), 2) if rss_vals else None,
             "median_optimality_gap": round(statistics.median(gaps), 4) if gaps else None,
-            "runtime_scope_note": f"opt_n={len(opt_times)}, exec_n={len(exec_times)}, censored_or_blocked={to_c+res_c+una_c}",
+            "runtime_scope_note": f"opt_n={len(opt_times)}, exec_n={len(exec_times)}, censored_or_blocked={to_c+res_c+una_c}{budget_note}",
         })
 
     # Per-instance comparison across all 54 READY
@@ -1450,20 +1452,20 @@ def compute_m3_6_statistics(
     paired_candidates = [
         _paired_summary(
             "RCM_vs_SA_54_seed17",
-            [r for r in hb_rows if r["method"] == "rcm"],
-            [r for r in hb_rows if r["method"] == "sa" and r["seed"] == 17],
+            [r for r in hb_rows if r["stage"] == "Stage_B_Heuristic_54" and r["method"] == "rcm"],
+            [r for r in hb_rows if r["stage"] == "Stage_B_Heuristic_54" and r["method"] == "sa" and r["seed"] == 17],
             lambda r: r["instance"],
         ),
         _paired_summary(
             "SA_vs_DRSA_Warm_54_seed17",
-            [r for r in hb_rows if r["method"] == "sa" and r["seed"] == 17],
-            [r for r in hb_rows if r["method"] == "drsa_modified_variant" and r["seed"] == 17],
+            [r for r in hb_rows if r["stage"] == "Stage_B_Heuristic_54" and r["method"] == "sa" and r["seed"] == 17],
+            [r for r in hb_rows if r["stage"] == "Stage_B_Heuristic_54" and r["method"] == "drsa_modified_variant" and r["seed"] == 17],
             lambda r: r["instance"],
         ),
         _paired_summary(
             "DRSA_PaperBounded_vs_DRSA_Warm_54_seed17",
-            [r for r in hb_rows if r["method"] == "drsa_paper_faithful" and r["seed"] == 17],
-            [r for r in hb_rows if r["method"] == "drsa_modified_variant" and r["seed"] == 17],
+            [r for r in hb_rows if r["stage"] == "Stage_B_Heuristic_54" and r["method"] == "drsa_paper_faithful" and r["seed"] == 17],
+            [r for r in hb_rows if r["stage"] == "Stage_B_Heuristic_54" and r["method"] == "drsa_modified_variant" and r["seed"] == 17],
             lambda r: r["instance"],
         ),
         _paired_summary(
@@ -1480,14 +1482,14 @@ def compute_m3_6_statistics(
         ),
         _paired_summary(
             "SAT_CaDiCaL_vs_Glucose_OrderSeqInc",
-            [r for r in hb_rows if r["family"] == "SAT" and r["backend"] == "cadical" and r["main_encoding"] == "order" and r["amo_encoding"] == "sequential" and r["strategy"] == "incremental" and r["symmetry_breaking"] is True and r["warm_start_mode"] == "NO_WARM_START"],
-            [r for r in hb_rows if r["family"] == "SAT" and r["backend"] == "glucose" and r["main_encoding"] == "order" and r["amo_encoding"] == "sequential" and r["strategy"] == "incremental"],
+            [r for r in hb_rows if r["stage"] == "Stage_D_SAT_Studies" and r.get("study") == "SAT_A_Backends" and r["family"] == "SAT" and r["backend"] == "cadical" and r["main_encoding"] == "order" and r["amo_encoding"] == "sequential" and r["strategy"] == "incremental" and r["symmetry_breaking"] is True and r["warm_start_mode"] == "NO_WARM_START"],
+            [r for r in hb_rows if r["stage"] == "Stage_D_SAT_Studies" and r.get("study") == "SAT_A_Backends" and r["family"] == "SAT" and r["backend"] == "glucose" and r["main_encoding"] == "order" and r["amo_encoding"] == "sequential" and r["strategy"] == "incremental"],
             lambda r: r["instance"],
         ),
         _paired_summary(
             "SAT_CaDiCaL_vs_MiniSat_OrderSeqInc",
-            [r for r in hb_rows if r["family"] == "SAT" and r["backend"] == "cadical" and r["main_encoding"] == "order" and r["amo_encoding"] == "sequential" and r["strategy"] == "incremental" and r["symmetry_breaking"] is True and r["warm_start_mode"] == "NO_WARM_START"],
-            [r for r in hb_rows if r["family"] == "SAT" and r["backend"] == "minisat" and r["main_encoding"] == "order" and r["amo_encoding"] == "sequential" and r["strategy"] == "incremental"],
+            [r for r in hb_rows if r["stage"] == "Stage_D_SAT_Studies" and r.get("study") == "SAT_A_Backends" and r["family"] == "SAT" and r["backend"] == "cadical" and r["main_encoding"] == "order" and r["amo_encoding"] == "sequential" and r["strategy"] == "incremental" and r["symmetry_breaking"] is True and r["warm_start_mode"] == "NO_WARM_START"],
+            [r for r in hb_rows if r["stage"] == "Stage_D_SAT_Studies" and r.get("study") == "SAT_A_Backends" and r["family"] == "SAT" and r["backend"] == "minisat" and r["main_encoding"] == "order" and r["amo_encoding"] == "sequential" and r["strategy"] == "incremental"],
             lambda r: r["instance"],
         ),
     ]

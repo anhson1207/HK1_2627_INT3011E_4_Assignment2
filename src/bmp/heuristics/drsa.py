@@ -434,6 +434,11 @@ class DRSASolver:
                 "stop_reason": stop_reason,
                 "timed_out": stop_reason == "timeout",
                 "bounded_execution": stop_reason != "final_temperature" and stop_reason != "trivial_or_edgeless",
+                "execution_regime": (
+                    "FULL_COOLING_SCHEDULE"
+                    if stop_reason in ("final_temperature", "trivial_or_edgeless")
+                    else f"BOUNDED_{stop_reason.upper()}"
+                ),
                 "certified_optimal_by_lb": certified_lb == report.actual_bandwidth,
                 "incumbent_source": "heuristic",
             },

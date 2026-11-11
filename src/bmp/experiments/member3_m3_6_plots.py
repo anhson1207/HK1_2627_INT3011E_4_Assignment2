@@ -161,7 +161,8 @@ def create_m3_6_plots(
     # 5. Study SAT-A: Backends (CaDiCaL vs Glucose vs MiniSat) on Order+Sequential+Incremental
     sat_d_all = hb[(hb["stage"] == "Stage_D_SAT_Studies") & (hb["family"] == "SAT")].copy()
     sat_a = sat_d_all[
-        (sat_d_all["main_encoding"] == "order")
+        (sat_d_all["study"] == "SAT_A_Backends")
+        & (sat_d_all["main_encoding"] == "order")
         & (sat_d_all["amo_encoding"] == "sequential")
         & (sat_d_all["strategy"] == "incremental")
         & (sat_d_all["symmetry_breaking"] == True)
@@ -185,7 +186,8 @@ def create_m3_6_plots(
 
     # 6. Study SAT-B: Pairwise vs Order Main Encoding (CNF size & wall time)
     sat_b = sat_d_all[
-        (sat_d_all["backend"] == "cadical")
+        (sat_d_all["study"] == "SAT_B_MainEncoding")
+        & (sat_d_all["backend"] == "cadical")
         & (sat_d_all["amo_encoding"] == "sequential")
         & (sat_d_all["strategy"] == "incremental")
         & (sat_d_all["symmetry_breaking"] == True)
@@ -212,7 +214,8 @@ def create_m3_6_plots(
 
     # 7. Study SAT-C: Six Cardinality AMO Encodings (CNF Clauses/Variables & Runtime)
     sat_c = sat_d_all[
-        (sat_d_all["backend"] == "cadical")
+        (sat_d_all["study"] == "SAT_C_Cardinality_AMO")
+        & (sat_d_all["backend"] == "cadical")
         & (sat_d_all["main_encoding"] == "order")
         & (sat_d_all["strategy"] == "incremental")
         & (sat_d_all["symmetry_breaking"] == True)
@@ -238,14 +241,15 @@ def create_m3_6_plots(
 
     # 8. Study SAT-D: Repeated vs Incremental SAT
     sat_d = sat_d_all[
-        (sat_d_all["backend"] == "cadical")
+        (sat_d_all["study"] == "SAT_D_Strategy")
+        & (sat_d_all["backend"] == "cadical")
         & (sat_d_all["main_encoding"] == "order")
         & (sat_d_all["amo_encoding"] == "sequential")
         & (sat_d_all["symmetry_breaking"] == True)
         & (sat_d_all["warm_start_mode"] == "NO_WARM_START")
     ].copy()
     if not sat_d.empty and sat_d["strategy"].nunique() >= 2:
-        sat_d_sub = sat_d[sat_d["instance"].isin(["bcspwr01", "bcsstk01", "bcspwr02", "ash85", "nos4"])]
+        sat_d_sub = sat_d.copy()
         fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(11.6, 4.4))
         cns.barplot(data=sat_d_sub[sat_d_sub["total_wall_time_s"].notna()], x="instance", y="total_wall_time_s", hue="strategy", ax=ax1)
         ax1.set_title("Repeated vs Incremental Wall Time (s)")
