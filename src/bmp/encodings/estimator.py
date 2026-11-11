@@ -61,6 +61,49 @@ class ResourceLimits:
         return True, None
 
 
+def _binary_amo_counts(m: int) -> tuple[int, int]:
+    """Return exact (aux_vars, clauses) for Binary AMO over m literals."""
+    if m < 2:
+        return 0, 0
+    bits = (m - 1).bit_length()
+    return bits, m * bits
+
+
+def _commander_amo_counts(m: int) -> tuple[int, int]:
+    """Return exact (aux_vars, clauses) for recursive group-3 Commander AMO over m literals."""
+    if m < 2:
+        return 0, 0
+    if m <= 3:
+        return 0, m * (m - 1) // 2
+    aux = 0
+    clauses = 0
+    num_groups = 0
+    for start in range(0, m, 3):
+        group_size = min(3, m - start)
+        clauses += group_size * (group_size - 1) // 2 + group_size
+        aux += 1
+        num_groups += 1
+    sub_aux, sub_clauses = _commander_amo_counts(num_groups)
+    return aux + sub_aux, clauses + sub_clauses
+
+
+def _single_amo_counts(amo_type: str, m: int, raw_amo: str) -> tuple[int, int]:
+    """Return exact (aux_vars, clauses) for a single AMO constraint of width m."""
+    if amo_type in ("pairwise", "naive"):
+        return 0, m * (m - 1) // 2
+    if amo_type in ("sequential", "seqcounter"):
+        if m < 2:
+            return 0, 0
+        if m == 2:
+            return 0, 1
+        return m - 1, 3 * m - 4
+    if amo_type == "binary":
+        return _binary_amo_counts(m)
+    if amo_type == "commander":
+        return _commander_amo_counts(m)
+    raise ValueError(f"Unsupported AMO type for estimation: {raw_amo}")
+
+
 def estimate_cnf_size(
     graph: Graph,
     *,
@@ -74,7 +117,7 @@ def estimate_cnf_size(
     Parameters:
         graph: Target Graph
         encoding: 'pairwise' or 'order'
-        amo: 'pairwise' or 'sequential'
+        amo: 'pairwise', 'sequential', 'binary', or 'commander'
         k: Bandwidth threshold. If None, assumes worst-case (k=0 for maximum clauses)
         symmetry_breaking: Whether anchor vertex symmetry breaking is active
     """
@@ -99,26 +142,16 @@ def estimate_cnf_size(
     enc_family = encoding.lower()
     amo_type = amo.lower()
 
+    aux_per_amo, clauses_per_amo = _single_amo_counts(amo_type, n, amo)
+
     if enc_family == "pairwise":
         num_orig = n * n
         num_chan = 0
         alo_clauses = n
 
-        if amo_type in ("pairwise", "naive"):
-            num_aux = 0
-            amo_vertex_clauses = n * (n * (n - 1) // 2)
-            amo_label_clauses = n * (n * (n - 1) // 2)
-        elif amo_type in ("sequential", "seqcounter"):
-            if n == 2:
-                num_aux = 0
-                amo_vertex_clauses = 2
-                amo_label_clauses = 2
-            else:
-                num_aux = 2 * n * (n - 1)
-                amo_vertex_clauses = n * (3 * n - 4)
-                amo_label_clauses = n * (3 * n - 4)
-        else:
-            raise ValueError(f"Unsupported AMO type for estimation: {amo}")
+        num_aux = 2 * n * aux_per_amo
+        amo_vertex_clauses = n * clauses_per_amo
+        amo_label_clauses = n * clauses_per_amo
 
         sym_clauses = 0
         if symmetry_breaking and n >= 2:
@@ -161,18 +194,8 @@ def estimate_cnf_size(
         chan_clauses = n * (3 * n - 2) if n >= 2 else 0
 
         # All-Different on channeled x[v, p]
-        if amo_type in ("pairwise", "naive"):
-            num_aux = 0
-            alldiff_clauses = n * (n * (n - 1) // 2)
-        elif amo_type in ("sequential", "seqcounter"):
-            if n == 2:
-                num_aux = 0
-                alldiff_clauses = 2
-            else:
-                num_aux = n * (n - 1)
-                alldiff_clauses = n * (3 * n - 4)
-        else:
-            raise ValueError(f"Unsupported AMO type for estimation: {amo}")
+        num_aux = n * aux_per_amo
+        alldiff_clauses = n * clauses_per_amo
 
         sym_clauses = 1 if (symmetry_breaking and n >= 2) else 0
         fixed_clauses = mono_clauses + chan_clauses + alldiff_clauses + sym_clauses

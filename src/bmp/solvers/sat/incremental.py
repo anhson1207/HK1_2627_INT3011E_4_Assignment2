@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from time import monotonic
-from typing import Mapping
+from typing import Callable, Mapping
 
 from bmp.core.graph import Graph
 from bmp.core.solution import SolutionStatus, SolverResult
@@ -14,7 +14,7 @@ from bmp.encodings.order import OrderEncoding
 from bmp.encodings.pairwise import PairwiseEncoding
 from bmp.solvers.sat.backends.base import get_sat_backend
 from bmp.solvers.sat.search import compute_initial_upper_bound, compute_lower_bound
-from bmp.solvers.sat.worker import report_progress, report_sat_event
+from bmp.solvers.sat.worker import emit_incumbent, report_progress, report_sat_event
 
 
 class IncrementalSATSolver:
@@ -41,6 +41,7 @@ class IncrementalSATSolver:
         heuristic_permutation: Mapping[int, int] | None = None,
         symmetry_breaking: bool = False,
         limits: ResourceLimits | None = None,
+        on_incumbent: Callable[[Mapping[int, int], int], None] | None = None,
     ) -> SolverResult:
         started = monotonic()
         n = graph.order
@@ -53,11 +54,13 @@ class IncrementalSATSolver:
                 self, graph, timeout_seconds=effective_timeout if effective_timeout is not None else 300.0,
                 heuristic_permutation=heuristic_permutation,
                 symmetry_breaking=symmetry_breaking, limits=limits,
+                on_incumbent=on_incumbent,
             )
 
         # Base case: edgeless or order <= 1
         if n <= 1 or not graph.edges:
             identity_perm = {v: i + 1 for i, v in enumerate(graph.vertices)}
+            emit_incumbent(graph, identity_perm, 0, on_incumbent=on_incumbent, last_key=None)
             return SolverResult(
                 instance=graph.name,
                 method="SAT",
@@ -75,7 +78,7 @@ class IncrementalSATSolver:
                 sat_calls=0,
                 lower_bound=0,
                 upper_bound=0,
-                metadata={"symmetry_breaking": symmetry_breaking},
+                metadata={"symmetry_breaking": symmetry_breaking, "incumbent_source": "edgeless"},
             )
 
         lb = compute_lower_bound(graph)
@@ -84,8 +87,10 @@ class IncrementalSATSolver:
             heuristic_permutation,
             symmetry_breaking=symmetry_breaking,
         )
+        initial_source = "heuristic" if heuristic_permutation is not None else "initial"
 
         if lb == ub:
+            emit_incumbent(graph, init_perm, ub, on_incumbent=on_incumbent, last_key=None)
             return SolverResult(
                 instance=graph.name,
                 method="SAT",
@@ -103,7 +108,11 @@ class IncrementalSATSolver:
                 sat_calls=0,
                 lower_bound=lb,
                 upper_bound=ub,
-                metadata={"symmetry_breaking": symmetry_breaking, "fast_path": "lb_equals_ub"},
+                metadata={
+                    "symmetry_breaking": symmetry_breaking,
+                    "fast_path": "lb_equals_ub",
+                    "incumbent_source": initial_source,
+                },
             )
 
         # Resource safety check
@@ -140,11 +149,17 @@ class IncrementalSATSolver:
                         "skipped_reason": reason,
                         "estimate": estimate.to_dict(),
                         "symmetry_breaking": symmetry_breaking,
+                        "incumbent_source": initial_source,
                     },
                 )
 
         best_bandwidth = ub
         best_permutation: dict[int, int] | None = dict(init_perm) if init_perm else None
+        incumbent_source = initial_source
+        last_key = emit_incumbent(
+            graph, best_permutation, best_bandwidth,
+            on_incumbent=on_incumbent, last_key=None,
+        )
         certified_lb = lb
         sat_calls = 0
         total_encoding_time = 0.0
@@ -158,6 +173,7 @@ class IncrementalSATSolver:
         report_progress(
             self, bandwidth=best_bandwidth, permutation=best_permutation,
             lower_bound=certified_lb, sat_calls=0,
+            incumbent_source=incumbent_source,
         )
 
         # Initialize persistent SAT solver backend
@@ -192,6 +208,7 @@ class IncrementalSATSolver:
                 encoding_time_s=total_encoding_time, solving_time_s=total_solving_time,
                 num_variables=total_variables, num_clauses=accumulated_clauses,
                 initial_clauses=fixed_clauses, added_clauses=added_clauses,
+                incumbent_source=incumbent_source,
             )
 
             while k_curr >= certified_lb:
@@ -204,9 +221,10 @@ class IncrementalSATSolver:
                 sat_calls += 1
                 remaining = None if effective_timeout is None else effective_timeout - (monotonic() - started)
                 is_sat = backend.solve_with_timeout(remaining)
-                total_solving_time += monotonic() - solve_start
+                solve_time = monotonic() - solve_start
+                total_solving_time += solve_time
                 if is_sat is None:
-                    report_sat_event(self, k=k_curr, outcome="UNKNOWN")
+                    report_sat_event(self, k=k_curr, outcome="UNKNOWN", solve_time_s=solve_time)
                     timed_out = True
                     break
 
@@ -216,15 +234,22 @@ class IncrementalSATSolver:
                         raise RuntimeError(f"Solver returned SAT but model is None for k={k_curr}")
                     decoded = self.encoder.decode(graph, model, k_curr)
                     actual_bw = calculate_bandwidth(graph, decoded)
-                    report_sat_event(self, k=k_curr, outcome="SAT", bandwidth=actual_bw)
-                    best_bandwidth = actual_bw
-                    best_permutation = decoded
+                    report_sat_event(self, k=k_curr, outcome="SAT", solve_time_s=solve_time, bandwidth=actual_bw)
+                    if actual_bw < best_bandwidth:
+                        best_bandwidth = actual_bw
+                        best_permutation = decoded
+                        incumbent_source = "sat"
+                        last_key = emit_incumbent(
+                            graph, best_permutation, best_bandwidth,
+                            on_incumbent=on_incumbent, last_key=last_key,
+                        )
                     report_progress(
                         self, bandwidth=best_bandwidth, permutation=best_permutation,
                         lower_bound=certified_lb, sat_calls=sat_calls,
                         encoding_time_s=total_encoding_time, solving_time_s=total_solving_time,
                         num_variables=total_variables, num_clauses=accumulated_clauses,
                         initial_clauses=fixed_clauses, added_clauses=added_clauses,
+                        incumbent_source=incumbent_source,
                     )
 
                     if best_bandwidth <= certified_lb:
@@ -263,7 +288,7 @@ class IncrementalSATSolver:
                     added_clauses += len(new_clauses)
                     k_curr = k_next
                 else:
-                    report_sat_event(self, k=k_curr, outcome="UNSAT")
+                    report_sat_event(self, k=k_curr, outcome="UNSAT", solve_time_s=solve_time)
                     # UNSAT at k_curr proves no bandwidth <= k_curr exists
                     certified_lb = k_curr + 1
                     report_progress(
@@ -272,6 +297,7 @@ class IncrementalSATSolver:
                         encoding_time_s=total_encoding_time, solving_time_s=total_solving_time,
                         num_variables=total_variables, num_clauses=accumulated_clauses,
                         initial_clauses=fixed_clauses, added_clauses=added_clauses,
+                        incumbent_source=incumbent_source,
                     )
                     break
 
@@ -311,6 +337,7 @@ class IncrementalSATSolver:
                 "threshold_policy": self.threshold_policy,
                 "initial_clauses": fixed_clauses,
                 "added_clauses": added_clauses,
+                "incumbent_source": incumbent_source,
                 "skipped_reason": resource_reason,
             },
         )
