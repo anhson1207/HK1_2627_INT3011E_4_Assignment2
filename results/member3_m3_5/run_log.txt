@@ -1,0 +1,8 @@
+Phase M3.5 Forensics completed on 2026-11-11 (verified_date=2026-11-11)
+Validator version: m3.5; Official policy: nonzero_union v1.0
+Status counts: READY=54 (unique_topologies=53), NEEDS_VERIFICATION=58, INVALID_DATA=1
+Duplicate topology pairs: [['mbeacxc', 'mbeaflw'], ['saylr3', 'sherman1']]
+Table 5 multi-component counts: nonzero_union=21 (extra fs_680_1, fs_760_1), stored_union=19 (19/19 match!), nonzero_intersection=60
+steam3 CP-SAT exact: A(nonzero_union)=5 vs B(stored_union)=7 vs C(nonzero_intersection)=3 (Paper LB=7, Best=7)
+mbeause isolated invariance (496 vs 492): rcm=473 vs 473, drsa=473 vs 473
+Provenance file updated: True
