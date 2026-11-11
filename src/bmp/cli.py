@@ -467,8 +467,10 @@ def main(argv: Sequence[str] | None = None) -> int:
                 TABLE_7_INSTANCES,
                 TABLE_8_INSTANCES,
                 ALL_INSTANCES,
+                VALIDATOR_VERSION,
                 preflight_check_dataset,
             )
+            from bmp.io.readers import CONVERSION_VERSION, OFFICIAL_CONVERSION_POLICY
             if args.table == "6":
                 catalog = TABLE_6_INSTANCES
             elif args.table == "7":
@@ -493,6 +495,9 @@ def main(argv: Sequence[str] | None = None) -> int:
                 "needs_verification_instances": list(report.needs_verification_instances),
                 "missing_instances": list(report.missing_instances),
                 "errors": list(report.errors),
+                "validator_version": VALIDATOR_VERSION,
+                "official_conversion_policy": OFFICIAL_CONVERSION_POLICY,
+                "conversion_version": CONVERSION_VERSION,
                 "dependency_status": "STRUCTURAL_READY" if report.ready_for_execution else "DATA_REVIEW_REQUIRED",
                 "verification_level": "file_parse_and_vertex_count_only; use benchmark_provenance.json for topology audit",
             }

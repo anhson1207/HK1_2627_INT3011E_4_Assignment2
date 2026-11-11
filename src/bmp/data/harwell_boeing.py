@@ -8,14 +8,20 @@ import json
 from dataclasses import dataclass
 from hashlib import sha256
 from pathlib import Path
-from tempfile import TemporaryDirectory
 from typing import Mapping
 
 from bmp.core.benchmark_catalog import ALL_INSTANCES, BenchmarkInstanceMeta
 from bmp.core.bounds import cuthill_mckee_order
 from bmp.core.graph import Graph
 from bmp.core.validation import calculate_bandwidth
-from bmp.io.readers import inspect_matrix_market, read_matrix_market
+from bmp.io.readers import (
+    CONVERSION_VERSION,
+    OFFICIAL_CONVERSION_POLICY,
+    graph_from_matrix_market_forensics,
+    inspect_matrix_market,
+    inspect_matrix_market_forensics,
+    parse_matrix_market_forensics,
+)
 from bmp.solvers.sat.search import compute_lower_bound
 
 
@@ -56,81 +62,51 @@ def load_provenance_index(
     }
 
 
-def _open_matrix_market_lines(source: Path) -> list[str]:
-    if source.suffix.lower() == ".gz":
-        with gzip.open(source, "rt", encoding="ascii") as stream:
-            return stream.read().splitlines()
-    return source.read_text(encoding="ascii").splitlines()
-
-
 def compare_matrix_market_conversions(path: str | Path) -> dict[str, object]:
-    """Diagnostic-only comparison of explicit-zero rules on a Matrix Market file.
+    """Diagnostic-only comparison of conversion rules on a Matrix Market file.
 
-    Returns edge counts, certified lower bounds, and RCM bandwidth under
-    ``drop_explicit_zeros`` (project standard) vs ``keep_explicit_zeros``.
-    Outputs are marked ``official_benchmark=False`` and must never be used to
-    override ``benchmark_provenance.json`` validation status.
+    Returns edge counts, certified lower bounds, RCM bandwidth, and canonical
+    fingerprints under ``drop_explicit_zeros`` (project standard ``nonzero_union``)
+    vs exploratory policies (``stored_union``, ``nonzero_intersection``,
+    ``stored_intersection``). Outputs are marked ``official_benchmark=False`` and
+    must never override ``benchmark_provenance.json`` validation status.
     """
     source = Path(path)
-    lines = _open_matrix_market_lines(source)
-    if not lines or len(lines[0].split()) != 5:
-        raise ValueError(f"Invalid Matrix Market header in {source}")
-    banner = lines[0].strip().lower().split()
-    field, symmetry = banner[3], banner[4]
-    records = [
-        line.strip()
-        for line in lines[1:]
-        if line.strip() and not line.lstrip().startswith("%")
-    ]
-    rows, columns, declared = map(int, records[0].split())
-    if rows != columns or declared != len(records) - 1:
-        raise ValueError(f"Invalid dimensions or entry count in {source}")
+    forensics = inspect_matrix_market_forensics(source)
 
-    drop_edges: set[tuple[int, int]] = set()
-    keep_edges: set[tuple[int, int]] = set()
-    diag = 0
-    explicit_off_zeros = 0
-    nonzero_off = 0
-
-    for record in records[1:]:
-        parts = record.split()
-        r, c = int(parts[0]), int(parts[1])
-        is_zero = field != "pattern" and all(float(val) == 0 for val in parts[2:])
-        if r == c:
-            diag += 1
-            continue
-        edge = (min(r, c), max(r, c))
-        keep_edges.add(edge)
-        if is_zero:
-            explicit_off_zeros += 1
-        else:
-            nonzero_off += 1
-            drop_edges.add(edge)
-
-    variants: dict[str, dict[str, int]] = {}
-    for label, edge_set in (
-        ("drop_explicit_zeros", drop_edges),
-        ("keep_explicit_zeros", keep_edges),
+    variants: dict[str, dict[str, object]] = {}
+    for label, policy in (
+        ("drop_explicit_zeros", "nonzero_union"),
+        ("keep_explicit_zeros", "stored_union"),
+        ("nonzero_intersection", "nonzero_intersection"),
+        ("stored_intersection", "stored_intersection"),
     ):
-        g = Graph.from_edges(range(1, rows + 1), edge_set, name=source.stem)
+        g = graph_from_matrix_market_forensics(forensics, policy=policy, one_based=True)
         order = cuthill_mckee_order(g)
         rcm_perm = {v: pos for pos, v in enumerate(reversed(order), start=1)}
         variants[label] = {
+            "policy": policy,
+            "official_benchmark": False,
             "n": g.order,
             "m": g.size,
             "certified_lower_bound": compute_lower_bound(g),
             "rcm_bandwidth": calculate_bandwidth(g, rcm_perm),
+            "topology_sha256": g.metadata["topology_sha256"],
+            "graph_fingerprint": g.metadata["graph_fingerprint"],
         }
 
     return {
         "source": source.name,
         "official_benchmark": False,
-        "field": field,
-        "symmetry": symmetry,
-        "declared_entries": declared,
-        "diagonal_entries": diag,
-        "explicit_off_diagonal_zeros": explicit_off_zeros,
-        "nonzero_off_diagonal_entries": nonzero_off,
+        "field": forensics.field,
+        "symmetry": forensics.symmetry,
+        "declared_entries": forensics.declared_entries,
+        "diagonal_entries": forensics.diagonal_entries_total,
+        "explicit_off_diagonal_zeros": forensics.offdiagonal_entries_zero,
+        "nonzero_off_diagonal_entries": forensics.offdiagonal_entries_nonzero,
+        "structural_symmetry_nonzero": forensics.structural_symmetry_nonzero,
+        "structural_symmetry_stored": forensics.structural_symmetry_stored,
+        "value_symmetry_nonzero": forensics.value_symmetry_nonzero,
         "variants": variants,
     }
 
@@ -198,59 +174,41 @@ class HarwellBoeingDataset:
         item = self.metadata(name)
         return item.status == "AVAILABLE" and (self.directory / item.path).is_file()
 
-    def load(self, name: str, *, require_ready: bool = False) -> Graph:
+    def load(
+        self,
+        name: str,
+        *,
+        require_ready: bool = False,
+        conversion_policy: str = OFFICIAL_CONVERSION_POLICY,
+    ) -> Graph:
         item = self.metadata(name)
         if item.status == "MISSING":
             raise FileNotFoundError(f"{name}: {item.reason}")
         if item.status != "AVAILABLE":
             raise ValueError(f"{name}: {item.reason}")
 
-        payload = (self.directory / item.path).read_bytes()
+        matrix_path = self.directory / item.path
+        payload = matrix_path.read_bytes()
         if sha256(payload).hexdigest() != item.sha256:
             raise ValueError(f"{name}: SHA-256 mismatch")
 
         val_status = self.validation_status(name)
-        if require_ready and val_status != "READY":
+        if require_ready and (val_status != "READY" or conversion_policy != OFFICIAL_CONVERSION_POLICY):
             raise ValueError(
-                f"{name}: validation_status={val_status} (refused when require_ready=True)"
+                f"{name}: validation_status={val_status}, policy={conversion_policy} (refused when require_ready=True)"
             )
 
-        lines = gzip.decompress(payload).decode("ascii").splitlines()
-        if not lines or len(lines[0].split()) != 5:
-            raise ValueError(f"{name}: invalid Matrix Market header")
-        banner, *body = lines
-        records = [
-            line.strip()
-            for line in body
-            if line.strip() and not line.lstrip().startswith("%")
-        ]
-        if not records:
-            raise ValueError(f"{name}: missing Matrix Market dimensions")
-        rows, columns, count = map(int, records[0].split())
-        if rows != columns or rows != item.n:
+        lines = gzip.decompress(payload).decode("utf-8-sig").splitlines()
+        forensics = parse_matrix_market_forensics(lines, source_name=matrix_path.name)
+        if forensics.rows != item.n:
             raise ValueError(
-                f"{name}: matrix {rows}x{columns} differs from paper n={item.n}"
+                f"{name}: matrix {forensics.rows}x{forensics.columns} differs from paper n={item.n}"
             )
-        if count != len(records) - 1:
-            raise ValueError(f"{name}: wrong Matrix Market record count")
-
-        # Validate diagonal structure cleanly before passing to audited core reader.
-        field = banner.lower().split()[3]
-        for record in records[1:]:
-            i, j, *values = record.split()
-            row, column = int(i), int(j)
-            if not 1 <= row <= rows or not 1 <= column <= columns:
-                raise ValueError(f"{name}: out-of-range matrix entry {record}")
-            if row == column:
-                if len(values) != (0 if field == "pattern" else 1):
-                    raise ValueError(f"{name}: invalid diagonal record {record}")
-                if values:
-                    float(values[0])
-
-        with TemporaryDirectory() as temporary:
-            temp_path = Path(temporary) / f"{name}.mtx.gz"
-            temp_path.write_bytes(payload)
-            graph = read_matrix_market(temp_path)
+        graph = graph_from_matrix_market_forensics(
+            forensics,
+            policy=conversion_policy,
+            one_based=True,
+        )
 
         return Graph(
             graph.vertices,
@@ -260,6 +218,8 @@ class HarwellBoeingDataset:
                 **graph.metadata,
                 "source": item.source_url,
                 "sha256": item.sha256,
+                "conversion_policy": conversion_policy,
+                "conversion_version": CONVERSION_VERSION,
                 "table_number": item.table_number,
                 "paper_lb": item.paper_lb,
                 "paper_best": item.paper_best,
