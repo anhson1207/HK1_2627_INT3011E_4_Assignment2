@@ -1,0 +1,452 @@
+{"reference_rows": 113, "unique_instances": 113, "configurations_per_instance": 11, "expected_runs": 1243, "legacy_runs_reused": 792, "legacy_audit": {"rows": 792, "unique_keys": 792, "duplicates": 0, "missing": 0, "unexpected": 0, "instances": 72}, "runs_already_recorded": 792, "new_runs_remaining": 451}
+gre_512 glucose pairwise repeated pairwise sym=False: RESOURCE_LIMIT bw= 0.00s
+gre_512 glucose pairwise incremental pairwise sym=False: RESOURCE_LIMIT bw= 0.00s
+gre_512 glucose order repeated pairwise sym=False: RESOURCE_LIMIT bw= 0.00s
+gre_512 glucose order incremental pairwise sym=False: RESOURCE_LIMIT bw= 0.00s
+gre_512 glucose pairwise repeated sequential sym=False: RESOURCE_LIMIT bw= 0.00s
+gre_512 glucose pairwise repeated binary sym=False: RESOURCE_LIMIT bw= 0.00s
+gre_512 glucose pairwise repeated commander sym=False: RESOURCE_LIMIT bw= 0.00s
+gre_512 gurobi    sym=False: RESOURCE_LIMIT bw= 0.00s
+gre_512 gurobi    sym=True: RESOURCE_LIMIT bw= 0.00s
+gre_512 cplex    sym=False: RESOURCE_LIMIT bw= 0.00s
+gre_512 cplex    sym=True: RESOURCE_LIMIT bw= 0.00s
+hor_131 glucose pairwise repeated pairwise sym=False: RESOURCE_LIMIT bw= 0.00s
+hor_131 glucose pairwise incremental pairwise sym=False: RESOURCE_LIMIT bw= 0.00s
+hor_131 glucose order repeated pairwise sym=False: RESOURCE_LIMIT bw= 0.00s
+hor_131 glucose order incremental pairwise sym=False: RESOURCE_LIMIT bw= 0.00s
+hor_131 glucose pairwise repeated sequential sym=False: RESOURCE_LIMIT bw= 0.00s
+hor_131 glucose pairwise repeated binary sym=False: RESOURCE_LIMIT bw= 0.00s
+hor_131 glucose pairwise repeated commander sym=False: RESOURCE_LIMIT bw= 0.00s
+hor_131 gurobi    sym=False: TIMEOUT bw=421 58.90s
+hor_131 gurobi    sym=True: TIMEOUT bw=421 59.34s
+hor_131 cplex    sym=False: UNAVAILABLE bw=421 3.75s
+hor_131 cplex    sym=True: UNAVAILABLE bw=421 2.80s
+impcol_a glucose pairwise repeated pairwise sym=False: RESOURCE_LIMIT bw= 0.00s
+impcol_a glucose pairwise incremental pairwise sym=False: RESOURCE_LIMIT bw= 0.00s
+impcol_a glucose order repeated pairwise sym=False: TIMEOUT bw=158 60.04s
+impcol_a glucose order incremental pairwise sym=False: TIMEOUT bw=72 60.03s
+impcol_a glucose pairwise repeated sequential sym=False: RESOURCE_LIMIT bw= 0.00s
+impcol_a glucose pairwise repeated binary sym=False: RESOURCE_LIMIT bw= 0.00s
+impcol_a glucose pairwise repeated commander sym=False: RESOURCE_LIMIT bw= 0.00s
+impcol_a gurobi    sym=False: TIMEOUT bw=105 58.72s
+impcol_a gurobi    sym=True: TIMEOUT bw=143 59.76s
+impcol_a cplex    sym=False: UNAVAILABLE bw=167 0.55s
+impcol_a cplex    sym=True: UNAVAILABLE bw=167 0.55s
+impcol_d glucose pairwise repeated pairwise sym=False: RESOURCE_LIMIT bw= 0.00s
+impcol_d glucose pairwise incremental pairwise sym=False: RESOURCE_LIMIT bw= 0.00s
+impcol_d glucose order repeated pairwise sym=False: TIMEOUT bw=406 60.24s
+impcol_d glucose order incremental pairwise sym=False: TIMEOUT bw=406 60.13s
+impcol_d glucose pairwise repeated sequential sym=False: RESOURCE_LIMIT bw= 0.00s
+impcol_d glucose pairwise repeated binary sym=False: RESOURCE_LIMIT bw= 0.00s
+impcol_d glucose pairwise repeated commander sym=False: RESOURCE_LIMIT bw= 0.00s
+impcol_d gurobi    sym=False: TIMEOUT bw=324 59.29s
+impcol_d gurobi    sym=True: TIMEOUT bw=406 58.98s
+impcol_d cplex    sym=False: UNAVAILABLE bw=406 1.27s
+impcol_d cplex    sym=True: UNAVAILABLE bw=406 1.47s
+impcol_e glucose pairwise repeated pairwise sym=False: RESOURCE_LIMIT bw= 0.00s
+impcol_e glucose pairwise incremental pairwise sym=False: RESOURCE_LIMIT bw= 0.00s
+impcol_e glucose order repeated pairwise sym=False: TIMEOUT bw=86 60.06s
+impcol_e glucose order incremental pairwise sym=False: TIMEOUT bw=82 60.04s
+impcol_e glucose pairwise repeated sequential sym=False: RESOURCE_LIMIT bw= 0.00s
+impcol_e glucose pairwise repeated binary sym=False: RESOURCE_LIMIT bw= 0.00s
+impcol_e glucose pairwise repeated commander sym=False: RESOURCE_LIMIT bw= 0.00s
+impcol_e gurobi    sym=False: TIMEOUT bw=90 58.64s
+impcol_e gurobi    sym=True: TIMEOUT bw=90 58.60s
+impcol_e cplex    sym=False: UNAVAILABLE bw=92 0.72s
+impcol_e cplex    sym=True: UNAVAILABLE bw=92 0.71s
+jagmesh1 glucose pairwise repeated pairwise sym=False: RESOURCE_LIMIT bw= 0.00s
+jagmesh1 glucose pairwise incremental pairwise sym=False: RESOURCE_LIMIT bw= 0.00s
+jagmesh1 glucose order repeated pairwise sym=False: RESOURCE_LIMIT bw= 0.00s
+jagmesh1 glucose order incremental pairwise sym=False: RESOURCE_LIMIT bw= 0.00s
+jagmesh1 glucose pairwise repeated sequential sym=False: RESOURCE_LIMIT bw= 0.00s
+jagmesh1 glucose pairwise repeated binary sym=False: RESOURCE_LIMIT bw= 0.00s
+jagmesh1 glucose pairwise repeated commander sym=False: RESOURCE_LIMIT bw= 0.00s
+jagmesh1 gurobi    sym=False: RESOURCE_LIMIT bw= 0.00s
+jagmesh1 gurobi    sym=True: RESOURCE_LIMIT bw= 0.00s
+jagmesh1 cplex    sym=False: RESOURCE_LIMIT bw= 0.00s
+jagmesh1 cplex    sym=True: RESOURCE_LIMIT bw= 0.00s
+jpwh_991 glucose pairwise repeated pairwise sym=False: RESOURCE_LIMIT bw= 0.00s
+jpwh_991 glucose pairwise incremental pairwise sym=False: RESOURCE_LIMIT bw= 0.00s
+jpwh_991 glucose order repeated pairwise sym=False: RESOURCE_LIMIT bw= 0.00s
+jpwh_991 glucose order incremental pairwise sym=False: RESOURCE_LIMIT bw= 0.00s
+jpwh_991 glucose pairwise repeated sequential sym=False: RESOURCE_LIMIT bw= 0.00s
+jpwh_991 glucose pairwise repeated binary sym=False: RESOURCE_LIMIT bw= 0.00s
+jpwh_991 glucose pairwise repeated commander sym=False: RESOURCE_LIMIT bw= 0.00s
+jpwh_991 gurobi    sym=False: RESOURCE_LIMIT bw= 0.00s
+jpwh_991 gurobi    sym=True: RESOURCE_LIMIT bw= 0.00s
+jpwh_991 cplex    sym=False: RESOURCE_LIMIT bw= 0.00s
+jpwh_991 cplex    sym=True: RESOURCE_LIMIT bw= 0.00s
+lns_511 glucose pairwise repeated pairwise sym=False: RESOURCE_LIMIT bw= 0.00s
+lns_511 glucose pairwise incremental pairwise sym=False: RESOURCE_LIMIT bw= 0.00s
+lns_511 glucose order repeated pairwise sym=False: RESOURCE_LIMIT bw= 0.00s
+lns_511 glucose order incremental pairwise sym=False: RESOURCE_LIMIT bw= 0.00s
+lns_511 glucose pairwise repeated sequential sym=False: RESOURCE_LIMIT bw= 0.00s
+lns_511 glucose pairwise repeated binary sym=False: RESOURCE_LIMIT bw= 0.00s
+lns_511 glucose pairwise repeated commander sym=False: RESOURCE_LIMIT bw= 0.00s
+lns_511 gurobi    sym=False: RESOURCE_LIMIT bw= 0.00s
+lns_511 gurobi    sym=True: RESOURCE_LIMIT bw= 0.00s
+lns_511 cplex    sym=False: RESOURCE_LIMIT bw= 0.00s
+lns_511 cplex    sym=True: RESOURCE_LIMIT bw= 0.00s
+mbeacxc glucose pairwise repeated pairwise sym=False: RESOURCE_LIMIT bw= 0.00s
+mbeacxc glucose pairwise incremental pairwise sym=False: RESOURCE_LIMIT bw= 0.00s
+mbeacxc glucose order repeated pairwise sym=False: RESOURCE_LIMIT bw= 0.00s
+mbeacxc glucose order incremental pairwise sym=False: RESOURCE_LIMIT bw= 0.00s
+mbeacxc glucose pairwise repeated sequential sym=False: RESOURCE_LIMIT bw= 0.00s
+mbeacxc glucose pairwise repeated binary sym=False: RESOURCE_LIMIT bw= 0.00s
+mbeacxc glucose pairwise repeated commander sym=False: RESOURCE_LIMIT bw= 0.00s
+mbeacxc gurobi    sym=False: TIMEOUT bw=490 62.29s
+mbeacxc gurobi    sym=True: TIMEOUT bw=490 61.94s
+mbeacxc cplex    sym=False: UNAVAILABLE bw=490 33.17s
+mbeacxc cplex    sym=True: UNAVAILABLE bw=490 34.63s
+mbeaflw glucose pairwise repeated pairwise sym=False: RESOURCE_LIMIT bw= 0.00s
+mbeaflw glucose pairwise incremental pairwise sym=False: RESOURCE_LIMIT bw= 0.00s
+mbeaflw glucose order repeated pairwise sym=False: RESOURCE_LIMIT bw= 0.00s
+mbeaflw glucose order incremental pairwise sym=False: RESOURCE_LIMIT bw= 0.00s
+mbeaflw glucose pairwise repeated sequential sym=False: RESOURCE_LIMIT bw= 0.00s
+mbeaflw glucose pairwise repeated binary sym=False: RESOURCE_LIMIT bw= 0.00s
+mbeaflw glucose pairwise repeated commander sym=False: RESOURCE_LIMIT bw= 0.00s
+mbeaflw gurobi    sym=False: TIMEOUT bw=490 62.42s
+mbeaflw gurobi    sym=True: TIMEOUT bw=490 62.72s
+mbeaflw cplex    sym=False: UNAVAILABLE bw=490 35.75s
+mbeaflw cplex    sym=True: UNAVAILABLE bw=490 39.37s
+mbeause glucose pairwise repeated pairwise sym=False: UNAVAILABLE bw= 0.00s
+mbeause glucose pairwise incremental pairwise sym=False: UNAVAILABLE bw= 0.00s
+mbeause glucose order repeated pairwise sym=False: UNAVAILABLE bw= 0.00s
+mbeause glucose order incremental pairwise sym=False: UNAVAILABLE bw= 0.00s
+mbeause glucose pairwise repeated sequential sym=False: UNAVAILABLE bw= 0.00s
+mbeause glucose pairwise repeated binary sym=False: UNAVAILABLE bw= 0.00s
+mbeause glucose pairwise repeated commander sym=False: UNAVAILABLE bw= 0.00s
+mbeause gurobi    sym=False: UNAVAILABLE bw= 0.00s
+mbeause gurobi    sym=True: UNAVAILABLE bw= 0.00s
+mbeause cplex    sym=False: UNAVAILABLE bw= 0.00s
+mbeause cplex    sym=True: UNAVAILABLE bw= 0.00s
+mcfe glucose pairwise repeated pairwise sym=False: RESOURCE_LIMIT bw= 0.00s
+mcfe glucose pairwise incremental pairwise sym=False: RESOURCE_LIMIT bw= 0.00s
+mcfe glucose order repeated pairwise sym=False: RESOURCE_LIMIT bw= 0.00s
+mcfe glucose order incremental pairwise sym=False: RESOURCE_LIMIT bw= 0.00s
+mcfe glucose pairwise repeated sequential sym=False: RESOURCE_LIMIT bw= 0.00s
+mcfe glucose pairwise repeated binary sym=False: RESOURCE_LIMIT bw= 0.00s
+mcfe glucose pairwise repeated commander sym=False: RESOURCE_LIMIT bw= 0.00s
+mcfe gurobi    sym=False: RESOURCE_LIMIT bw= 0.00s
+mcfe gurobi    sym=True: RESOURCE_LIMIT bw= 0.00s
+mcfe cplex    sym=False: RESOURCE_LIMIT bw= 0.00s
+mcfe cplex    sym=True: RESOURCE_LIMIT bw= 0.00s
+nnc261 glucose pairwise repeated pairwise sym=False: RESOURCE_LIMIT bw= 0.00s
+nnc261 glucose pairwise incremental pairwise sym=False: RESOURCE_LIMIT bw= 0.00s
+nnc261 glucose order repeated pairwise sym=False: TIMEOUT bw=60 60.05s
+nnc261 glucose order incremental pairwise sym=False: TIMEOUT bw=51 60.06s
+nnc261 glucose pairwise repeated sequential sym=False: RESOURCE_LIMIT bw= 0.00s
+nnc261 glucose pairwise repeated binary sym=False: RESOURCE_LIMIT bw= 0.00s
+nnc261 glucose pairwise repeated commander sym=False: RESOURCE_LIMIT bw= 0.00s
+nnc261 gurobi    sym=False: TIMEOUT bw=63 58.72s
+nnc261 gurobi    sym=True: TIMEOUT bw=64 58.63s
+nnc261 cplex    sym=False: UNAVAILABLE bw=64 0.68s
+nnc261 cplex    sym=True: UNAVAILABLE bw=64 0.72s
+nnc666 glucose pairwise repeated pairwise sym=False: RESOURCE_LIMIT bw= 0.00s
+nnc666 glucose pairwise incremental pairwise sym=False: RESOURCE_LIMIT bw= 0.00s
+nnc666 glucose order repeated pairwise sym=False: RESOURCE_LIMIT bw= 0.00s
+nnc666 glucose order incremental pairwise sym=False: RESOURCE_LIMIT bw= 0.00s
+nnc666 glucose pairwise repeated sequential sym=False: RESOURCE_LIMIT bw= 0.00s
+nnc666 glucose pairwise repeated binary sym=False: RESOURCE_LIMIT bw= 0.00s
+nnc666 glucose pairwise repeated commander sym=False: RESOURCE_LIMIT bw= 0.00s
+nnc666 gurobi    sym=False: RESOURCE_LIMIT bw= 0.00s
+nnc666 gurobi    sym=True: RESOURCE_LIMIT bw= 0.00s
+nnc666 cplex    sym=False: RESOURCE_LIMIT bw= 0.00s
+nnc666 cplex    sym=True: RESOURCE_LIMIT bw= 0.00s
+nos1 glucose pairwise repeated pairwise sym=False: RESOURCE_LIMIT bw= 0.00s
+nos1 glucose pairwise incremental pairwise sym=False: RESOURCE_LIMIT bw= 0.00s
+nos1 glucose order repeated pairwise sym=False: OPTIMAL bw=3 16.73s
+nos1 glucose order incremental pairwise sym=False: OPTIMAL bw=3 16.81s
+nos1 glucose pairwise repeated sequential sym=False: RESOURCE_LIMIT bw= 0.00s
+nos1 glucose pairwise repeated binary sym=False: RESOURCE_LIMIT bw= 0.00s
+nos1 glucose pairwise repeated commander sym=False: RESOURCE_LIMIT bw= 0.00s
+nos1 gurobi    sym=False: TIMEOUT bw=4 58.89s
+nos1 gurobi    sym=True: TIMEOUT bw=4 58.73s
+nos1 cplex    sym=False: UNAVAILABLE bw=4 0.60s
+nos1 cplex    sym=True: UNAVAILABLE bw=4 0.60s
+nos2 glucose pairwise repeated pairwise sym=False: RESOURCE_LIMIT bw= 0.00s
+nos2 glucose pairwise incremental pairwise sym=False: RESOURCE_LIMIT bw= 0.00s
+nos2 glucose order repeated pairwise sym=False: RESOURCE_LIMIT bw= 0.00s
+nos2 glucose order incremental pairwise sym=False: RESOURCE_LIMIT bw= 0.00s
+nos2 glucose pairwise repeated sequential sym=False: RESOURCE_LIMIT bw= 0.00s
+nos2 glucose pairwise repeated binary sym=False: RESOURCE_LIMIT bw= 0.00s
+nos2 glucose pairwise repeated commander sym=False: RESOURCE_LIMIT bw= 0.00s
+nos2 gurobi    sym=False: RESOURCE_LIMIT bw= 0.00s
+nos2 gurobi    sym=True: RESOURCE_LIMIT bw= 0.00s
+nos2 cplex    sym=False: RESOURCE_LIMIT bw= 0.00s
+nos2 cplex    sym=True: RESOURCE_LIMIT bw= 0.00s
+nos3 glucose pairwise repeated pairwise sym=False: RESOURCE_LIMIT bw= 0.00s
+nos3 glucose pairwise incremental pairwise sym=False: RESOURCE_LIMIT bw= 0.00s
+nos3 glucose order repeated pairwise sym=False: RESOURCE_LIMIT bw= 0.00s
+nos3 glucose order incremental pairwise sym=False: RESOURCE_LIMIT bw= 0.00s
+nos3 glucose pairwise repeated sequential sym=False: RESOURCE_LIMIT bw= 0.00s
+nos3 glucose pairwise repeated binary sym=False: RESOURCE_LIMIT bw= 0.00s
+nos3 glucose pairwise repeated commander sym=False: RESOURCE_LIMIT bw= 0.00s
+nos3 gurobi    sym=False: RESOURCE_LIMIT bw= 0.00s
+nos3 gurobi    sym=True: RESOURCE_LIMIT bw= 0.00s
+nos3 cplex    sym=False: RESOURCE_LIMIT bw= 0.00s
+nos3 cplex    sym=True: RESOURCE_LIMIT bw= 0.00s
+nos5 glucose pairwise repeated pairwise sym=False: RESOURCE_LIMIT bw= 0.00s
+nos5 glucose pairwise incremental pairwise sym=False: RESOURCE_LIMIT bw= 0.00s
+nos5 glucose order repeated pairwise sym=False: RESOURCE_LIMIT bw= 0.00s
+nos5 glucose order incremental pairwise sym=False: RESOURCE_LIMIT bw= 0.00s
+nos5 glucose pairwise repeated sequential sym=False: RESOURCE_LIMIT bw= 0.00s
+nos5 glucose pairwise repeated binary sym=False: RESOURCE_LIMIT bw= 0.00s
+nos5 glucose pairwise repeated commander sym=False: RESOURCE_LIMIT bw= 0.00s
+nos5 gurobi    sym=False: TIMEOUT bw=178 59.06s
+nos5 gurobi    sym=True: TIMEOUT bw=178 59.20s
+nos5 cplex    sym=False: UNAVAILABLE bw=178 2.98s
+nos5 cplex    sym=True: UNAVAILABLE bw=178 2.99s
+nos6 glucose pairwise repeated pairwise sym=False: RESOURCE_LIMIT bw= 0.00s
+nos6 glucose pairwise incremental pairwise sym=False: RESOURCE_LIMIT bw= 0.00s
+nos6 glucose order repeated pairwise sym=False: RESOURCE_LIMIT bw= 0.00s
+nos6 glucose order incremental pairwise sym=False: RESOURCE_LIMIT bw= 0.00s
+nos6 glucose pairwise repeated sequential sym=False: RESOURCE_LIMIT bw= 0.00s
+nos6 glucose pairwise repeated binary sym=False: RESOURCE_LIMIT bw= 0.00s
+nos6 glucose pairwise repeated commander sym=False: RESOURCE_LIMIT bw= 0.00s
+nos6 gurobi    sym=False: RESOURCE_LIMIT bw= 0.00s
+nos6 gurobi    sym=True: RESOURCE_LIMIT bw= 0.00s
+nos6 cplex    sym=False: RESOURCE_LIMIT bw= 0.00s
+nos6 cplex    sym=True: RESOURCE_LIMIT bw= 0.00s
+nos7 glucose pairwise repeated pairwise sym=False: RESOURCE_LIMIT bw= 0.00s
+nos7 glucose pairwise incremental pairwise sym=False: RESOURCE_LIMIT bw= 0.00s
+nos7 glucose order repeated pairwise sym=False: RESOURCE_LIMIT bw= 0.00s
+nos7 glucose order incremental pairwise sym=False: RESOURCE_LIMIT bw= 0.00s
+nos7 glucose pairwise repeated sequential sym=False: RESOURCE_LIMIT bw= 0.00s
+nos7 glucose pairwise repeated binary sym=False: RESOURCE_LIMIT bw= 0.00s
+nos7 glucose pairwise repeated commander sym=False: RESOURCE_LIMIT bw= 0.00s
+nos7 gurobi    sym=False: RESOURCE_LIMIT bw= 0.00s
+nos7 gurobi    sym=True: RESOURCE_LIMIT bw= 0.00s
+nos7 cplex    sym=False: RESOURCE_LIMIT bw= 0.00s
+nos7 cplex    sym=True: RESOURCE_LIMIT bw= 0.00s
+orsirr_2 glucose pairwise repeated pairwise sym=False: RESOURCE_LIMIT bw= 0.00s
+orsirr_2 glucose pairwise incremental pairwise sym=False: RESOURCE_LIMIT bw= 0.00s
+orsirr_2 glucose order repeated pairwise sym=False: RESOURCE_LIMIT bw= 0.00s
+orsirr_2 glucose order incremental pairwise sym=False: RESOURCE_LIMIT bw= 0.00s
+orsirr_2 glucose pairwise repeated sequential sym=False: RESOURCE_LIMIT bw= 0.00s
+orsirr_2 glucose pairwise repeated binary sym=False: RESOURCE_LIMIT bw= 0.00s
+orsirr_2 glucose pairwise repeated commander sym=False: RESOURCE_LIMIT bw= 0.00s
+orsirr_2 gurobi    sym=False: RESOURCE_LIMIT bw= 0.00s
+orsirr_2 gurobi    sym=True: RESOURCE_LIMIT bw= 0.00s
+orsirr_2 cplex    sym=False: RESOURCE_LIMIT bw= 0.00s
+orsirr_2 cplex    sym=True: RESOURCE_LIMIT bw= 0.00s
+plat362 glucose pairwise repeated pairwise sym=False: RESOURCE_LIMIT bw= 0.00s
+plat362 glucose pairwise incremental pairwise sym=False: RESOURCE_LIMIT bw= 0.00s
+plat362 glucose order repeated pairwise sym=False: RESOURCE_LIMIT bw= 0.00s
+plat362 glucose order incremental pairwise sym=False: RESOURCE_LIMIT bw= 0.00s
+plat362 glucose pairwise repeated sequential sym=False: RESOURCE_LIMIT bw= 0.00s
+plat362 glucose pairwise repeated binary sym=False: RESOURCE_LIMIT bw= 0.00s
+plat362 glucose pairwise repeated commander sym=False: RESOURCE_LIMIT bw= 0.00s
+plat362 gurobi    sym=False: TIMEOUT bw=249 59.32s
+plat362 gurobi    sym=True: TIMEOUT bw=249 59.30s
+plat362 cplex    sym=False: UNAVAILABLE bw=249 2.44s
+plat362 cplex    sym=True: UNAVAILABLE bw=249 2.02s
+plskz362 glucose pairwise repeated pairwise sym=False: RESOURCE_LIMIT bw= 0.00s
+plskz362 glucose pairwise incremental pairwise sym=False: RESOURCE_LIMIT bw= 0.00s
+plskz362 glucose order repeated pairwise sym=False: TIMEOUT bw=247 60.07s
+plskz362 glucose order incremental pairwise sym=False: TIMEOUT bw=207 60.06s
+plskz362 glucose pairwise repeated sequential sym=False: RESOURCE_LIMIT bw= 0.00s
+plskz362 glucose pairwise repeated binary sym=False: RESOURCE_LIMIT bw= 0.00s
+plskz362 glucose pairwise repeated commander sym=False: RESOURCE_LIMIT bw= 0.00s
+plskz362 gurobi    sym=False: TIMEOUT bw=205 58.72s
+plskz362 gurobi    sym=True: TIMEOUT bw=237 58.64s
+plskz362 cplex    sym=False: UNAVAILABLE bw=248 0.64s
+plskz362 cplex    sym=True: UNAVAILABLE bw=248 0.65s
+pores_3 glucose pairwise repeated pairwise sym=False: RESOURCE_LIMIT bw= 0.00s
+pores_3 glucose pairwise incremental pairwise sym=False: RESOURCE_LIMIT bw= 0.00s
+pores_3 glucose order repeated pairwise sym=False: RESOURCE_LIMIT bw= 0.00s
+pores_3 glucose order incremental pairwise sym=False: RESOURCE_LIMIT bw= 0.00s
+pores_3 glucose pairwise repeated sequential sym=False: RESOURCE_LIMIT bw= 0.00s
+pores_3 glucose pairwise repeated binary sym=False: RESOURCE_LIMIT bw= 0.00s
+pores_3 glucose pairwise repeated commander sym=False: RESOURCE_LIMIT bw= 0.00s
+pores_3 gurobi    sym=False: RESOURCE_LIMIT bw= 0.00s
+pores_3 gurobi    sym=True: RESOURCE_LIMIT bw= 0.00s
+pores_3 cplex    sym=False: RESOURCE_LIMIT bw= 0.00s
+pores_3 cplex    sym=True: RESOURCE_LIMIT bw= 0.00s
+saylr1 glucose pairwise repeated pairwise sym=False: RESOURCE_LIMIT bw= 0.00s
+saylr1 glucose pairwise incremental pairwise sym=False: RESOURCE_LIMIT bw= 0.00s
+saylr1 glucose order repeated pairwise sym=False: TIMEOUT bw=14 60.03s
+saylr1 glucose order incremental pairwise sym=False: TIMEOUT bw=14 60.02s
+saylr1 glucose pairwise repeated sequential sym=False: RESOURCE_LIMIT bw= 0.00s
+saylr1 glucose pairwise repeated binary sym=False: RESOURCE_LIMIT bw= 0.00s
+saylr1 glucose pairwise repeated commander sym=False: RESOURCE_LIMIT bw= 0.00s
+saylr1 gurobi    sym=False: TIMEOUT bw=14 58.52s
+saylr1 gurobi    sym=True: TIMEOUT bw=14 60.03s
+saylr1 cplex    sym=False: UNAVAILABLE bw=14 0.49s
+saylr1 cplex    sym=True: UNAVAILABLE bw=14 0.41s
+saylr3 glucose pairwise repeated pairwise sym=False: RESOURCE_LIMIT bw= 0.00s
+saylr3 glucose pairwise incremental pairwise sym=False: RESOURCE_LIMIT bw= 0.00s
+saylr3 glucose order repeated pairwise sym=False: RESOURCE_LIMIT bw= 0.00s
+saylr3 glucose order incremental pairwise sym=False: RESOURCE_LIMIT bw= 0.00s
+saylr3 glucose pairwise repeated sequential sym=False: RESOURCE_LIMIT bw= 0.00s
+saylr3 glucose pairwise repeated binary sym=False: RESOURCE_LIMIT bw= 0.00s
+saylr3 glucose pairwise repeated commander sym=False: RESOURCE_LIMIT bw= 0.00s
+saylr3 gurobi    sym=False: RESOURCE_LIMIT bw= 0.00s
+saylr3 gurobi    sym=True: RESOURCE_LIMIT bw= 0.00s
+saylr3 cplex    sym=False: RESOURCE_LIMIT bw= 0.00s
+saylr3 cplex    sym=True: RESOURCE_LIMIT bw= 0.00s
+sherman1 glucose pairwise repeated pairwise sym=False: RESOURCE_LIMIT bw= 0.00s
+sherman1 glucose pairwise incremental pairwise sym=False: RESOURCE_LIMIT bw= 0.00s
+sherman1 glucose order repeated pairwise sym=False: RESOURCE_LIMIT bw= 0.00s
+sherman1 glucose order incremental pairwise sym=False: RESOURCE_LIMIT bw= 0.00s
+sherman1 glucose pairwise repeated sequential sym=False: RESOURCE_LIMIT bw= 0.00s
+sherman1 glucose pairwise repeated binary sym=False: RESOURCE_LIMIT bw= 0.00s
+sherman1 glucose pairwise repeated commander sym=False: RESOURCE_LIMIT bw= 0.00s
+sherman1 gurobi    sym=False: RESOURCE_LIMIT bw= 0.00s
+sherman1 gurobi    sym=True: RESOURCE_LIMIT bw= 0.00s
+sherman1 cplex    sym=False: RESOURCE_LIMIT bw= 0.00s
+sherman1 cplex    sym=True: RESOURCE_LIMIT bw= 0.00s
+sherman4 glucose pairwise repeated pairwise sym=False: RESOURCE_LIMIT bw= 0.00s
+sherman4 glucose pairwise incremental pairwise sym=False: RESOURCE_LIMIT bw= 0.00s
+sherman4 glucose order repeated pairwise sym=False: RESOURCE_LIMIT bw= 0.00s
+sherman4 glucose order incremental pairwise sym=False: RESOURCE_LIMIT bw= 0.00s
+sherman4 glucose pairwise repeated sequential sym=False: RESOURCE_LIMIT bw= 0.00s
+sherman4 glucose pairwise repeated binary sym=False: RESOURCE_LIMIT bw= 0.00s
+sherman4 glucose pairwise repeated commander sym=False: RESOURCE_LIMIT bw= 0.00s
+sherman4 gurobi    sym=False: RESOURCE_LIMIT bw= 0.00s
+sherman4 gurobi    sym=True: RESOURCE_LIMIT bw= 0.00s
+sherman4 cplex    sym=False: RESOURCE_LIMIT bw= 0.00s
+sherman4 cplex    sym=True: RESOURCE_LIMIT bw= 0.00s
+shl_0 glucose pairwise repeated pairwise sym=False: RESOURCE_LIMIT bw= 0.00s
+shl_0 glucose pairwise incremental pairwise sym=False: RESOURCE_LIMIT bw= 0.00s
+shl_0 glucose order repeated pairwise sym=False: RESOURCE_LIMIT bw= 0.00s
+shl_0 glucose order incremental pairwise sym=False: RESOURCE_LIMIT bw= 0.00s
+shl_0 glucose pairwise repeated sequential sym=False: RESOURCE_LIMIT bw= 0.00s
+shl_0 glucose pairwise repeated binary sym=False: RESOURCE_LIMIT bw= 0.00s
+shl_0 glucose pairwise repeated commander sym=False: RESOURCE_LIMIT bw= 0.00s
+shl_0 gurobi    sym=False: RESOURCE_LIMIT bw= 0.00s
+shl_0 gurobi    sym=True: RESOURCE_LIMIT bw= 0.00s
+shl_0 cplex    sym=False: RESOURCE_LIMIT bw= 0.00s
+shl_0 cplex    sym=True: RESOURCE_LIMIT bw= 0.00s
+shl_200 glucose pairwise repeated pairwise sym=False: RESOURCE_LIMIT bw= 0.00s
+shl_200 glucose pairwise incremental pairwise sym=False: RESOURCE_LIMIT bw= 0.00s
+shl_200 glucose order repeated pairwise sym=False: RESOURCE_LIMIT bw= 0.00s
+shl_200 glucose order incremental pairwise sym=False: RESOURCE_LIMIT bw= 0.00s
+shl_200 glucose pairwise repeated sequential sym=False: RESOURCE_LIMIT bw= 0.00s
+shl_200 glucose pairwise repeated binary sym=False: RESOURCE_LIMIT bw= 0.00s
+shl_200 glucose pairwise repeated commander sym=False: RESOURCE_LIMIT bw= 0.00s
+shl_200 gurobi    sym=False: RESOURCE_LIMIT bw= 0.00s
+shl_200 gurobi    sym=True: RESOURCE_LIMIT bw= 0.00s
+shl_200 cplex    sym=False: RESOURCE_LIMIT bw= 0.00s
+shl_200 cplex    sym=True: RESOURCE_LIMIT bw= 0.00s
+shl_400 glucose pairwise repeated pairwise sym=False: RESOURCE_LIMIT bw= 0.00s
+shl_400 glucose pairwise incremental pairwise sym=False: RESOURCE_LIMIT bw= 0.00s
+shl_400 glucose order repeated pairwise sym=False: RESOURCE_LIMIT bw= 0.00s
+shl_400 glucose order incremental pairwise sym=False: RESOURCE_LIMIT bw= 0.00s
+shl_400 glucose pairwise repeated sequential sym=False: RESOURCE_LIMIT bw= 0.00s
+shl_400 glucose pairwise repeated binary sym=False: RESOURCE_LIMIT bw= 0.00s
+shl_400 glucose pairwise repeated commander sym=False: RESOURCE_LIMIT bw= 0.00s
+shl_400 gurobi    sym=False: RESOURCE_LIMIT bw= 0.00s
+shl_400 gurobi    sym=True: RESOURCE_LIMIT bw= 0.00s
+shl_400 cplex    sym=False: RESOURCE_LIMIT bw= 0.00s
+shl_400 cplex    sym=True: RESOURCE_LIMIT bw= 0.00s
+steam1 glucose pairwise repeated pairwise sym=False: RESOURCE_LIMIT bw= 0.00s
+steam1 glucose pairwise incremental pairwise sym=False: RESOURCE_LIMIT bw= 0.00s
+steam1 glucose order repeated pairwise sym=False: TIMEOUT bw=142 60.04s
+steam1 glucose order incremental pairwise sym=False: TIMEOUT bw=132 60.04s
+steam1 glucose pairwise repeated sequential sym=False: RESOURCE_LIMIT bw= 0.00s
+steam1 glucose pairwise repeated binary sym=False: RESOURCE_LIMIT bw= 0.00s
+steam1 glucose pairwise repeated commander sym=False: RESOURCE_LIMIT bw= 0.00s
+steam1 gurobi    sym=False: TIMEOUT bw=145 58.52s
+steam1 gurobi    sym=True: TIMEOUT bw=143 58.44s
+steam1 cplex    sym=False: UNAVAILABLE bw=146 0.60s
+steam1 cplex    sym=True: UNAVAILABLE bw=146 0.66s
+steam2 glucose pairwise repeated pairwise sym=False: RESOURCE_LIMIT bw= 0.00s
+steam2 glucose pairwise incremental pairwise sym=False: RESOURCE_LIMIT bw= 0.00s
+steam2 glucose order repeated pairwise sym=False: RESOURCE_LIMIT bw= 0.00s
+steam2 glucose order incremental pairwise sym=False: RESOURCE_LIMIT bw= 0.00s
+steam2 glucose pairwise repeated sequential sym=False: RESOURCE_LIMIT bw= 0.00s
+steam2 glucose pairwise repeated binary sym=False: RESOURCE_LIMIT bw= 0.00s
+steam2 glucose pairwise repeated commander sym=False: RESOURCE_LIMIT bw= 0.00s
+steam2 gurobi    sym=False: RESOURCE_LIMIT bw= 0.00s
+steam2 gurobi    sym=True: RESOURCE_LIMIT bw= 0.00s
+steam2 cplex    sym=False: RESOURCE_LIMIT bw= 0.00s
+steam2 cplex    sym=True: RESOURCE_LIMIT bw= 0.00s
+str_0 glucose pairwise repeated pairwise sym=False: RESOURCE_LIMIT bw= 0.00s
+str_0 glucose pairwise incremental pairwise sym=False: RESOURCE_LIMIT bw= 0.00s
+str_0 glucose order repeated pairwise sym=False: RESOURCE_LIMIT bw= 0.00s
+str_0 glucose order incremental pairwise sym=False: RESOURCE_LIMIT bw= 0.00s
+str_0 glucose pairwise repeated sequential sym=False: RESOURCE_LIMIT bw= 0.00s
+str_0 glucose pairwise repeated binary sym=False: RESOURCE_LIMIT bw= 0.00s
+str_0 glucose pairwise repeated commander sym=False: RESOURCE_LIMIT bw= 0.00s
+str_0 gurobi    sym=False: TIMEOUT bw=291 58.66s
+str_0 gurobi    sym=True: TIMEOUT bw=327 58.59s
+str_0 cplex    sym=False: UNAVAILABLE bw=359 1.31s
+str_0 cplex    sym=True: UNAVAILABLE bw=359 1.30s
+str_200 glucose pairwise repeated pairwise sym=False: RESOURCE_LIMIT bw= 0.00s
+str_200 glucose pairwise incremental pairwise sym=False: RESOURCE_LIMIT bw= 0.00s
+str_200 glucose order repeated pairwise sym=False: RESOURCE_LIMIT bw= 0.00s
+str_200 glucose order incremental pairwise sym=False: RESOURCE_LIMIT bw= 0.00s
+str_200 glucose pairwise repeated sequential sym=False: RESOURCE_LIMIT bw= 0.00s
+str_200 glucose pairwise repeated binary sym=False: RESOURCE_LIMIT bw= 0.00s
+str_200 glucose pairwise repeated commander sym=False: RESOURCE_LIMIT bw= 0.00s
+str_200 gurobi    sym=False: TIMEOUT bw=359 58.69s
+str_200 gurobi    sym=True: TIMEOUT bw=325 58.83s
+str_200 cplex    sym=False: UNAVAILABLE bw=359 1.60s
+str_200 cplex    sym=True: UNAVAILABLE bw=359 1.54s
+str_600 glucose pairwise repeated pairwise sym=False: RESOURCE_LIMIT bw= 0.00s
+str_600 glucose pairwise incremental pairwise sym=False: RESOURCE_LIMIT bw= 0.00s
+str_600 glucose order repeated pairwise sym=False: RESOURCE_LIMIT bw= 0.00s
+str_600 glucose order incremental pairwise sym=False: RESOURCE_LIMIT bw= 0.00s
+str_600 glucose pairwise repeated sequential sym=False: RESOURCE_LIMIT bw= 0.00s
+str_600 glucose pairwise repeated binary sym=False: RESOURCE_LIMIT bw= 0.00s
+str_600 glucose pairwise repeated commander sym=False: RESOURCE_LIMIT bw= 0.00s
+str_600 gurobi    sym=False: TIMEOUT bw=359 59.06s
+str_600 gurobi    sym=True: TIMEOUT bw=359 59.00s
+str_600 cplex    sym=False: UNAVAILABLE bw=359 2.08s
+str_600 cplex    sym=True: UNAVAILABLE bw=359 2.10s
+west0381 glucose pairwise repeated pairwise sym=False: RESOURCE_LIMIT bw= 0.00s
+west0381 glucose pairwise incremental pairwise sym=False: RESOURCE_LIMIT bw= 0.00s
+west0381 glucose order repeated pairwise sym=False: TIMEOUT bw=360 60.07s
+west0381 glucose order incremental pairwise sym=False: TIMEOUT bw=287 60.07s
+west0381 glucose pairwise repeated sequential sym=False: RESOURCE_LIMIT bw= 0.00s
+west0381 glucose pairwise repeated binary sym=False: RESOURCE_LIMIT bw= 0.00s
+west0381 glucose pairwise repeated commander sym=False: RESOURCE_LIMIT bw= 0.00s
+west0381 gurobi    sym=False: TIMEOUT bw=327 59.12s
+west0381 gurobi    sym=True: TIMEOUT bw=339 58.69s
+west0381 cplex    sym=False: UNAVAILABLE bw=363 1.45s
+west0381 cplex    sym=True: UNAVAILABLE bw=363 1.31s
+west0479 glucose pairwise repeated pairwise sym=False: RESOURCE_LIMIT bw= 0.00s
+west0479 glucose pairwise incremental pairwise sym=False: RESOURCE_LIMIT bw= 0.00s
+west0479 glucose order repeated pairwise sym=False: RESOURCE_LIMIT bw= 0.00s
+west0479 glucose order incremental pairwise sym=False: RESOURCE_LIMIT bw= 0.00s
+west0479 glucose pairwise repeated sequential sym=False: RESOURCE_LIMIT bw= 0.00s
+west0479 glucose pairwise repeated binary sym=False: RESOURCE_LIMIT bw= 0.00s
+west0479 glucose pairwise repeated commander sym=False: RESOURCE_LIMIT bw= 0.00s
+west0479 gurobi    sym=False: TIMEOUT bw=383 58.91s
+west0479 gurobi    sym=True: TIMEOUT bw=387 58.84s
+west0479 cplex    sym=False: UNAVAILABLE bw=388 1.65s
+west0479 cplex    sym=True: UNAVAILABLE bw=388 1.59s
+west0497 glucose pairwise repeated pairwise sym=False: RESOURCE_LIMIT bw= 0.00s
+west0497 glucose pairwise incremental pairwise sym=False: RESOURCE_LIMIT bw= 0.00s
+west0497 glucose order repeated pairwise sym=False: RESOURCE_LIMIT bw= 0.00s
+west0497 glucose order incremental pairwise sym=False: RESOURCE_LIMIT bw= 0.00s
+west0497 glucose pairwise repeated sequential sym=False: RESOURCE_LIMIT bw= 0.00s
+west0497 glucose pairwise repeated binary sym=False: RESOURCE_LIMIT bw= 0.00s
+west0497 glucose pairwise repeated commander sym=False: RESOURCE_LIMIT bw= 0.00s
+west0497 gurobi    sym=False: TIMEOUT bw=399 58.81s
+west0497 gurobi    sym=True: TIMEOUT bw=416 58.86s
+west0497 cplex    sym=False: UNAVAILABLE bw=416 1.55s
+west0497 cplex    sym=True: UNAVAILABLE bw=416 1.54s
+west0655 glucose pairwise repeated pairwise sym=False: RESOURCE_LIMIT bw= 0.00s
+west0655 glucose pairwise incremental pairwise sym=False: RESOURCE_LIMIT bw= 0.00s
+west0655 glucose order repeated pairwise sym=False: RESOURCE_LIMIT bw= 0.00s
+west0655 glucose order incremental pairwise sym=False: RESOURCE_LIMIT bw= 0.00s
+west0655 glucose pairwise repeated sequential sym=False: RESOURCE_LIMIT bw= 0.00s
+west0655 glucose pairwise repeated binary sym=False: RESOURCE_LIMIT bw= 0.00s
+west0655 glucose pairwise repeated commander sym=False: RESOURCE_LIMIT bw= 0.00s
+west0655 gurobi    sym=False: RESOURCE_LIMIT bw= 0.00s
+west0655 gurobi    sym=True: RESOURCE_LIMIT bw= 0.00s
+west0655 cplex    sym=False: RESOURCE_LIMIT bw= 0.00s
+west0655 cplex    sym=True: RESOURCE_LIMIT bw= 0.00s
+west0989 glucose pairwise repeated pairwise sym=False: RESOURCE_LIMIT bw= 0.00s
+west0989 glucose pairwise incremental pairwise sym=False: RESOURCE_LIMIT bw= 0.00s
+west0989 glucose order repeated pairwise sym=False: RESOURCE_LIMIT bw= 0.00s
+west0989 glucose order incremental pairwise sym=False: RESOURCE_LIMIT bw= 0.00s
+west0989 glucose pairwise repeated sequential sym=False: RESOURCE_LIMIT bw= 0.00s
+west0989 glucose pairwise repeated binary sym=False: RESOURCE_LIMIT bw= 0.00s
+west0989 glucose pairwise repeated commander sym=False: RESOURCE_LIMIT bw= 0.00s
+west0989 gurobi    sym=False: RESOURCE_LIMIT bw= 0.00s
+west0989 gurobi    sym=True: RESOURCE_LIMIT bw= 0.00s
+west0989 cplex    sym=False: RESOURCE_LIMIT bw= 0.00s
+west0989 cplex    sym=True: RESOURCE_LIMIT bw= 0.00s

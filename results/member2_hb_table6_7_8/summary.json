@@ -1,0 +1,72 @@
+{
+  "tables": {
+    "6": {
+      "reference_rows": 31,
+      "unique_instances": 31,
+      "runs_recorded": 341,
+      "optimal_runs": 12,
+      "optimal_instances": 5,
+      "timeout_runs": 162,
+      "resource_limit_runs": 105,
+      "unavailable_runs": 60,
+      "comparison": {
+        "better": 1,
+        "equal": 9,
+        "worse": 21,
+        "no_solution": 0,
+        "missing_best": 0
+      }
+    },
+    "7": {
+      "reference_rows": 41,
+      "unique_instances": 41,
+      "runs_recorded": 451,
+      "optimal_runs": 0,
+      "optimal_instances": 0,
+      "timeout_runs": 62,
+      "resource_limit_runs": 353,
+      "unavailable_runs": 36,
+      "comparison": {
+        "better": 0,
+        "equal": 0,
+        "worse": 18,
+        "no_solution": 23,
+        "missing_best": 0
+      }
+    },
+    "8": {
+      "reference_rows": 41,
+      "unique_instances": 41,
+      "runs_recorded": 451,
+      "optimal_runs": 2,
+      "optimal_instances": 1,
+      "timeout_runs": 54,
+      "resource_limit_runs": 346,
+      "unavailable_runs": 49,
+      "comparison": {
+        "better": 0,
+        "equal": 2,
+        "worse": 17,
+        "no_solution": 22,
+        "missing_best": 0
+      }
+    }
+  },
+  "overall": {
+    "reference_rows": 113,
+    "unique_instances": 113,
+    "runs_recorded": 1243,
+    "optimal_runs": 14,
+    "optimal_instances": 6,
+    "timeout_runs": 278,
+    "resource_limit_runs": 804,
+    "unavailable_runs": 145,
+    "comparison": {
+      "better": 1,
+      "equal": 11,
+      "worse": 56,
+      "no_solution": 45,
+      "missing_best": 0
+    }
+  }
+}

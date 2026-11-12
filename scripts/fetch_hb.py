@@ -1,9 +1,11 @@
 """Download original HB matrices from NIST and make simple undirected graphs."""
 
+import argparse
 import csv
 import gzip
 import hashlib
 import re
+import shutil
 import sys
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from html.parser import HTMLParser
@@ -17,7 +19,7 @@ from bmp.core.graph import Graph
 from bmp.io.readers import write_edge_list
 
 ROOT = "https://math.nist.gov/MatrixMarket/data/Harwell-Boeing/"
-BASE = Path(__file__).resolve().parents[1] / "data" / "hb_table6_7"
+PROJECT = Path(__file__).resolve().parents[1]
 
 
 class Links(HTMLParser):
@@ -90,7 +92,7 @@ def parse_mtx_gz(raw, name):
     return Graph.from_edges(range(1, n + 1), edges, name=name), field, count
 
 
-def fetch(row, mapping):
+def fetch(row, mapping, base):
     name = row["instance"]
     result = dict(row, source="NIST Matrix Market / Harwell-Boeing", matrix_name="",
                   matrix_url="", sha256="", matrix_entries="", edges="", status="", reason="")
@@ -101,7 +103,8 @@ def fetch(row, mapping):
     page_url = matches[0]
     matrix_name = Path(page_url).stem
     result["matrix_name"] = matrix_name
-    matrix_links = [url for url in links(page_url) if url.endswith(".mtx.gz")]
+    matrix_links = sorted({url for url in links(page_url)
+                           if Path(url).name.lower() == f"{matrix_name.lower()}.mtx.gz"})
     if len(matrix_links) != 1:
         result.update(status="NOT_FOUND", reason=f"Matrix download links: {matrix_links}")
         return result
@@ -114,45 +117,78 @@ def fetch(row, mapping):
     graph, field, entries = parse_mtx_gz(body, name)
     result["matrix_entries"] = entries
     result["edges"] = graph.size
+    raw_dir = base / "raw"
+    raw_dir.mkdir(parents=True, exist_ok=True)
+    (raw_dir / f"{name}.mtx.gz").write_bytes(body)
     if graph.order != int(row["n"]):
         result.update(status="SIZE_MISMATCH", reason=f"PDF n={row['n']}; matrix n={graph.order}")
         return result
-    raw_dir = BASE / "raw"
-    graph_dir = BASE / "graphs"
-    raw_dir.mkdir(parents=True, exist_ok=True)
+    graph_dir = base / "graphs"
     graph_dir.mkdir(parents=True, exist_ok=True)
-    (raw_dir / f"{name}.mtx.gz").write_bytes(body)
     write_edge_list(graph, graph_dir / f"{name}.edgelist")
     result["status"] = "VERIFIED"
     return result
 
 
+def verified_local(row, source, base):
+    name = row["instance"]
+    raw = base / "raw" / f"{name}.mtx.gz"
+    graph_file = base / "graphs" / f"{name}.edgelist"
+    if source.get("status") != "VERIFIED" or not raw.exists() or not graph_file.exists():
+        return False
+    if hashlib.sha256(raw.read_bytes()).hexdigest() != source.get("sha256"):
+        return False
+    from bmp.io.readers import read_graph
+    graph = read_graph(graph_file)
+    return graph.order == int(row["n"]) and graph.size == int(source["edges"])
+
+
 def main():
-    with (BASE / "manifest.csv").open(newline="", encoding="utf-8") as source:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--base", type=Path, default=PROJECT / "data" / "hb_table6_7")
+    parser.add_argument("--reuse-from", type=Path)
+    args = parser.parse_args()
+    base = args.base.resolve()
+    with (base / "manifest.csv").open(newline="", encoding="utf-8") as source:
         rows = list(csv.DictReader(source))
-    mapping = index()
-    target = BASE / "sources.csv"
+    target = base / "sources.csv"
     fields = list(rows[0]) + ["source", "matrix_name", "matrix_url", "sha256",
                               "matrix_entries", "edges", "status", "reason"]
     old = {}
     if target.exists():
         with target.open(newline="", encoding="utf-8") as source:
             old = {row["instance"]: row for row in csv.DictReader(source)}
+    reused = {}
+    if args.reuse_from:
+        reuse_base = args.reuse_from.resolve()
+        with (reuse_base / "sources.csv").open(newline="", encoding="utf-8") as source:
+            reused = {row["instance"]: row for row in csv.DictReader(source)}
+    pending = [row for row in rows if not verified_local(row, old.get(row["instance"], {}), base)
+               and not (row["instance"] in reused and verified_local(row, reused[row["instance"]], args.reuse_from.resolve()))]
+    mapping = index() if pending else {}
     for row in rows:
         name = row["instance"]
-        if old.get(name, {}).get("status") == "VERIFIED" and (BASE / "graphs" / f"{name}.edgelist").exists():
+        if verified_local(row, old.get(name, {}), base):
             continue
-        try:
-            old[name] = fetch(row, mapping)
-        except Exception as exc:
-            old[name] = dict(row, source="NIST Matrix Market / Harwell-Boeing", matrix_name="",
-                             matrix_url="", sha256="", matrix_entries="", edges="",
-                             status="DOWNLOAD_ERROR", reason=f"{type(exc).__name__}: {exc}")
+        if name in reused and verified_local(row, reused[name], args.reuse_from.resolve()):
+            for folder, suffix in (("raw", ".mtx.gz"), ("graphs", ".edgelist")):
+                (base / folder).mkdir(parents=True, exist_ok=True)
+                shutil.copy2(args.reuse_from.resolve() / folder / f"{name}{suffix}",
+                             base / folder / f"{name}{suffix}")
+            old[name] = dict(row, **{field: reused[name][field] for field in fields if field not in row})
+            print(name, "REUSED", flush=True)
+        else:
+            try:
+                old[name] = fetch(row, mapping, base)
+            except Exception as exc:
+                old[name] = dict(row, source="NIST Matrix Market / Harwell-Boeing", matrix_name="",
+                                 matrix_url="", sha256="", matrix_entries="", edges="",
+                                 status="DOWNLOAD_ERROR", reason=f"{type(exc).__name__}: {exc}")
+            print(name, old[name]["status"], old[name]["reason"], flush=True)
         with target.open("w", newline="", encoding="utf-8") as output:
             writer = csv.DictWriter(output, fieldnames=fields)
             writer.writeheader()
             writer.writerows(old[r["instance"]] for r in rows if r["instance"] in old)
-        print(name, old[name]["status"], old[name]["reason"], flush=True)
 
 
 if __name__ == "__main__":

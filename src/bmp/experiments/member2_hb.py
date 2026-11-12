@@ -1,4 +1,4 @@
-"""Resumable Member 2 benchmark for the 72 HB instances in Tables 6 and 7."""
+"""Resumable Member 2 benchmark for HB instances in Tables 6, 7, and 8."""
 
 from __future__ import annotations
 
@@ -6,9 +6,11 @@ import argparse
 import csv
 import json
 import os
+import shutil
 import subprocess
 import sys
 import tomllib
+from collections import Counter
 from pathlib import Path
 from time import monotonic
 
@@ -47,6 +49,72 @@ def configurations(config):
 def identity(row):
     return (row["instance"], row["solver"], row["encoding"], row["strategy"],
             row["amo"], str(row["symmetry_breaking"]).lower(), str(row["repetition"]))
+
+
+def read_rows(path):
+    with path.open(newline="", encoding="utf-8") as source:
+        return list(csv.DictReader(source))
+
+
+def unique_instances(manifest):
+    instances = {}
+    for item in manifest:
+        previous = instances.setdefault(item["instance"], item)
+        if previous["n"] != item["n"]:
+            raise ValueError(f"Conflicting n for repeated instance {item['instance']}")
+    return instances
+
+
+def expected_keys(instances, config, repetitions):
+    keys = set()
+    for name in instances:
+        for solver, encoding, strategy, amo, symmetry in configurations(config):
+            for repetition in range(1, repetitions + 1):
+                keys.add((name, solver, encoding, strategy, amo,
+                          str(symmetry).lower(), str(repetition)))
+    return keys
+
+
+def audit_legacy(rows, config, repetitions, legacy_manifest, graph_dir, timeout):
+    """Reject duplicates, missing configurations, and invalid saved incumbents."""
+    old_names = {row["instance"] for row in rows}
+    references = unique_instances(legacy_manifest)
+    unexpected_names = old_names - set(references)
+    expected = expected_keys(references, config, repetitions)
+    keys = [identity(row) for row in rows]
+    duplicates = [key for key, count in Counter(keys).items() if count > 1]
+    missing = expected - set(keys)
+    unexpected = set(keys) - expected
+    problems = []
+    if unexpected_names:
+        problems.append(f"Unknown legacy instances: {sorted(unexpected_names)}")
+    if duplicates:
+        problems.append(f"Duplicate legacy keys ({len(duplicates)}): {duplicates[:5]}")
+    if missing:
+        problems.append(f"Missing legacy keys ({len(missing)}): {sorted(missing)[:5]}")
+    if unexpected:
+        problems.append(f"Unexpected legacy configurations ({len(unexpected)}): {sorted(unexpected)[:5]}")
+    graphs = {}
+    for row in rows:
+        name = row["instance"]
+        if name not in references:
+            continue
+        if row["n"] != references[name]["n"] or row["table"] != references[name]["table"]:
+            problems.append(f"Legacy n/table mismatch: {name}")
+        if float(row["timeout_seconds"]) != timeout:
+            problems.append(f"Legacy timeout mismatch: {name}")
+        if row.get("assignment"):
+            if name not in graphs:
+                graphs[name] = read_graph(graph_dir / f"{name}.edgelist")
+            assignment = {int(v): int(label) for v, label in json.loads(row["assignment"]).items()}
+            report = validate_assignment(graphs[name], assignment,
+                                         claimed_bandwidth=int(row["bandwidth"]) if row["bandwidth"] else None)
+            if not report.valid and row["status"] != "ERROR":
+                problems.append(f"Invalid legacy assignment: {name} {identity(row)}: {report.errors}")
+    if problems:
+        raise ValueError("Legacy runs cannot be reused:\n" + "\n".join(problems[:20]))
+    return {"rows": len(rows), "unique_keys": len(set(keys)), "duplicates": len(duplicates),
+            "missing": len(missing), "unexpected": len(unexpected), "instances": len(old_names)}
 
 
 def estimate_sat_clauses(graph, encoding, amo, lb):
@@ -100,36 +168,86 @@ def worker(graph_path, solver, encoding, strategy, amo, symmetry, timeout, progr
     }), flush=True)
 
 
-def run(config_path, selected=None, resume=True):
+def run(config_path, selected=None, resume=True, preflight_only=False):
     config_path = config_path.resolve()
     config = tomllib.loads(config_path.read_text(encoding="utf-8"))["benchmark"]
     config.setdefault("solvers", ["glucose", "gurobi", "cplex"])
     config.setdefault("amo", ["pairwise", "sequential", "binary", "commander"])
+    if not resume and "reuse_runs" in config:
+        raise ValueError("--rerun is incompatible with a reused benchmark; resume is the default")
     timeout = float(config["timeout_seconds"])
     repetitions = int(config["repetitions"])
     if timeout <= 0 or repetitions < 1:
         raise ValueError("timeout_seconds and repetitions must be positive")
     root = config_path.parent
-    with (root / config["manifest"]).open(newline="", encoding="utf-8") as source:
-        manifest = list(csv.DictReader(source))
-    if len(manifest) != 72 or len({item["instance"] for item in manifest}) != 72:
-        raise ValueError("Manifest must contain the 72 unique Table 6/7 instances")
+    manifest = read_rows(root / config["manifest"])
+    instances = unique_instances(manifest)
+    if not manifest:
+        raise ValueError("Manifest is empty")
+    all_keys = expected_keys(instances, config, repetitions)
+    legacy_rows = []
+    legacy_audit = None
+    if "reuse_runs" in config:
+        previous_config = tomllib.loads((root / config["reuse_config"]).read_text(encoding="utf-8"))["benchmark"]
+        comparable = ("timeout_seconds", "repetitions", "max_sat_estimated_clauses",
+                      "max_mip_variables", "amo", "solvers")
+        changed = [field for field in comparable if config[field] != previous_config[field]]
+        if changed:
+            raise ValueError(f"Cannot reuse legacy runs: changed settings {changed}")
+        legacy_manifest = read_rows(root / config["reuse_manifest"])
+        legacy_rows = read_rows(root / config["reuse_runs"])
+        if not set(unique_instances(legacy_manifest)).issubset(instances):
+            raise ValueError("Legacy instances are absent from the combined manifest")
+        legacy_audit = audit_legacy(legacy_rows, config, repetitions, legacy_manifest,
+                                    root / config["graph_dir"], timeout)
     output_dir = (root / config["output_dir"]).resolve()
     output_dir.mkdir(parents=True, exist_ok=True)
     output_path = output_dir / "runs.csv"
-    existing = []
-    if output_path.exists():
-        with output_path.open(newline="", encoding="utf-8") as source:
-            existing = list(csv.DictReader(source))
+    if legacy_rows and not output_path.exists():
+        shutil.copyfile(root / config["reuse_runs"], output_path)
+    existing = read_rows(output_path) if output_path.exists() else []
+    existing_keys = [identity(row) for row in existing]
+    duplicates = [key for key, count in Counter(existing_keys).items() if count > 1]
+    unexpected = set(existing_keys) - all_keys
+    if duplicates or unexpected:
+        raise ValueError(f"Combined CSV has {len(duplicates)} duplicate and {len(unexpected)} unexpected keys")
+    if legacy_rows:
+        old_by_key = {identity(row): row for row in legacy_rows}
+        new_by_key = {identity(row): row for row in existing}
+        conflicting = [key for key, old in old_by_key.items()
+                       if key in new_by_key and old != new_by_key[key]]
+        if conflicting:
+            raise ValueError(f"Combined CSV conflicts with original legacy rows: {conflicting[:5]}")
+        missing_old = [row for row in legacy_rows if identity(row) not in new_by_key]
+        if missing_old:
+            with output_path.open("a", newline="", encoding="utf-8") as output:
+                writer = csv.DictWriter(output, fieldnames=FIELDS)
+                writer.writerows(missing_old)
+            existing.extend(missing_old)
+            existing_keys.extend(identity(row) for row in missing_old)
+    preflight = {"reference_rows": len(manifest), "unique_instances": len(instances),
+                 "configurations_per_instance": len(list(configurations(config))) * repetitions,
+                 "expected_runs": len(all_keys), "legacy_runs_reused": len(legacy_rows),
+                 "legacy_audit": legacy_audit, "runs_already_recorded": len(existing_keys),
+                 "new_runs_remaining": len(all_keys - set(existing_keys))}
+    (output_dir / "preflight.json").write_text(json.dumps(preflight, indent=2), encoding="utf-8")
+    print(json.dumps(preflight, ensure_ascii=False), flush=True)
+    if preflight_only:
+        summarize(output_dir, manifest)
+        return
     done = {identity(row) for row in existing} if resume else set()
     with output_path.open("a", newline="", encoding="utf-8") as output:
         writer = csv.DictWriter(output, fieldnames=FIELDS)
         if not output_path.stat().st_size:
             writer.writeheader()
             output.flush()
-        for item in manifest:
+        for item in instances.values():
             name = item["instance"]
             if selected and name not in selected:
+                continue
+            if all((name, solver, encoding, strategy, amo, str(symmetry).lower(), str(rep)) in done
+                   for solver, encoding, strategy, amo, symmetry in configurations(config)
+                   for rep in range(1, repetitions + 1)):
                 continue
             graph_path = root / config["graph_dir"] / f"{name}.edgelist"
             graph = read_graph(graph_path) if graph_path.exists() else None
@@ -199,42 +317,78 @@ def run(config_path, selected=None, resume=True):
 
 
 def summarize(output_dir, manifest):
-    with (output_dir / "runs.csv").open(newline="", encoding="utf-8") as source:
-        rows = list(csv.DictReader(source))
+    rows = read_rows(output_dir / "runs.csv")
     by_name = {}
     for row in rows:
-        if row["validation"] != "True" or not row["bandwidth"] or row["status"] in ("UNAVAILABLE", "RESOURCE_LIMIT", "ERROR"):
+        if (row["validation"] != "True" or not row["bandwidth"] or
+                row["status"] in ("UNAVAILABLE", "RESOURCE_LIMIT", "ERROR")):
             continue
         name = row["instance"]
-        if (name not in by_name or
-                (int(row["bandwidth"]), row["status"] != "OPTIMAL", float(row["runtime_total_s"])) <
-                (int(by_name[name]["bandwidth"]), by_name[name]["status"] != "OPTIMAL",
-                 float(by_name[name]["runtime_total_s"]))):
+        rank = (int(row["bandwidth"]), row["status"] != "OPTIMAL",
+                float(row["runtime_total_s"]))
+        previous = by_name.get(name)
+        if previous is None or rank < (int(previous["bandwidth"]),
+                                       previous["status"] != "OPTIMAL",
+                                       float(previous["runtime_total_s"])):
             by_name[name] = row
-    report = []
-    counts = {key: 0 for key in ("equal", "better", "worse", "no_solution")}
+
+    def relation(item):
+        if item["Best"] in ("", "-", "—", "–"):
+            return "missing_best"
+        best_row = by_name.get(item["instance"])
+        if best_row is None:
+            return "no_solution"
+        bw, best = int(best_row["bandwidth"]), int(item["Best"])
+        return "equal" if bw == best else "better" if bw < best else "worse"
+
+    def statistics(items):
+        names = {item["instance"] for item in items}
+        relevant = [row for row in rows if row["instance"] in names]
+        counts = Counter(relation(item) for item in items)
+        return {
+            "reference_rows": len(items), "unique_instances": len(names),
+            "runs_recorded": len(relevant),
+            "optimal_runs": sum(row["status"] == "OPTIMAL" and row["validation"] == "True"
+                                for row in relevant),
+            "optimal_instances": len({row["instance"] for row in relevant
+                                      if row["status"] == "OPTIMAL" and row["validation"] == "True"}),
+            "timeout_runs": sum(row["status"] == "TIMEOUT" for row in relevant),
+            "resource_limit_runs": sum(row["status"] == "RESOURCE_LIMIT" for row in relevant),
+            "unavailable_runs": sum(row["status"] == "UNAVAILABLE" for row in relevant),
+            "comparison": {category: counts[category] for category in
+                           ("better", "equal", "worse", "no_solution", "missing_best")},
+        }
+
+    per_table = {str(table): statistics([item for item in manifest if item["table"] == str(table)])
+                 for table in sorted({int(item["table"]) for item in manifest})}
+    overall = statistics(list(unique_instances(manifest).values()))
+    summary = {"tables": per_table, "overall": overall}
+    (output_dir / "summary.json").write_text(json.dumps(summary, indent=2), encoding="utf-8")
+    table_names = ", ".join(per_table)
+    lines = [f"# Member 2 HB Tables {table_names}", "",
+             "| Bảng | Instance | n | Best bài báo | DRSA | Bandwidth hợp lệ | Cấu hình đạt được | Thời gian (s) | Trạng thái | Đối chiếu Best |",
+             "|---:|---|---:|---:|---:|---:|---|---:|---|---|"]
     for item in manifest:
-        name = item["instance"]
-        row = by_name.get(name)
-        if row is None:
-            relation = "no_solution"
+        row = by_name.get(item["instance"])
+        if row:
+            config_label = (f"{row['solver']} / {row['encoding']} / {row['strategy']} / {row['amo']}"
+                            if row["solver"] == "glucose" else
+                            f"{row['solver']} / symmetry={row['symmetry_breaking']}")
         else:
-            bw, best = int(row["bandwidth"]), int(item["Best"])
-            relation = "equal" if bw == best else "better" if bw < best else "worse"
-        counts[relation] += 1
-        report.append((name, item["Best"], row["bandwidth"] if row else "—",
-                       row["solver"] if row else "—", row["runtime_total_s"] if row else "—",
-                       row["status"] if row else "—", relation))
-    lines = ["# Member 2 HB Tables 6–7", "", "| Đồ thị | Best bài báo | Bandwidth của mình | Solver | Thời gian (s) | Trạng thái | Đối chiếu |",
-             "|---|---:|---:|---|---:|---|---|"]
-    lines += ["| " + " | ".join(map(str, entry)) + " |" for entry in report]
-    attempted = {row["instance"] for row in rows if row["status"] not in ("RESOURCE_LIMIT", "UNAVAILABLE")}
-    optimal = {row["instance"] for row in rows if row["status"] == "OPTIMAL" and row["validation"] == "True"}
-    timeout_cases = {row["instance"] for row in rows if row["status"] == "TIMEOUT"}
-    resource_cases = {row["instance"] for row in rows if row["status"] in ("RESOURCE_LIMIT", "UNAVAILABLE")}
-    lines += ["", f"Bằng Best: {counts['equal']}; tốt hơn: {counts['better']}; kém hơn: {counts['worse']}; chưa có nghiệm: {counts['no_solution']}.",
-              f"Đồ thị có ít nhất một lượt giải: {len(attempted)}/72; đồ thị đạt tối ưu: {len(optimal)}; đồ thị có timeout: {len(timeout_cases)}; đồ thị có giới hạn tài nguyên/license: {len(resource_cases)}.",
-              f"Tổng lượt: {len(rows)}; OPTIMAL: {sum(row['status'] == 'OPTIMAL' for row in rows)}; TIMEOUT: {sum(row['status'] == 'TIMEOUT' for row in rows)}; RESOURCE_LIMIT: {sum(row['status'] == 'RESOURCE_LIMIT' for row in rows)}; UNAVAILABLE: {sum(row['status'] == 'UNAVAILABLE' for row in rows)}."]
+            config_label = "—"
+        cells = (item["table"], item["instance"], item["n"], item["Best"] or "—",
+                 item["DRSA"] or "—", row["bandwidth"] if row else "—",
+                 config_label, row["runtime_total_s"] if row else "—",
+                 row["status"] if row else "—", relation(item))
+        lines.append("| " + " | ".join(map(str, cells)) + " |")
+    lines.extend(["", "Best trong bài báo là nghiệm tốt nhất đã biết; chỉ trạng thái OPTIMAL của solver mới chứng minh tối ưu.",
+                  "Thời gian trong mỗi dòng là thời gian của đúng lượt chạy đã cho bandwidth hiển thị.", ""])
+    for label, stats in [(f"Table {table}", values) for table, values in per_table.items()] + [("Toàn bộ (đồ thị duy nhất)", overall)]:
+        c = stats["comparison"]
+        lines.append(f"- {label}: {stats['reference_rows']} dòng tham chiếu, {stats['unique_instances']} đồ thị; "
+                     f"{stats['runs_recorded']} lượt ghi, {stats['optimal_runs']} lượt OPTIMAL trên "
+                     f"{stats['optimal_instances']} đồ thị; tốt hơn Best {c['better']}, bằng {c['equal']}, "
+                     f"kém {c['worse']}, chưa có nghiệm {c['no_solution']}, thiếu Best {c['missing_best']}.")
     (output_dir / "comparison.md").write_text("\n".join(lines) + "\n", encoding="utf-8")
 
 
@@ -245,6 +399,8 @@ def main():
     parser.add_argument("--rerun", action="store_true")
     parser.add_argument("--report-only", action="store_true",
                         help="Refresh comparison.md from the CSV without solving")
+    parser.add_argument("--preflight-only", action="store_true",
+                        help="Audit/reuse saved rows and print counts without solving")
     parser.add_argument("--worker", nargs=8, metavar=("GRAPH", "SOLVER", "ENCODING", "STRATEGY", "AMO", "SYMMETRY", "TIMEOUT", "PROGRESS"))
     args = parser.parse_args()
     if args.worker:
@@ -257,7 +413,8 @@ def main():
             manifest = list(csv.DictReader(source))
         summarize((config_path.parent / config["output_dir"]).resolve(), manifest)
     elif args.config:
-        run(args.config, set(args.instance) if args.instance else None, not args.rerun)
+        run(args.config, set(args.instance) if args.instance else None,
+            not args.rerun, args.preflight_only)
     else:
         parser.error("config is required")
 
