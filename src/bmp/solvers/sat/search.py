@@ -20,15 +20,16 @@ def _cached_component_diameters(
 
     v_to_idx = {v: i for i, v in enumerate(vertices)}
     adj: list[list[int]] = [[] for _ in range(n)]
+    adj_mask = [0] * n
     for u, v in edges:
         ui = v_to_idx[u]
         vi = v_to_idx[v]
         adj[ui].append(vi)
         adj[vi].append(ui)
+        adj_mask[ui] |= 1 << vi
+        adj_mask[vi] |= 1 << ui
 
     comp_visited = [False] * n
-    seen_stamp = [0] * n
-    stamp = 0
     components: list[tuple[int, int]] = []
 
     for root in range(n):
@@ -49,19 +50,20 @@ def _cached_component_diameters(
         if c_size >= 2:
             c_diam = 0
             for start in comp_nodes:
-                stamp += 1
-                seen_stamp[start] = stamp
-                frontier = [start]
+                visited_mask = 1 << start
+                frontier_mask = visited_mask
                 depth = -1
-                while frontier:
+                while frontier_mask:
                     depth += 1
-                    next_frontier: list[int] = []
-                    for u in frontier:
-                        for v in adj[u]:
-                            if seen_stamp[v] != stamp:
-                                seen_stamp[v] = stamp
-                                next_frontier.append(v)
-                    frontier = next_frontier
+                    next_mask = 0
+                    rem = frontier_mask
+                    while rem:
+                        lsb = rem & -rem
+                        next_mask |= adj_mask[lsb.bit_length() - 1]
+                        rem ^= lsb
+                    next_mask &= ~visited_mask
+                    visited_mask |= next_mask
+                    frontier_mask = next_mask
                 if depth > c_diam:
                     c_diam = depth
             components.append((c_size, max(1, c_diam)))

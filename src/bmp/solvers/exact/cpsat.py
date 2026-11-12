@@ -32,6 +32,8 @@ class CPSATSolver:
         use_lower_bound: bool = True,
         use_initial_upper_bound: bool = True,
         isolate_timeout: bool = False,
+        injectivity_mode: str = "auto",
+        presolve: bool | None = None,
     ) -> SolverResult:
         if timeout_seconds is not None and (
             not math.isfinite(timeout_seconds) or timeout_seconds < 0
@@ -39,6 +41,15 @@ class CPSATSolver:
             raise ValueError("timeout_seconds must be finite and non-negative")
         if threads is not None and threads < 1:
             raise ValueError("threads must be at least 1")
+        if injectivity_mode not in ("auto", "all_different", "no_overlap"):
+            raise ValueError("injectivity_mode must be 'auto', 'all_different', or 'no_overlap'")
+
+        active_injectivity = (
+            ("no_overlap" if graph.order > 75 else "all_different")
+            if injectivity_mode == "auto"
+            else injectivity_mode
+        )
+        active_presolve = (graph.order <= 75) if presolve is None else bool(presolve)
 
         active_seed = self.seed if seed is None else int(seed)
         certified_lb, model_lb, model_ub, hint_perm, anchor, reversed_hint = prepare_cp_hints(
@@ -57,6 +68,8 @@ class CPSATSolver:
                 "symmetry_breaking": symmetry_breaking,
                 "anchor_vertex": anchor,
                 "threads": 1 if threads is None else int(threads),
+                "injectivity_mode": active_injectivity,
+                "presolve_enabled": active_presolve,
                 "certified_graph_lower_bound": certified_lb,
                 "model_lower_bound": model_lb,
                 "model_upper_bound": model_ub,
@@ -113,7 +126,18 @@ class CPSATSolver:
             num_constrs = 0
 
             if positions:
-                model.add_all_different(positions.values())
+                if active_injectivity == "no_overlap":
+                    # Fixed-length unit intervals [p_v, p_v + 1) enforce injectivity
+                    # without triggering OR-Tools O(n^2) AllDifferent Boolean expansion
+                    # during presolve on large Harwell-Boeing graphs.
+                    intervals = [
+                        model.new_fixed_size_interval_var(positions[v], 1, f"iv_{v}")
+                        for v in graph.vertices
+                    ]
+                    model.add_no_overlap(intervals)
+                    num_vars += len(intervals)
+                else:
+                    model.add_all_different(positions.values())
                 num_constrs += 1
             if symmetry_breaking and anchor is not None and graph.order >= 2:
                 cutoff = (graph.order + 1) // 2
@@ -122,9 +146,12 @@ class CPSATSolver:
 
             bandwidth = model.new_int_var(model_lb, model_ub, "B")
             # Hai bất đẳng thức tuyến tính tương đương |p_u - p_v| <= B.
+            add_constr = model.add
             for u, v in sorted(graph.edges):
-                model.add(positions[u] - positions[v] <= bandwidth)
-                model.add(positions[v] - positions[u] <= bandwidth)
+                pu = positions[u]
+                pv = positions[v]
+                add_constr(pu - pv <= bandwidth)
+                add_constr(pv - pu <= bandwidth)
                 num_constrs += 2
 
             if hint_perm is not None and positions:
@@ -143,6 +170,7 @@ class CPSATSolver:
             solver = cp_model.CpSolver()
             solver.parameters.num_search_workers = 1 if threads is None else int(threads)
             solver.parameters.random_seed = active_seed
+            solver.parameters.cp_model_presolve = active_presolve
             engine_init_time_s = monotonic() - init_started
 
             if timeout_seconds is not None:

@@ -314,6 +314,47 @@ class CPContractAndMockTests(unittest.TestCase):
         self.assertIn("bandwidth", M3_3_FIELDS)
         self.assertIn("eligibility", PREFLIGHT_FIELDS)
 
+    @unittest.skipUnless(_has_ortools(), "ortools is not installed")
+    def test_cp_sat_no_overlap_and_presolve_off_match_exact_oracle_and_unblock_bcspwr03(self) -> None:
+        from bmp.heuristics.rcm import RCMSolver
+        from bmp.io.readers import read_graph
+        from bmp.solvers.sat.search import compute_lower_bound
+
+        solver = CPSATSolver(seed=17)
+        for graph in ORACLE_GRAPHS:
+            for inj in ("all_different", "no_overlap"):
+                res = solver.solve(
+                    graph,
+                    timeout_seconds=10.0,
+                    symmetry_breaking=True,
+                    threads=1,
+                    injectivity_mode=inj,
+                    presolve=(inj == "all_different"),
+                )
+                oracle = BruteForceSolver().solve(graph)
+                self.assertEqual(res.status, SolutionStatus.OPTIMAL)
+                self.assertEqual(res.bandwidth, oracle.bandwidth)
+                self.assertTrue(validate_solution(graph, res).valid)
+                self.assertEqual(res.metadata["injectivity_mode"], inj)
+
+        # Verify large-graph auto mode solves previously presolve-stalled bcspwr03 (n=118)
+        g = read_graph(ROOT / "data" / "hb_table6_7" / "raw" / "bcspwr03.mtx.gz")
+        self.assertEqual(compute_lower_bound(g), 9)
+        rcm_res = RCMSolver().solve(g)
+        res = solver.solve(
+            g,
+            timeout_seconds=4.0,
+            symmetry_breaking=True,
+            threads=1,
+            initial_permutation=rcm_res.permutation,
+        )
+        self.assertIn(res.status, (SolutionStatus.OPTIMAL, SolutionStatus.FEASIBLE))
+        self.assertEqual(res.metadata["injectivity_mode"], "no_overlap")
+        self.assertFalse(res.metadata["presolve_enabled"])
+        self.assertIsNotNone(res.bandwidth)
+        self.assertLessEqual(res.bandwidth, rcm_res.bandwidth)
+        self.assertTrue(validate_solution(g, res).valid)
+
 
 if __name__ == "__main__":
     unittest.main()
