@@ -187,7 +187,9 @@ Benchmark summary across 10 instances (100 runs total) from `data/leader_sat_ben
 
 These are small synthetic graphs. The [L7 official 113-instance dataset audit and bounded SAT attempt](docs/leader_l7_audit.md) record the earlier Leader status; no general encoding or strategy ranking is inferred from the table below.
 
-The [L8 dataset classification and staged SAT audit](docs/leader_l8_audit.md) is the latest official Leader assessment. Its source checks and run tables are kept separate from the earlier L7 artifacts.
+The [L8 dataset classification and staged SAT audit](docs/leader_l8_audit.md) is the latest official L8 Leader assessment. Its source checks and run tables are kept separate from the earlier L7 artifacts.
+
+The [Leader Phase L9 Full 113-Instance SAT Report](docs/leader-l9-full113-sat-report.md) and [L9 Integration Guide](docs/leader-l9-integration-guide.md) document the full 113-instance Harwell-Boeing expansion (`54 READY` + `58 NEEDS_VERIFICATION` + `1 INVALID_DATA` `mbeause`), encoding/AMO/strategy optimizations (`70/113` eligible & attempted, `23/113` valid CaDiCaL SAT solutions, `3/113` proved `OPTIMAL`), and 12 SVG visualizations under `results/leader_l9_full113/`.
 
 | Encoding | Strategy | Symmetry Breaking | Avg Total Runtime (s) | Avg Solver Time (s) | Avg Clauses | Avg SAT Calls |
 | :--- | :--- | :---: | :---: | :---: | :---: |
