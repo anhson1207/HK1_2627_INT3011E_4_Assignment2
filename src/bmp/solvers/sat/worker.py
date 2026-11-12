@@ -49,6 +49,8 @@ def report_progress(
     solving_time_s: float = 0.0, num_variables: int | None = None,
     num_clauses: int | None = None,
     initial_clauses: int | None = None, added_clauses: int | None = None,
+    sat_solved_any: bool = False,
+    incumbent_source: str | None = None,
 ) -> None:
     conn = getattr(solver, "_progress_conn", None)
     if conn is not None:
@@ -60,6 +62,8 @@ def report_progress(
             "num_variables": num_variables, "num_clauses": num_clauses,
             "initial_clauses": initial_clauses,
             "added_clauses": added_clauses,
+            "sat_solved_any": sat_solved_any,
+            "incumbent_source": incumbent_source,
         }))
 
 
@@ -81,6 +85,36 @@ def run_bounded_solver(
 ) -> SolverResult:
     """Run the whole search in a POSIX child and enforce a wall clock deadline."""
     started = monotonic()
+    if timeout_seconds <= 0:
+        if heuristic_permutation is not None:
+            incumbent = dict(heuristic_permutation)
+            upper = calculate_bandwidth(graph, incumbent)
+        else:
+            upper, incumbent = identity_upper_bound(graph)
+        return SolverResult(
+            instance=graph.name, method="SAT", solver=solver.backend_name,
+            encoding=solver.encoder.name,
+            strategy=(
+                f"repeated_{solver.search_mode}"
+                if hasattr(solver, "search_mode") and "Repeated" in type(solver).__name__
+                else (
+                    "incremental_binary"
+                    if getattr(solver, "search_mode", "linear") == "binary"
+                    else "incremental"
+                )
+            ),
+            status=SolutionStatus.TIMEOUT, bandwidth=upper, permutation=incumbent,
+            runtime_s=monotonic() - started, lower_bound=0, upper_bound=upper,
+            encoding_time_s=0.0, solving_time_s=0.0,
+            num_variables=None, num_clauses=None, sat_calls=0,
+            metadata={
+                "worker_reason": "Wall clock deadline exceeded before worker launch",
+                "timeout_seconds": timeout_seconds,
+                "initial_clauses": None, "added_clauses": None,
+                "sat_trace": [], "sampled_peak_memory_mb": None,
+                "sat_solved_any": False, "incumbent_source": "HEURISTIC",
+            },
+        )
     context = get_context("fork")
     parent, child = context.Pipe(duplex=False)
     process = context.Process(
@@ -171,19 +205,35 @@ def run_bounded_solver(
         incumbent = dict(progress["permutation"])
         upper = calculate_bandwidth(graph, incumbent)
         lower = progress["lower_bound"]
+        sat_solved_any = bool(progress.get("sat_solved_any")) or any(
+            ev.get("outcome") == "SAT" for ev in sat_trace
+        )
+        inc_source = progress.get("incumbent_source") or ("SAT" if sat_solved_any else "HEURISTIC")
     elif heuristic_permutation is not None:
         incumbent = dict(heuristic_permutation)
         upper = calculate_bandwidth(graph, incumbent)
         lower = 0
+        sat_solved_any = False
+        inc_source = "HEURISTIC"
     else:
         upper, incumbent = identity_upper_bound(graph)
         lower = 0
+        sat_solved_any = False
+        inc_source = "HEURISTIC"
     if sat_trace and sat_trace[-1]["outcome"] == "STARTED":
         sat_trace[-1] = {**sat_trace[-1], "outcome": "UNKNOWN"}
     return SolverResult(
         instance=graph.name, method="SAT", solver=solver.backend_name,
         encoding=solver.encoder.name,
-        strategy=(f"repeated_{solver.search_mode}" if hasattr(solver, "search_mode") else "incremental"),
+        strategy=(
+            f"repeated_{solver.search_mode}"
+            if hasattr(solver, "search_mode") and "Repeated" in type(solver).__name__
+            else (
+                "incremental_binary"
+                if getattr(solver, "search_mode", "linear") == "binary"
+                else "incremental"
+            )
+        ),
         status=status, bandwidth=upper, permutation=incumbent,
         runtime_s=monotonic() - started, lower_bound=lower, upper_bound=upper,
         encoding_time_s=progress["encoding_time_s"] if progress else 0.0,
@@ -197,5 +247,7 @@ def run_bounded_solver(
             "added_clauses": progress["added_clauses"] if progress else None,
             "sat_trace": sat_trace,
             "sampled_peak_memory_mb": peak_memory_mb,
+            "sat_solved_any": sat_solved_any,
+            "incumbent_source": inc_source,
         },
     )

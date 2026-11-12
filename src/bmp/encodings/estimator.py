@@ -68,16 +68,12 @@ def estimate_cnf_size(
     amo: str = "pairwise",
     k: int | None = None,
     symmetry_breaking: bool = False,
+    occupancy_mode: str = "both",
+    bandwidth_mode: str = "conflict",
+    channel_mode: str = "full",
+    compact_boundary: bool = False,
 ) -> CNFSizeEstimate:
-    """Compute exact closed-form count of variables and clauses before CNF generation.
-
-    Parameters:
-        graph: Target Graph
-        encoding: 'pairwise' or 'order'
-        amo: 'pairwise' or 'sequential'
-        k: Bandwidth threshold. If None, assumes worst-case (k=0 for maximum clauses)
-        symmetry_breaking: Whether anchor vertex symmetry breaking is active
-    """
+    """Compute exact closed-form count of variables and clauses before CNF generation."""
     n = graph.order
     m = graph.size
 
@@ -100,25 +96,36 @@ def estimate_cnf_size(
     amo_type = amo.lower()
 
     if enc_family == "pairwise":
+        occ = occupancy_mode.lower()
+        bwm = bandwidth_mode.lower()
+        if occ not in ("both", "pigeonhole"):
+            raise ValueError(f"Unsupported occupancy_mode: {occupancy_mode}")
+        if bwm not in ("conflict", "support", "support_single"):
+            raise ValueError(f"Unsupported bandwidth_mode: {bandwidth_mode}")
+
         num_orig = n * n
         num_chan = 0
         alo_clauses = n
+        amo_blocks_factor = 2 if occ == "both" else 1
 
         if amo_type in ("pairwise", "naive"):
             num_aux = 0
-            amo_vertex_clauses = n * (n * (n - 1) // 2)
-            amo_label_clauses = n * (n * (n - 1) // 2)
+            single_amo = n * (n * (n - 1) // 2)
         elif amo_type in ("sequential", "seqcounter"):
             if n == 2:
                 num_aux = 0
-                amo_vertex_clauses = 2
-                amo_label_clauses = 2
+                single_amo = 1 * 2
+            elif n <= 1:
+                num_aux = 0
+                single_amo = 0
             else:
-                num_aux = 2 * n * (n - 1)
-                amo_vertex_clauses = n * (3 * n - 4)
-                amo_label_clauses = n * (3 * n - 4)
+                num_aux = amo_blocks_factor * n * (n - 1)
+                single_amo = n * (3 * n - 4)
         else:
             raise ValueError(f"Unsupported AMO type for estimation: {amo}")
+
+        amo_vertex_clauses = single_amo if occ == "both" else 0
+        amo_label_clauses = single_amo
 
         sym_clauses = 0
         if symmetry_breaking and n >= 2:
@@ -127,9 +134,16 @@ def estimate_cnf_size(
 
         fixed_clauses = alo_clauses + amo_vertex_clauses + amo_label_clauses + sym_clauses
 
-        # Bandwidth clauses: for each edge (u, v), pairs (p, q) with |p - q| > eval_k
-        bw_pairs_per_edge = (n - eval_k) * (n - eval_k - 1) if eval_k < n else 0
-        bw_clauses = m * bw_pairs_per_edge
+        if bwm == "conflict":
+            bw_pairs_per_edge = (n - eval_k) * (n - eval_k - 1) if eval_k < n else 0
+            bw_clauses = m * bw_pairs_per_edge
+        else:
+            if n <= 1 or eval_k >= n - 1:
+                bw_clauses = 0
+            else:
+                per_dir = min(n, 2 * max(0, n - eval_k - 1))
+                dirs = 2 if bwm == "support" else 1
+                bw_clauses = m * dirs * per_dir
 
         breakdown = {
             "alo_vertex": alo_clauses,
@@ -151,16 +165,25 @@ def estimate_cnf_size(
         )
 
     elif enc_family == "order":
-        num_orig = n * (n - 1)  # y[v, t] for t in 2..n
-        num_chan = n * n        # x[v, p] for p in 1..n
+        cmode = channel_mode.lower()
+        if cmode not in ("full", "one_sided"):
+            raise ValueError(f"Unsupported channel_mode: {channel_mode}")
 
-        # Monotonicity
+        num_orig = n * (n - 1)
+        num_chan = n * (n - 2) if compact_boundary else n * n
+
         mono_clauses = n * (n - 2) if n >= 2 else 0
 
-        # Channeling clauses
-        chan_clauses = n * (3 * n - 2) if n >= 2 else 0
+        if n < 2:
+            chan_clauses = 0
+        elif compact_boundary:
+            chan_clauses = (3 if cmode == "full" else 1) * n * (n - 2)
+        else:
+            if cmode == "full":
+                chan_clauses = n * (3 * n - 2)
+            else:
+                chan_clauses = n * n
 
-        # All-Different on channeled x[v, p]
         if amo_type in ("pairwise", "naive"):
             num_aux = 0
             alldiff_clauses = n * (n * (n - 1) // 2)
@@ -177,7 +200,6 @@ def estimate_cnf_size(
         sym_clauses = 1 if (symmetry_breaking and n >= 2) else 0
         fixed_clauses = mono_clauses + chan_clauses + alldiff_clauses + sym_clauses
 
-        # Bandwidth clauses: for each edge, 2 * (n - eval_k - 1) binary clauses
         bw_per_edge = 2 * (n - eval_k - 1) if (eval_k < n - 1) else 0
         bw_clauses = m * bw_per_edge
 
@@ -212,23 +234,38 @@ def estimate_incremental_cnf_size(
     initial_k: int,
     target_k: int,
     symmetry_breaking: bool = False,
+    occupancy_mode: str = "both",
+    bandwidth_mode: str = "conflict",
+    channel_mode: str = "full",
+    compact_boundary: bool = False,
 ) -> CNFSizeEstimate:
-    """Cumulative count for unit steps; safe upper bound for adaptive jumps.
-
-    Pairwise adds only new distance clauses. Order currently adds the full
-    bandwidth formula at every tested threshold, including duplicate clauses.
-    Summing the entire range overestimates Order when adaptive search jumps.
-    """
+    """Cumulative count for unit steps; safe upper bound for adaptive jumps."""
     if target_k > initial_k or target_k < 0:
         raise ValueError("Require 0 <= target_k <= initial_k")
     current = estimate_cnf_size(
-        graph, encoding=encoding, amo=amo, k=target_k,
+        graph,
+        encoding=encoding,
+        amo=amo,
+        k=target_k,
         symmetry_breaking=symmetry_breaking,
+        occupancy_mode=occupancy_mode,
+        bandwidth_mode=bandwidth_mode,
+        channel_mode=channel_mode,
+        compact_boundary=compact_boundary,
     )
-    if encoding.lower() != "order":
+    if encoding.lower() != "order" and bandwidth_mode.lower() == "conflict":
         return current
     added = sum(
-        estimate_cnf_size(graph, encoding="order", amo=amo, k=step).num_bandwidth_clauses
+        estimate_cnf_size(
+            graph,
+            encoding=encoding,
+            amo=amo,
+            k=step,
+            occupancy_mode=occupancy_mode,
+            bandwidth_mode=bandwidth_mode,
+            channel_mode=channel_mode,
+            compact_boundary=compact_boundary,
+        ).num_bandwidth_clauses
         for step in range(target_k, initial_k + 1)
     )
     return CNFSizeEstimate(
@@ -243,9 +280,99 @@ def estimate_incremental_cnf_size(
     )
 
 
+def _encoder_estimate_kwargs(encoder: object) -> dict[str, object]:
+    """Extract normalized estimator keyword options from a BMPEncoder instance."""
+    name = getattr(encoder, "name", "")
+    encoding = "order" if "order" in str(name).lower() else "pairwise"
+    amo = str(getattr(encoder, "amo_name", "pairwise"))
+    if encoding == "pairwise":
+        return {
+            "encoding": "pairwise",
+            "amo": amo,
+            "occupancy_mode": str(getattr(encoder, "occupancy_mode", "both")),
+            "bandwidth_mode": str(getattr(encoder, "bandwidth_mode", "conflict")),
+        }
+    return {
+        "encoding": "order",
+        "amo": amo,
+        "channel_mode": str(getattr(encoder, "channel_mode", "full")),
+        "compact_boundary": bool(getattr(encoder, "compact_boundary", False)),
+    }
+
+
+def estimate_for_encoder(
+    encoder: object,
+    graph: Graph,
+    *,
+    k: int | None = None,
+    symmetry_breaking: bool = False,
+) -> CNFSizeEstimate:
+    """Compute exact CNF size estimate matching an encoder instance's options."""
+    opts = _encoder_estimate_kwargs(encoder)
+    return estimate_cnf_size(
+        graph,
+        k=k,
+        symmetry_breaking=symmetry_breaking,
+        encoding=str(opts["encoding"]),
+        amo=str(opts["amo"]),
+        occupancy_mode=str(opts.get("occupancy_mode", "both")),
+        bandwidth_mode=str(opts.get("bandwidth_mode", "conflict")),
+        channel_mode=str(opts.get("channel_mode", "full")),
+        compact_boundary=bool(opts.get("compact_boundary", False)),
+    )
+
+
+def estimate_incremental_for_encoder(
+    encoder: object,
+    graph: Graph,
+    *,
+    initial_k: int,
+    target_k: int,
+    symmetry_breaking: bool = False,
+    search_mode: str = "linear",
+    steps_count: int | None = None,
+) -> CNFSizeEstimate:
+    """Estimate cumulative incremental CNF size honoring encoder variant and search mode."""
+    opts = _encoder_estimate_kwargs(encoder)
+    encoding = str(opts["encoding"])
+    amo = str(opts["amo"])
+    bwm = str(opts.get("bandwidth_mode", "conflict"))
+    if search_mode == "binary":
+        single = estimate_for_encoder(encoder, graph, k=target_k, symmetry_breaking=symmetry_breaking)
+        if steps_count is None:
+            span = max(1, initial_k - target_k + 1)
+            steps_count = span.bit_length()
+        # Each binary call adds <= single.num_bandwidth_clauses + 1 activation variable
+        added = single.num_bandwidth_clauses * max(1, steps_count)
+        return CNFSizeEstimate(
+            num_variables=single.num_variables + max(1, steps_count),
+            num_original_vars=single.num_original_vars,
+            num_channeling_vars=single.num_channeling_vars,
+            num_aux_vars=single.num_aux_vars + max(1, steps_count),
+            num_clauses=single.num_fixed_clauses + added + max(1, steps_count),
+            num_fixed_clauses=single.num_fixed_clauses,
+            num_bandwidth_clauses=added,
+            formula_breakdown={**single.formula_breakdown, "bandwidth": added},
+        )
+    return estimate_incremental_cnf_size(
+        graph,
+        encoding=encoding,
+        amo=amo,
+        initial_k=initial_k,
+        target_k=target_k,
+        symmetry_breaking=symmetry_breaking,
+        occupancy_mode=str(opts.get("occupancy_mode", "both")),
+        bandwidth_mode=bwm,
+        channel_mode=str(opts.get("channel_mode", "full")),
+        compact_boundary=bool(opts.get("compact_boundary", False)),
+    )
+
+
 __all__ = [
     "CNFSizeEstimate",
     "ResourceLimits",
     "estimate_cnf_size",
+    "estimate_for_encoder",
     "estimate_incremental_cnf_size",
+    "estimate_incremental_for_encoder",
 ]
