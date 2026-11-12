@@ -1,0 +1,4 @@
+era,scope,dataset_catalog,eligible_count,sat_attempted_instances,sat_solved_instances,proved_optimal_instances,error_count,notes
+Before_L9_L8_Official,2 READY instances (29 runs),113,max 53 (Order+Seq raw k=ub-1),2,2,1,0,"Baseline Leader L8 (bcspwr01 OPTIMAL, bcsstk01 improved to 17)"
+After_L9_Leader_SAT,"Full 113 Harwell-Boeing (Tier 1 READY=54, Tier 2 Exploratory=59)",113,70,70,23,3,0,"Leader SAT with Order Compact, Pairwise Pigeonhole+Support, Binary Incremental, Decomposition"
+Reference_M3_8_Product_AMO,"Coverage reference only (Order+Product+DRSA_Warm, not Leader AMO)",113,56,54,54,0,0,"M3.8 used Member 3 Product AMO + DRSA warm-start (54/113 TIMEOUT_WITH_INCUMBENT, 59 RESOURCE_LIMIT)"
