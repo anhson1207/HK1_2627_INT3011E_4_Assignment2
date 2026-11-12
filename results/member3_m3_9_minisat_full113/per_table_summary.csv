@@ -1,0 +1,5 @@
+table,total,preflight,eligible,minisat_attempted,minisat_feasible_witness,sat_optimal,bound_optimal,timeout_no_witness,resource_limit,validation_passed
+Table 6,31,31,31,31,13,2,0,18,0,31
+Table 7,41,41,23,23,0,0,0,23,18,23
+Table 8,41,41,31,31,1,1,0,30,10,31
+Total,113,113,85,85,14,3,0,71,28,85
