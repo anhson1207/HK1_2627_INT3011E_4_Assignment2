@@ -1,0 +1,36 @@
+[RESUME] m33-001 bcspwr01 cp-sat sym=True
+[RESUME] m33-002 bcspwr01 cp-sat sym=False
+[RESUME] m33-003 bcspwr02 cp-sat sym=True
+[RESUME] m33-004 bcspwr02 cp-sat sym=False
+[RESUME] m33-005 bcsstk01 cp-sat sym=True
+[RESUME] m33-006 bcsstk01 cp-sat sym=False
+[RESUME] m33-007 ash85 cp-sat sym=True
+[RESUME] m33-008 ash85 cp-sat sym=False
+[RESUME] m33-009 nos4 cp-sat sym=True
+[RESUME] m33-010 nos4 cp-sat sym=False
+[RESUME] m33-011 dwt_209 cp-sat sym=True
+[RESUME] m33-012 dwt_209 cp-sat sym=False
+[RESUME] m33-013 bcspwr01 cp-sat sym=True
+[RESUME] m33-014 bcspwr01 cp-sat sym=True
+[RESUME] m33-015 bcspwr01 cp-sat sym=True
+[RESUME] m33-016 bcspwr02 cp-sat sym=True
+[RESUME] m33-017 bcspwr02 cp-sat sym=True
+[RESUME] m33-018 bcspwr02 cp-sat sym=True
+[RESUME] m33-019 bcsstk01 cp-sat sym=True
+[RESUME] m33-020 bcsstk01 cp-sat sym=True
+[RESUME] m33-021 bcsstk01 cp-sat sym=True
+[RESUME] m33-022 bcspwr01 cp-optimizer sym=True
+[RESUME] m33-023 bcspwr01 cp-optimizer sym=False
+[RESUME] m33-024 bcspwr02 cp-optimizer sym=True
+[RESUME] m33-025 bcspwr02 cp-optimizer sym=False
+[RESUME] m33-026 bcsstk01 cp-optimizer sym=True
+[RESUME] m33-027 bcsstk01 cp-optimizer sym=False
+[RESUME] m33-028 ash85 cp-optimizer sym=True
+[RESUME] m33-029 ash85 cp-optimizer sym=False
+[RESUME] m33-030 nos4 cp-optimizer sym=True
+[RESUME] m33-031 nos4 cp-optimizer sym=False
+[RESUME] m33-032 dwt_209 cp-optimizer sym=True
+[RESUME] m33-033 dwt_209 cp-optimizer sym=False
+[DONE] m33-034 bcspwr01 cp-optimizer sym=True lb=True ub=False hint=none -> status=FEASIBLE bw=5 bound=4 wall=24.548139s valid=True
+[DONE] m33-035 bcspwr02 cp-optimizer sym=True lb=True ub=False hint=none -> status=FEASIBLE bw=7 bound=7 wall=20.166789s valid=True
+[DONE] m33-036 bcsstk01 cp-optimizer sym=True lb=True ub=False hint=none -> status=FEASIBLE bw=18 bound=12 wall=20.212906s valid=True

@@ -143,6 +143,10 @@ source .venv/bin/activate
 # Install package and SAT dependencies
 pip install -e .
 pip install python-sat pytest
+
+# Optional Member 3 / exact CP / MIP / plotting extras
+# pip install -e ".[cp-sat]"        # Google OR-Tools CP-SAT
+# pip install -e ".[cp-optimizer]"  # IBM docplex Python API (requires local cpoptimizer runtime)
 ```
 
 ---
@@ -220,5 +224,5 @@ pytest -v
 
 - **`dev/leader`**: SAT Position & Order Encodings, Pairwise & Sequential AMO, Repeated & Incremental CaDiCaL SAT, Symmetry Breaking, L6–L8 CNF Estimator/ResourceLimits/Worker & 113-instance Audit (`54 READY / 58 NEEDS_VERIFICATION / 1 INVALID_DATA`).
 - **`dev/member-2` (Integrated with Leader L8, M2.2 Validated & M2.3 Audited)**: Binary & Commander Cardinality Encodings, Glucose 4 SAT Backend (`SATBackend` contract), Live-Verified Gurobi (`13.0.3`) & CPLEX (`22.2.0.0`) Assignment MIPs, Member 2 Experiment Runners (`configs/member2.toml`, `configs/member2_m2_2.toml`, `configs/member2_m2_3_baseline.toml`, `configs/member2_m2_3_studies.toml` using the 113-instance `READY`-filtered catalog), `cnsplots` Visualization, [Phase M2.2 Report](docs/member2-m2_2-report.md), [Phase M2.3 Benchmark & Final Audit Report](docs/member2-m2_3-report.md), and [Member 3 Integration Guide](docs/member3-integration-guide.md).
-- **`dev/member-3` (In Development by Member 3)**: Product & Ladder Cardinality Encodings, MiniSat Solver, CP-SAT, CP Optimizer, Harwell-Boeing Dataset Pipeline, Metaheuristics (RCM, SA, DRSA).
+- **`dev/member-3` (Phases M3.1–M3.9 Complete; Full 113/113 CP-SAT & MiniSat22 Covered)**: Synced onto Leader L8 & Member 2 M2.3 base; includes Product & Ladder AMO (`AMOEncoder`), MiniSat22 (`SATBackend`) ([M3.2 SAT Report](docs/member3-m3_2-sat-report.md)), live-verified OR-Tools CP-SAT (`9.15.6755`) & IBM CP Optimizer (`22.2.0.0` CE) ([M3.3 CP Report](docs/member3-m3_3-cp-report.md)), paper-faithful Torres-Jimenez et al. (2015) Dual Representation Simulated Annealing (`DRSASolver`), incremental-delta `SimulatedAnnealingSolver`, deterministic `RCMSolver`, warm-start hooks ([M3.4 DRSA Report](docs/member3-m3_4-drsa-report.md)), provenance-guarded Harwell–Boeing dataset forensics (`54 READY / 53 unique topologies`), the **M3.6 Unified 10-Method Benchmark** (`500/500` runs across Stages A–E with `preflight_54.csv` + 12 SVG figures in `results/member3_m3_6/`, [M3.6 Unified Benchmark Report](docs/member3-m3_6-unified-benchmark-report.md)), the **M3.7 Final Technical Audit & Integration Readiness Assessment** ([Final Integration Readiness Report](docs/final-integration-readiness.md)), the **M3.8 Full 113/113 Coverage** ([M3.8 Full 113 Report](docs/member3-m3_8-full113-report.md)), and the **Full 113/113 CP-SAT Achievement** (`113/113` valid solutions: `16 OPTIMAL`, `97 FEASIBLE`, `0` errors across all Harwell–Boeing instances in `results/member3_complete/cpsat_results.csv`, plus full Phase M3.9 MiniSat22 113-instance benchmark in `results/member3_m3_9_full113/`). Ready for maintainer merge into `main`.
 

@@ -1,0 +1,119 @@
+{
+  "generated_at_utc": "2026-11-12T16:36:33.907542+00:00",
+  "total_wall_time_s": 125.739,
+  "oracle_verification": {
+    "oracle_graphs": 7,
+    "total_checks_passed": 84
+  },
+  "dataset_count": 113,
+  "table_summary": [
+    {
+      "table": "Table 6",
+      "total": 31,
+      "preflight": 31,
+      "eligible": 31,
+      "minisat_attempted": 31,
+      "minisat_feasible_witness": 13,
+      "sat_optimal": 2,
+      "bound_optimal": 0,
+      "timeout_no_witness": 18,
+      "resource_limit": 0,
+      "validation_passed": 31
+    },
+    {
+      "table": "Table 7",
+      "total": 41,
+      "preflight": 41,
+      "eligible": 23,
+      "minisat_attempted": 23,
+      "minisat_feasible_witness": 0,
+      "sat_optimal": 0,
+      "bound_optimal": 0,
+      "timeout_no_witness": 23,
+      "resource_limit": 18,
+      "validation_passed": 23
+    },
+    {
+      "table": "Table 8",
+      "total": 41,
+      "preflight": 41,
+      "eligible": 31,
+      "minisat_attempted": 31,
+      "minisat_feasible_witness": 1,
+      "sat_optimal": 1,
+      "bound_optimal": 0,
+      "timeout_no_witness": 30,
+      "resource_limit": 10,
+      "validation_passed": 31
+    },
+    {
+      "table": "Total",
+      "total": 113,
+      "preflight": 113,
+      "eligible": 85,
+      "minisat_attempted": 85,
+      "minisat_feasible_witness": 14,
+      "sat_optimal": 3,
+      "bound_optimal": 0,
+      "timeout_no_witness": 71,
+      "resource_limit": 28,
+      "validation_passed": 85
+    }
+  ],
+  "tier_summary": [
+    {
+      "tier": "TIER1_READY",
+      "total": 54,
+      "preflight": 54,
+      "eligible": 42,
+      "minisat_attempted": 42,
+      "minisat_feasible_witness": 5,
+      "sat_optimal": 1,
+      "bound_optimal": 0,
+      "timeout_no_witness": 37,
+      "resource_limit": 12,
+      "validation_passed": 42
+    },
+    {
+      "tier": "TIER2A_NEEDS_VERIFICATION",
+      "total": 58,
+      "preflight": 58,
+      "eligible": 42,
+      "minisat_attempted": 42,
+      "minisat_feasible_witness": 9,
+      "sat_optimal": 2,
+      "bound_optimal": 0,
+      "timeout_no_witness": 33,
+      "resource_limit": 16,
+      "validation_passed": 42
+    },
+    {
+      "tier": "TIER2B_INVALID_DATA",
+      "total": 1,
+      "preflight": 1,
+      "eligible": 1,
+      "minisat_attempted": 1,
+      "minisat_feasible_witness": 0,
+      "sat_optimal": 0,
+      "bound_optimal": 0,
+      "timeout_no_witness": 1,
+      "resource_limit": 0,
+      "validation_passed": 1
+    },
+    {
+      "tier": "Total",
+      "total": 113,
+      "preflight": 113,
+      "eligible": 85,
+      "minisat_attempted": 85,
+      "minisat_feasible_witness": 14,
+      "sat_optimal": 3,
+      "bound_optimal": 0,
+      "timeout_no_witness": 71,
+      "resource_limit": 28,
+      "validation_passed": 85
+    }
+  ],
+  "total_runs_recorded": 295,
+  "minisat_runs_recorded": 275
+}

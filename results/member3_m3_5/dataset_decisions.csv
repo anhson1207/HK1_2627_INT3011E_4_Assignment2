@@ -1,0 +1,7 @@
+category,count,policy_or_status,decision_for_m3_6
+TOTAL_CATALOG,113,31 Table 6 + 41 Table 7 + 41 Table 8,Canonical 113-instance reference catalog preserved unchanged
+OFFICIAL_READY,54,"READY (conversion_policy=nonzero_union, v1.0)",Eligible for official exact/heuristic runs; 53 unique topologies (saylr3 == sherman1 duplicated in Table 8)
+NEEDS_VERIFICATION,58,NEEDS_VERIFICATION (general unsymmetric without explicit paper rule),Excluded from official exact comparisons; eligible only in explicitly tagged exploratory sensitivity appendix
+INVALID_DATA,1,INVALID_DATA (mbeause: raw 496 / Table 5 496 vs Table 8 492),Excluded from official runs; isolated vertices documented via Theorem B*(G_496)=B*(G_492)
+DUPLICATE_TOPOLOGIES_IN_113,2,mbeacxc==mbeaflw (known in paper p.48); saylr3==sherman1 (discovered in M3.5),Report both full 54 READY and 53 unique-topology aggregates in M3.6 statistics
+DATASET_COPY_PARITY,72,"100% SHA-256 parity across benchmarks/raw, hb_table6_7/raw, harwell_boeing/raw; 72/72 .edgelist match nonzero_union",Use canonical raw resolver; retain tracked dirs in M3.5 to preserve backward compatibility

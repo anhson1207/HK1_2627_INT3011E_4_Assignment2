@@ -1,0 +1,55 @@
+{
+  "experiment_name": "member3-m3.4-drsa-evaluation",
+  "timestamp": "2026-11-11T01:36:27+00:00",
+  "git_commit": "326ec7c",
+  "environment": {
+    "os": "macOS-14.0-arm64-arm-64bit-Mach-O",
+    "machine": "arm64",
+    "python_version": "3.14.3"
+  },
+  "config": {
+    "name": "member3-m3.4-drsa-evaluation",
+    "provenance": "data/benchmark_provenance.json",
+    "raw_dir": "data/hb_table6_7/raw",
+    "fallback_raw_dir": "data/benchmarks/raw",
+    "output_dir": "results/member3_m3_4",
+    "seeds": [
+      17,
+      23,
+      42
+    ],
+    "stage_b_instances": [
+      "bcspwr01",
+      "bcspwr02",
+      "bcsstk01",
+      "ash85",
+      "nos4",
+      "bcsstk22",
+      "dwt_209",
+      "saylr1"
+    ],
+    "stage_b_timeout_seconds": 4.0,
+    "ablation_instances": [
+      "bcsstk01",
+      "ash85",
+      "nos4"
+    ],
+    "ablation_timeout_seconds": 3.0,
+    "ablation_speed_instances": [
+      "bcsstk01",
+      "ash85",
+      "dwt_209"
+    ],
+    "ablation_speed_moves": 5000,
+    "stage_c_timeout_seconds": 1.5,
+    "stage_c_seed": 17,
+    "stage_c_max_batch_seconds": 360.0
+  },
+  "provenance_counts": {
+    "total": 113,
+    "ready": 54,
+    "needs_verification": 58,
+    "invalid_data": 1
+  },
+  "total_planned_runs": 395
+}

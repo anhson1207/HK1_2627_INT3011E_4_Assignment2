@@ -1,0 +1,348 @@
+{
+  "total_runs": 36,
+  "preflight_ready_total": 54,
+  "status_by_solver": {
+    "cp-sat": {
+      "OPTIMAL": 8,
+      "FEASIBLE": 8,
+      "TIMEOUT": 5
+    },
+    "cp-optimizer": {
+      "FEASIBLE": 13,
+      "UNAVAILABLE": 2
+    }
+  },
+  "all_validations_passed": true,
+  "paired_cp_comparison": [
+    {
+      "instance": "bcspwr01",
+      "n": 39,
+      "m": 46,
+      "published_lb": 5,
+      "published_best": 5,
+      "cpsat_status": "OPTIMAL",
+      "cpsat_bw": 5,
+      "cpsat_lb": 5,
+      "cpsat_time_s": 13.547244,
+      "cpo_status": "FEASIBLE",
+      "cpo_bw": 5,
+      "cpo_lb": 4,
+      "cpo_time_s": 21.757741
+    },
+    {
+      "instance": "bcspwr02",
+      "n": 49,
+      "m": 59,
+      "published_lb": 7,
+      "published_best": 7,
+      "cpsat_status": "OPTIMAL",
+      "cpsat_bw": 7,
+      "cpsat_lb": 7,
+      "cpsat_time_s": 13.947557,
+      "cpo_status": "FEASIBLE",
+      "cpo_bw": 7,
+      "cpo_lb": 6,
+      "cpo_time_s": 20.330167
+    },
+    {
+      "instance": "bcsstk01",
+      "n": 48,
+      "m": 176,
+      "published_lb": 16,
+      "published_best": 16,
+      "cpsat_status": "FEASIBLE",
+      "cpsat_bw": 24,
+      "cpsat_lb": 12,
+      "cpsat_time_s": 20.223909,
+      "cpo_status": "FEASIBLE",
+      "cpo_bw": 18,
+      "cpo_lb": 12,
+      "cpo_time_s": 20.171179
+    },
+    {
+      "instance": "ash85",
+      "n": 85,
+      "m": 219,
+      "published_lb": 9,
+      "published_best": 9,
+      "cpsat_status": "TIMEOUT",
+      "cpsat_bw": null,
+      "cpsat_lb": 7,
+      "cpsat_time_s": 15.855492,
+      "cpo_status": "FEASIBLE",
+      "cpo_bw": 10,
+      "cpo_lb": 7,
+      "cpo_time_s": 28.778755
+    },
+    {
+      "instance": "nos4",
+      "n": 100,
+      "m": 247,
+      "published_lb": 10,
+      "published_best": 10,
+      "cpsat_status": "TIMEOUT",
+      "cpsat_bw": null,
+      "cpsat_lb": 8,
+      "cpsat_time_s": 16.751201,
+      "cpo_status": "FEASIBLE",
+      "cpo_bw": 10,
+      "cpo_lb": 8,
+      "cpo_time_s": 27.69791
+    },
+    {
+      "instance": "dwt_209",
+      "n": 209,
+      "m": 767,
+      "published_lb": 21,
+      "published_best": 23,
+      "cpsat_status": "TIMEOUT",
+      "cpsat_bw": null,
+      "cpsat_lb": 18,
+      "cpsat_time_s": 21.421378,
+      "cpo_status": "UNAVAILABLE",
+      "cpo_bw": null,
+      "cpo_lb": 18,
+      "cpo_time_s": 7.066491
+    }
+  ],
+  "reference_baselines": [
+    {
+      "source": "results/member2_m2_3/runs.json (historical same-machine, 30s)",
+      "instance": "bcspwr01",
+      "solver": "M2.3 cadical (order, 30s)",
+      "status": "TIMEOUT",
+      "bandwidth": 5,
+      "lower_bound": 4,
+      "runtime_s": 30.006169
+    },
+    {
+      "source": "results/member2_m2_3/runs.json (historical same-machine, 30s)",
+      "instance": "bcsstk01",
+      "solver": "M2.3 cadical (order, 30s)",
+      "status": "TIMEOUT",
+      "bandwidth": 20,
+      "lower_bound": 12,
+      "runtime_s": 30.006976
+    },
+    {
+      "source": "results/member2_m2_3/runs.json (historical same-machine, 30s)",
+      "instance": "bcspwr02",
+      "solver": "M2.3 cadical (order, 30s)",
+      "status": "TIMEOUT",
+      "bandwidth": 8,
+      "lower_bound": 6,
+      "runtime_s": 30.007461
+    },
+    {
+      "source": "results/member2_m2_3/runs.json (historical same-machine, 30s)",
+      "instance": "ash85",
+      "solver": "M2.3 cadical (order, 30s)",
+      "status": "TIMEOUT",
+      "bandwidth": 10,
+      "lower_bound": 7,
+      "runtime_s": 30.010279
+    },
+    {
+      "source": "results/member2_m2_3/runs.json (historical same-machine, 30s)",
+      "instance": "nos4",
+      "solver": "M2.3 cadical (order, 30s)",
+      "status": "TIMEOUT",
+      "bandwidth": 12,
+      "lower_bound": 8,
+      "runtime_s": 30.010674
+    },
+    {
+      "source": "results/member2_m2_3/runs.json (historical same-machine, 30s)",
+      "instance": "dwt_209",
+      "solver": "M2.3 cadical (order, 30s)",
+      "status": "TIMEOUT",
+      "bandwidth": 42,
+      "lower_bound": 18,
+      "runtime_s": 30.014892
+    },
+    {
+      "source": "results/member2_m2_3/runs.json (historical same-machine, 30s)",
+      "instance": "bcspwr01",
+      "solver": "M2.3 cadical (pairwise, 30s)",
+      "status": "TIMEOUT",
+      "bandwidth": 5,
+      "lower_bound": 4,
+      "runtime_s": 30.007418
+    },
+    {
+      "source": "results/member2_m2_3/runs.json (historical same-machine, 30s)",
+      "instance": "bcsstk01",
+      "solver": "M2.3 cadical (pairwise, 30s)",
+      "status": "TIMEOUT",
+      "bandwidth": 26,
+      "lower_bound": 12,
+      "runtime_s": 30.013279
+    },
+    {
+      "source": "results/member2_m2_3/runs.json (historical same-machine, 30s)",
+      "instance": "bcspwr02",
+      "solver": "M2.3 cadical (pairwise, 30s)",
+      "status": "TIMEOUT",
+      "bandwidth": 8,
+      "lower_bound": 6,
+      "runtime_s": 30.008356
+    },
+    {
+      "source": "results/member2_m2_3/runs.json (historical same-machine, 30s)",
+      "instance": "ash85",
+      "solver": "M2.3 cadical (pairwise, 30s)",
+      "status": "TIMEOUT",
+      "bandwidth": 10,
+      "lower_bound": 7,
+      "runtime_s": 30.743716
+    },
+    {
+      "source": "results/member2_m2_3/runs.json (historical same-machine, 30s)",
+      "instance": "bcspwr01",
+      "solver": "M2.3 glucose (order, 30s)",
+      "status": "TIMEOUT",
+      "bandwidth": 5,
+      "lower_bound": 4,
+      "runtime_s": 30.009685
+    },
+    {
+      "source": "results/member2_m2_3/runs.json (historical same-machine, 30s)",
+      "instance": "bcsstk01",
+      "solver": "M2.3 glucose (order, 30s)",
+      "status": "TIMEOUT",
+      "bandwidth": 22,
+      "lower_bound": 12,
+      "runtime_s": 30.009991
+    },
+    {
+      "source": "results/member2_m2_3/runs.json (historical same-machine, 30s)",
+      "instance": "bcspwr02",
+      "solver": "M2.3 glucose (order, 30s)",
+      "status": "TIMEOUT",
+      "bandwidth": 8,
+      "lower_bound": 6,
+      "runtime_s": 30.100918
+    },
+    {
+      "source": "results/member2_m2_3/runs.json (historical same-machine, 30s)",
+      "instance": "ash85",
+      "solver": "M2.3 glucose (order, 30s)",
+      "status": "TIMEOUT",
+      "bandwidth": 10,
+      "lower_bound": 7,
+      "runtime_s": 30.010861
+    },
+    {
+      "source": "results/member2_m2_3/runs.json (historical same-machine, 30s)",
+      "instance": "bcspwr01",
+      "solver": "M2.3 gurobi (MIP, 30s)",
+      "status": "OPTIMAL",
+      "bandwidth": 5,
+      "lower_bound": 5,
+      "runtime_s": 13.258293
+    },
+    {
+      "source": "results/member2_m2_3/runs.json (historical same-machine, 30s)",
+      "instance": "bcsstk01",
+      "solver": "M2.3 gurobi (MIP, 30s)",
+      "status": "UNAVAILABLE",
+      "bandwidth": null,
+      "lower_bound": null,
+      "runtime_s": 3.1e-05
+    },
+    {
+      "source": "results/member2_m2_3/runs.json (historical same-machine, 30s)",
+      "instance": "bcspwr02",
+      "solver": "M2.3 gurobi (MIP, 30s)",
+      "status": "UNAVAILABLE",
+      "bandwidth": null,
+      "lower_bound": null,
+      "runtime_s": 1.4e-05
+    },
+    {
+      "source": "results/member2_m2_3/runs.json (historical same-machine, 30s)",
+      "instance": "ash85",
+      "solver": "M2.3 gurobi (MIP, 30s)",
+      "status": "UNAVAILABLE",
+      "bandwidth": null,
+      "lower_bound": null,
+      "runtime_s": 1.2e-05
+    },
+    {
+      "source": "results/member2_m2_3/runs.json (historical same-machine, 30s)",
+      "instance": "bcspwr01",
+      "solver": "M2.3 cplex (MIP, 30s)",
+      "status": "UNAVAILABLE",
+      "bandwidth": null,
+      "lower_bound": null,
+      "runtime_s": 0.000118
+    },
+    {
+      "source": "results/member2_m2_3/runs.json (historical same-machine, 30s)",
+      "instance": "bcsstk01",
+      "solver": "M2.3 cplex (MIP, 30s)",
+      "status": "UNAVAILABLE",
+      "bandwidth": null,
+      "lower_bound": null,
+      "runtime_s": 1.4e-05
+    },
+    {
+      "source": "results/member2_m2_3/runs.json (historical same-machine, 30s)",
+      "instance": "bcspwr02",
+      "solver": "M2.3 cplex (MIP, 30s)",
+      "status": "UNAVAILABLE",
+      "bandwidth": null,
+      "lower_bound": null,
+      "runtime_s": 1e-05
+    },
+    {
+      "source": "results/member2_m2_3/runs.json (historical same-machine, 30s)",
+      "instance": "ash85",
+      "solver": "M2.3 cplex (MIP, 30s)",
+      "status": "UNAVAILABLE",
+      "bandwidth": null,
+      "lower_bound": null,
+      "runtime_s": 1.1e-05
+    },
+    {
+      "source": "results/member3_m3_2/runs.json (same-machine pilot, 10s)",
+      "instance": "ash85",
+      "solver": "M3.2 minisat best (order_sequential, 10s)",
+      "status": "TIMEOUT",
+      "bandwidth": 10,
+      "lower_bound": 7,
+      "runtime_s": 10.029539
+    },
+    {
+      "source": "results/member3_m3_2/runs.json (same-machine pilot, 10s)",
+      "instance": "bcspwr01",
+      "solver": "M3.2 minisat best (pairwise_commander, 10s)",
+      "status": "TIMEOUT",
+      "bandwidth": 5,
+      "lower_bound": 4,
+      "runtime_s": 10.005202
+    },
+    {
+      "source": "results/member3_m3_2/runs.json (same-machine pilot, 10s)",
+      "instance": "bcspwr02",
+      "solver": "M3.2 minisat best (order_sequential, 10s)",
+      "status": "TIMEOUT",
+      "bandwidth": 8,
+      "lower_bound": 6,
+      "runtime_s": 10.004842
+    },
+    {
+      "source": "results/member3_m3_2/runs.json (same-machine pilot, 10s)",
+      "instance": "bcsstk01",
+      "solver": "M3.2 minisat best (pairwise_product, 10s)",
+      "status": "TIMEOUT",
+      "bandwidth": 21,
+      "lower_bound": 12,
+      "runtime_s": 10.174157
+    }
+  ],
+  "figures": [
+    "figures/fig1_cp_bandwidth_comparison.svg",
+    "figures/fig2_cp_runtime_symmetry.svg"
+  ]
+}

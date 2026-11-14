@@ -4,12 +4,27 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 import csv
+import hashlib
 from importlib.resources import files
 from pathlib import Path
-from typing import Mapping
+from typing import Mapping, Sequence
 
 from bmp.core.graph import Graph
-from bmp.io.readers import inspect_matrix_market, read_graph
+from bmp.io.readers import (
+    OFFICIAL_CONVERSION_POLICY,
+    compute_topology_sha256,
+    inspect_matrix_market,
+    read_edge_list,
+    read_graph,
+    read_matrix_market,
+)
+
+VALIDATOR_VERSION = "m3.5"
+CANONICAL_RAW_DIR = Path("data/benchmarks/raw")
+FALLBACK_RAW_DIRS: tuple[Path, ...] = (
+    Path("data/hb_table6_7/raw"),
+    Path("data/harwell_boeing/raw"),
+)
 
 
 @dataclass(frozen=True, slots=True)
@@ -177,13 +192,96 @@ def preflight_check_dataset(
     )
 
 
+def _file_sha256(path: Path) -> str:
+    digest = hashlib.sha256()
+    with path.open("rb") as stream:
+        for chunk in iter(lambda: stream.read(65536), b""):
+            digest.update(chunk)
+    return digest.hexdigest()
+
+
+def resolve_raw_matrix_path(
+    instance: str,
+    *,
+    search_dirs: Sequence[Path] | None = None,
+    root: Path | None = None,
+) -> Path | None:
+    """Resolve the canonical raw Matrix Market file for ``instance``.
+
+    Searches ``data/benchmarks/raw`` first, then legacy fallback directories
+    (``data/hb_table6_7/raw``, ``data/harwell_boeing/raw``) without mutating
+    existing tracked directories.
+    """
+
+    repo_root = Path.cwd() if root is None else Path(root)
+    dirs = (CANONICAL_RAW_DIR, *FALLBACK_RAW_DIRS) if search_dirs is None else tuple(search_dirs)
+    for rel_or_abs in dirs:
+        base = rel_or_abs if rel_or_abs.is_absolute() else repo_root / rel_or_abs
+        for suffix in (".mtx.gz", ".mtx"):
+            candidate = base / f"{instance}{suffix}"
+            if candidate.is_file():
+                return candidate
+    return None
+
+
+def audit_raw_copy_parity(
+    instance: str,
+    *,
+    root: Path | None = None,
+) -> dict[str, object]:
+    """Compare raw SHA-256 hashes across dataset copies and derived edge list."""
+
+    repo_root = Path.cwd() if root is None else Path(root)
+    locations = {
+        "benchmarks_raw": repo_root / CANONICAL_RAW_DIR,
+        "hb_table6_7_raw": repo_root / "data/hb_table6_7/raw",
+        "harwell_boeing_raw": repo_root / "data/harwell_boeing/raw",
+    }
+    hashes: dict[str, str] = {}
+    paths: dict[str, str] = {}
+    for label, folder in locations.items():
+        for suffix in (".mtx.gz", ".mtx"):
+            cand = folder / f"{instance}{suffix}"
+            if cand.is_file():
+                hashes[label] = _file_sha256(cand)
+                paths[label] = cand.as_posix()
+                break
+
+    distinct_hashes = sorted(set(hashes.values()))
+    canonical_path = resolve_raw_matrix_path(instance, root=repo_root)
+    edge_path = repo_root / "data/hb_table6_7/graphs" / f"{instance}.edgelist"
+    edgelist_matches_nonzero_union: bool | None = None
+    if edge_path.is_file() and canonical_path is not None:
+        raw_graph = read_matrix_market(canonical_path)
+        edge_graph = read_edge_list(edge_path)
+        edgelist_matches_nonzero_union = (
+            compute_topology_sha256(raw_graph) == compute_topology_sha256(edge_graph)
+        )
+
+    return {
+        "instance": instance,
+        "canonical_path": None if canonical_path is None else canonical_path.as_posix(),
+        "copy_paths": paths,
+        "copy_sha256": hashes,
+        "copy_count": len(hashes),
+        "raw_parity_ok": len(distinct_hashes) <= 1,
+        "edgelist_path": edge_path.as_posix() if edge_path.is_file() else None,
+        "edgelist_matches_nonzero_union": edgelist_matches_nonzero_union,
+    }
+
+
 __all__ = [
     "BenchmarkInstanceMeta",
+    "CANONICAL_RAW_DIR",
+    "FALLBACK_RAW_DIRS",
     "PreflightReport",
     "TABLE_6_INSTANCES",
     "TABLE_7_INSTANCES",
     "TABLE_8_INSTANCES",
     "ALL_INSTANCES",
+    "VALIDATOR_VERSION",
+    "audit_raw_copy_parity",
     "preflight_check_dataset",
+    "resolve_raw_matrix_path",
     "verify_instance_file",
 ]
