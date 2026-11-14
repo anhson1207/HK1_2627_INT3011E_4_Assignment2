@@ -417,6 +417,10 @@ def compute_initial_upper_bound(
 
     if heuristic_permutation is not None:
         perm = dict(heuristic_permutation)
+        from bmp.core.validation import validate_solution
+
+        if not validate_solution(graph, perm).valid:
+            raise ValueError("Initial upper bound requires a valid permutation on this graph")
         bw = calculate_bandwidth(graph, perm)
     elif init_mode == "identity":
         bw, perm = identity_upper_bound(graph)

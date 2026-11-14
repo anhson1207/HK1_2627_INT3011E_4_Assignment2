@@ -62,7 +62,7 @@ def _solve_instance(
         else:
             raise ValueError(f"Unknown encoding: {encoding_name}")
 
-        mode = "binary" if "binary" in strategy_name or search_mode == "binary" else "linear"
+        mode = "binary" if "binary" in strategy_name else search_mode
         sat_solver = RepeatedSATSolver(
             encoder=encoder,
             backend_name=solver_name,
@@ -75,6 +75,8 @@ def _solve_instance(
             limits=limits,
         )
     elif strategy_name == "incremental":
+        if search_mode == "adaptive":
+            raise ValueError("adaptive search is currently supported only with repeated SAT")
         from bmp.solvers.sat.incremental import IncrementalSATSolver
         if encoding_name == "pairwise":
             encoder = PairwiseEncoding(amo=amo_name)
@@ -134,7 +136,7 @@ def _build_parser() -> argparse.ArgumentParser:
     solve.add_argument("--encoding", choices=("pairwise", "order"), default="pairwise")
     solve.add_argument("--strategy", choices=("repeated", "incremental", "brute-force"), default="repeated")
     solve.add_argument("--amo", choices=("pairwise", "sequential"), default="pairwise")
-    solve.add_argument("--search-mode", choices=("linear", "binary"), default="linear")
+    solve.add_argument("--search-mode", choices=("linear", "binary", "adaptive"), default="linear")
     solve.add_argument("--symmetry-breaking", action="store_true", default=False)
     solve.add_argument("--timeout", type=float, default=None)
     solve.add_argument("--max-vertices", type=int, default=10)

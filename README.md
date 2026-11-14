@@ -220,6 +220,6 @@ pytest -v
 
 ## 8. Ongoing Development & Member Responsibilities
 
-- **`dev/leader` (Current Branch)**: SAT Position & Order Encodings, Pairwise & Sequential AMO, Repeated & Incremental CaDiCaL SAT, Symmetry Breaking.
+- **`dev/leader` (Phases L9–L10 Complete; Full 113 SAT Coverage & Adaptive CaDiCaL Optimization)**: SAT Position & Order Encodings, Pairwise & Sequential AMO, Repeated & Incremental CaDiCaL SAT, Symmetry Breaking, L6–L8 CNF Estimator/ResourceLimits/Worker, Phase L9 Full 113 Benchmark ([Phase L9 Report](docs/leader-l9-full113-sat-report.md)), and Phase L10 Adaptive CaDiCaL Optimization (37 SAT witnesses, 4 SAT-proved optimal, 1 bound-proved optimal across 113 instances, 17 SVGs in `results/leader_l10_cadical_optimization/`, [Phase L10 Report](docs/leader-l10-cadical-optimization-report.md)).
 - **`dev/member-2` (In Development by Member 2)**: Binary & Commander Cardinality Encodings, Glucose SAT Solver, Gurobi MIP, CPLEX MIP, Comprehensive Benchmarking Suite.
 - **`dev/member-3` (In Development by Member 3)**: Product & Ladder Cardinality Encodings, MiniSat Solver, CP-SAT, CP Optimizer, Harwell-Boeing Dataset Pipeline, Metaheuristics (RCM, SA, DRSA).

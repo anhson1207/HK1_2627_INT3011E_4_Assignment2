@@ -723,6 +723,7 @@ def _execute_sat_spec(
             threshold_policy=threshold_policy,  # type: ignore[arg-type]
             init_mode=warm_mode,
             decompose_components=decompose,
+            certify_feasible_with_sat=bool(spec.get("certify_feasible_with_sat", False)),
         )
     else:
         solver = IncrementalSATSolver(
@@ -789,8 +790,9 @@ def _execute_sat_spec(
         "symmetry_breaking": sym,
         "time_limit_s": tlim,
         "memory_limit_mb": memory_limit_mb,
-        "solver_attempted": res.status is not SolutionStatus.SKIPPED or int(res.sat_calls or 0) > 0,
-        "sat_calls": int(res.sat_calls or 0),
+        "solver_attempted": bool(trace) or int(res.sat_calls or 0) > 0,
+        "solver_call_started": bool(trace) or int(res.sat_calls or 0) > 0,
+        "sat_calls": max(int(res.sat_calls or 0), len(trace)),
         "sat_solved_any": sat_solved_any,
         "sat_improved_initial_ub": sat_improved,
         "num_variables": res.num_variables if res.num_variables is not None else pre_est.num_variables,
@@ -809,6 +811,11 @@ def _execute_sat_spec(
         "lower_bound": res.lower_bound,
         "upper_bound": res.upper_bound,
         "incumbent_source": inc_src,
+        "witness_permutation_json": (
+            json.dumps(dict(res.permutation), sort_keys=True)
+            if spec.get("record_permutation") and sat_solved_any and val_ok and res.permutation is not None
+            else ""
+        ),
         "blocker_reason": str(blocker) if blocker else "",
         "notes": spec.get("notes", ""),
     }

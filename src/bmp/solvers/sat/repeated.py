@@ -7,7 +7,7 @@ from typing import Literal, Mapping
 
 from bmp.core.graph import Graph
 from bmp.core.solution import SolutionStatus, SolverResult
-from bmp.core.validation import calculate_bandwidth
+from bmp.core.validation import calculate_bandwidth, validate_solution
 from bmp.encodings.base import BMPEncoder
 from bmp.encodings.estimator import ResourceLimits, estimate_for_encoder
 from bmp.encodings.pairwise import PairwiseEncoding
@@ -28,21 +28,23 @@ class RepeatedSATSolver:
         encoder: BMPEncoder | None = None,
         *,
         backend_name: str = "cadical",
-        search_mode: Literal["linear", "binary"] = "linear",
+        search_mode: Literal["linear", "binary", "adaptive"] = "linear",
         threshold_policy: Literal["adaptive", "unit"] = "adaptive",
         init_mode: str = "rcm",
         decompose_components: bool = False,
+        certify_feasible_with_sat: bool = False,
     ) -> None:
         self.encoder = encoder if encoder is not None else PairwiseEncoding()
         self.backend_name = backend_name
         self.search_mode = search_mode.lower()
-        if self.search_mode not in ("linear", "binary"):
-            raise ValueError(f"Unknown search mode: {search_mode}. Choose 'linear' or 'binary'.")
+        if self.search_mode not in ("linear", "binary", "adaptive"):
+            raise ValueError(f"Unknown search mode: {search_mode}. Choose 'linear', 'binary', or 'adaptive'.")
         self.threshold_policy = threshold_policy
         if threshold_policy not in ("adaptive", "unit"):
             raise ValueError("threshold_policy must be 'adaptive' or 'unit'")
         self.init_mode = init_mode
         self.decompose_components = bool(decompose_components)
+        self.certify_feasible_with_sat = bool(certify_feasible_with_sat)
 
     def _clone_non_decomposed(self) -> RepeatedSATSolver:
         return RepeatedSATSolver(
@@ -52,6 +54,7 @@ class RepeatedSATSolver:
             threshold_policy=self.threshold_policy,  # type: ignore[arg-type]
             init_mode=self.init_mode,
             decompose_components=False,
+            certify_feasible_with_sat=self.certify_feasible_with_sat,
         )
 
     def solve(
@@ -126,8 +129,10 @@ class RepeatedSATSolver:
             symmetry_breaking=symmetry_breaking,
             init_mode=self.init_mode,
         )
+        if not validate_solution(graph, init_perm, claimed_bandwidth=ub).valid:
+            raise ValueError("Initial upper bound requires a valid permutation on this graph")
 
-        if lb == ub:
+        if lb == ub and not self.certify_feasible_with_sat:
             return SolverResult(
                 instance=graph.name,
                 method="SAT",
@@ -268,6 +273,8 @@ class RepeatedSATSolver:
                         raise RuntimeError(f"Solver returned SAT but model is None for k={k}")
                     decoded_perm = self.encoder.decode(graph, model, k)
                     actual_bw = calculate_bandwidth(graph, decoded_perm)
+                    if not validate_solution(graph, decoded_perm).valid or actual_bw > k:
+                        raise RuntimeError(f"Invalid CaDiCaL model at k={k}")
                     sat_solved_any = True
                     report_sat_event(self, k=k, outcome="SAT", solve_time_s=solve_time, bandwidth=actual_bw)
                     best_bandwidth = actual_bw
@@ -309,15 +316,27 @@ class RepeatedSATSolver:
                     )
                     break
 
-        elif self.search_mode == "binary":
+        elif self.search_mode in ("binary", "adaptive"):
             low = certified_lb
-            high = best_bandwidth - 1
+            # Adaptive mode obtains an independently decoded SAT witness at the
+            # validated incumbent bound before attempting a harder threshold.
+            # The incumbent permutation is never passed as SAT assumptions.
+            high = best_bandwidth if self.search_mode == "adaptive" else best_bandwidth - 1
+            first_adaptive_call = self.search_mode == "adaptive"
             while low <= high:
                 if effective_timeout is not None and (monotonic() - started) >= effective_timeout:
                     timed_out = True
                     break
 
-                mid = (low + high) // 2
+                confirming_incumbent = first_adaptive_call
+                if first_adaptive_call:
+                    mid = high
+                    first_adaptive_call = False
+                elif self.search_mode == "adaptive":
+                    gap = high - low
+                    mid = high if gap <= 3 else low + (3 * gap + 3) // 4
+                else:
+                    mid = (low + high) // 2
                 estimate = estimate_for_encoder(
                     self.encoder,
                     graph,
@@ -370,9 +389,11 @@ class RepeatedSATSolver:
                         raise RuntimeError(f"Solver returned SAT but model is None for k={mid}")
                     decoded_perm = self.encoder.decode(graph, model, mid)
                     actual_bw = calculate_bandwidth(graph, decoded_perm)
+                    if not validate_solution(graph, decoded_perm).valid or actual_bw > mid:
+                        raise RuntimeError(f"Invalid CaDiCaL model at k={mid}")
                     sat_solved_any = True
                     report_sat_event(self, k=mid, outcome="SAT", solve_time_s=solve_time, bandwidth=actual_bw)
-                    if actual_bw < best_bandwidth:
+                    if actual_bw <= best_bandwidth:
                         best_bandwidth = actual_bw
                         best_permutation = decoded_perm
                         report_progress(
@@ -392,6 +413,8 @@ class RepeatedSATSolver:
                 else:
                     backend.delete()
                     report_sat_event(self, k=mid, outcome="UNSAT", solve_time_s=solve_time)
+                    if confirming_incumbent:
+                        raise RuntimeError("CaDiCaL reported UNSAT at a validated feasible bound")
                     low = mid + 1
                     certified_lb = max(certified_lb, low)
                     report_progress(
