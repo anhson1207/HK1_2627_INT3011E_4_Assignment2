@@ -17,13 +17,17 @@ classifiers = [
   "Programming Language :: Python :: 3 :: Only",
   "Topic :: Scientific/Engineering",
 ]
-dependencies = []
+dependencies = ["python-sat>=1.8"]
 
 [project.optional-dependencies]
-sat = ["python-sat==1.9.dev15"]
-cp-sat = ["ortools==9.15.6755"]
-cp-optimizer = ["docplex==2.32.264"]
-test = ["pytest==9.2.0"]
+gurobi = ["gurobipy"]
+cplex = ["cplex"]
+cp-sat = ["ortools>=9.11"]
+cp-optimizer = ["docplex>=2.25"]
+heuristics = []
+plots = ["cnsplots==0.8.0", "matplotlib", "pandas"]
+datasets = ["requests", "pypdf"]
+dev = ["pytest>=8.0"]
 
 [project.scripts]
 bmp = "bmp.cli:main"
@@ -31,7 +35,10 @@ bmp = "bmp.cli:main"
 [tool.setuptools.packages.find]
 where = ["src"]
 
+[tool.setuptools.package-data]
+"bmp.core" = ["official_paper_results.csv"]
+
 [tool.pytest.ini_options]
 addopts = "-q"
-pythonpath = ["src"]
+pythonpath = ["src", "."]
 testpaths = ["tests"]

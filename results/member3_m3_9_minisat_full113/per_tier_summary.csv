@@ -1,0 +1,5 @@
+tier,total,preflight,eligible,minisat_attempted,minisat_feasible_witness,sat_optimal,bound_optimal,timeout_no_witness,resource_limit,validation_passed
+TIER1_READY,54,54,42,42,5,1,0,37,12,42
+TIER2A_NEEDS_VERIFICATION,58,58,42,42,9,2,0,33,16,42
+TIER2B_INVALID_DATA,1,1,1,1,0,0,0,1,0,1
+Total,113,113,85,85,14,3,0,71,28,85

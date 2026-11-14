@@ -1,6 +1,8 @@
 """Member 3 unit and small-instance integration tests."""
 
+import importlib.util
 import os
+from shutil import which
 import unittest
 from itertools import product
 from pathlib import Path
@@ -92,6 +94,28 @@ class MiniSatTests(unittest.TestCase):
             self.assertTrue(fresh.solve())
 
 
+def _has_module(name: str) -> bool:
+    try:
+        return importlib.util.find_spec(name) is not None
+    except ModuleNotFoundError:
+        return False
+
+
+def _has_ortools() -> bool:
+    return _has_module("ortools.sat.python.cp_model")
+
+
+def _has_docplex() -> bool:
+    return _has_module("docplex.cp.model")
+
+
+def _has_cpo_runtime() -> bool:
+    from bmp.solvers.exact.cp_optimizer import _resolve_executable
+
+    exe = os.environ.get("BMP_CPO_EXECUTABLE", "cpoptimizer")
+    return _has_docplex() and _resolve_executable(exe) is not None
+
+
 class SolverTests(unittest.TestCase):
     cases = [
         (path_graph(5), 1),
@@ -124,26 +148,25 @@ class SolverTests(unittest.TestCase):
                 )
                 self.check_certificate(graph, result)
 
+    @unittest.skipUnless(_has_ortools(), "ortools is not installed in the current environment")
     def test_cp_sat(self):
         self.check_exact(CPSATSolver())
 
+    @unittest.skipUnless(_has_ortools(), "ortools is not installed in the current environment")
     def test_cp_sat_zero_budget(self):
         result = CPSATSolver().solve(cycle_graph(4), timeout_seconds=0)
-        if result.status is SolutionStatus.UNAVAILABLE:
-            self.skipTest(str(result.metadata))
         self.assertEqual(result.status, SolutionStatus.TIMEOUT)
         self.assertIsNone(result.assignment)
 
+    @unittest.skipUnless(_has_cpo_runtime(), "docplex or cpoptimizer runtime is unavailable")
     def test_cp_optimizer(self):
         self.check_exact(
             CPOptimizerSolver(os.environ.get("BMP_CPO_EXECUTABLE", "cpoptimizer"))
         )
 
+    @unittest.skipUnless(_has_docplex(), "docplex is not installed in the current environment")
     def test_cp_optimizer_model_and_missing_runtime(self):
-        try:
-            model, positions = _build_model(path_graph(3))
-        except ImportError as exc:
-            self.skipTest(str(exc))
+        model, positions = _build_model(path_graph(3))
         self.assertEqual(set(positions), {1, 2, 3})
         source = model.get_cpo_string()
         for expression in ("alldiff(", "abs(", "minimize("):

@@ -1,0 +1,114 @@
+instance,source_table,n,dataset_status,benchmark_status,reason
+arc130,Table 6,130,NEEDS_VERIFICATION,NEEDS_VERIFICATION,Asymmetric or duplicate source entries; conversion rule unconfirmed
+ash85,Table 6,85,READY,SKIPPED,batch scope
+bcspwr01,Table 6,39,READY,EXECUTED,
+bcspwr02,Table 6,49,READY,SKIPPED,batch scope
+bcspwr03,Table 6,118,READY,SKIPPED,batch scope
+bcsstk01,Table 6,48,READY,EXECUTED,
+bcsstk04,Table 6,132,READY,SKIPPED,batch scope
+bcsstk05,Table 6,153,READY,SKIPPED,batch scope
+bcsstk22,Table 6,138,READY,SKIPPED,batch scope
+can_144,Table 6,144,READY,SKIPPED,batch scope
+can_161,Table 6,161,READY,SKIPPED,batch scope
+curtis54,Table 6,54,NEEDS_VERIFICATION,NEEDS_VERIFICATION,Asymmetric or duplicate source entries; conversion rule unconfirmed
+fs_183_1,Table 6,183,NEEDS_VERIFICATION,NEEDS_VERIFICATION,Asymmetric or duplicate source entries; conversion rule unconfirmed
+gent113,Table 6,113,NEEDS_VERIFICATION,NEEDS_VERIFICATION,Asymmetric or duplicate source entries; conversion rule unconfirmed
+gre_115,Table 6,115,NEEDS_VERIFICATION,NEEDS_VERIFICATION,Asymmetric or duplicate source entries; conversion rule unconfirmed
+gre_185,Table 6,185,NEEDS_VERIFICATION,NEEDS_VERIFICATION,Asymmetric or duplicate source entries; conversion rule unconfirmed
+ibm32,Table 6,32,NEEDS_VERIFICATION,NEEDS_VERIFICATION,Asymmetric or duplicate source entries; conversion rule unconfirmed
+impcol_b,Table 6,59,NEEDS_VERIFICATION,NEEDS_VERIFICATION,Asymmetric or duplicate source entries; conversion rule unconfirmed
+impcol_c,Table 6,137,NEEDS_VERIFICATION,NEEDS_VERIFICATION,Asymmetric or duplicate source entries; conversion rule unconfirmed
+lns_131,Table 6,131,NEEDS_VERIFICATION,NEEDS_VERIFICATION,Asymmetric or duplicate source entries; conversion rule unconfirmed
+lund_a,Table 6,147,READY,SKIPPED,batch scope
+lund_b,Table 6,147,READY,SKIPPED,batch scope
+mcca,Table 6,180,NEEDS_VERIFICATION,NEEDS_VERIFICATION,Asymmetric or duplicate source entries; conversion rule unconfirmed
+nos4,Table 6,100,READY,SKIPPED,batch scope
+pores_1,Table 6,30,NEEDS_VERIFICATION,NEEDS_VERIFICATION,Asymmetric or duplicate source entries; conversion rule unconfirmed
+steam3,Table 6,80,NEEDS_VERIFICATION,NEEDS_VERIFICATION,Asymmetric or duplicate source entries; conversion rule unconfirmed
+west0132,Table 6,132,NEEDS_VERIFICATION,NEEDS_VERIFICATION,Asymmetric or duplicate source entries; conversion rule unconfirmed
+west0156,Table 6,156,NEEDS_VERIFICATION,NEEDS_VERIFICATION,Asymmetric or duplicate source entries; conversion rule unconfirmed
+west0167,Table 6,167,NEEDS_VERIFICATION,NEEDS_VERIFICATION,Asymmetric or duplicate source entries; conversion rule unconfirmed
+will199,Table 6,199,NEEDS_VERIFICATION,NEEDS_VERIFICATION,Asymmetric or duplicate source entries; conversion rule unconfirmed
+will57,Table 6,57,NEEDS_VERIFICATION,NEEDS_VERIFICATION,Asymmetric or duplicate source entries; conversion rule unconfirmed
+494_bus,Table 7,494,READY,SKIPPED,batch scope
+662_bus,Table 7,662,READY,SKIPPED,batch scope
+685_bus,Table 7,685,READY,SKIPPED,batch scope
+ash292,Table 7,292,READY,SKIPPED,batch scope
+bcspwr04,Table 7,274,READY,SKIPPED,batch scope
+bcspwr05,Table 7,443,READY,SKIPPED,batch scope
+bcsstk06,Table 7,420,READY,SKIPPED,batch scope
+bcsstk19,Table 7,817,READY,SKIPPED,batch scope
+bcsstk20,Table 7,485,READY,SKIPPED,batch scope
+bcsstm07,Table 7,420,READY,SKIPPED,batch scope
+bp_0,Table 7,822,NEEDS_VERIFICATION,NEEDS_VERIFICATION,Asymmetric or duplicate source entries; conversion rule unconfirmed
+bp_1000,Table 7,822,NEEDS_VERIFICATION,NEEDS_VERIFICATION,Asymmetric or duplicate source entries; conversion rule unconfirmed
+bp_1200,Table 7,822,NEEDS_VERIFICATION,NEEDS_VERIFICATION,Asymmetric or duplicate source entries; conversion rule unconfirmed
+bp_1400,Table 7,822,NEEDS_VERIFICATION,NEEDS_VERIFICATION,Asymmetric or duplicate source entries; conversion rule unconfirmed
+bp_1600,Table 7,822,NEEDS_VERIFICATION,NEEDS_VERIFICATION,Asymmetric or duplicate source entries; conversion rule unconfirmed
+bp_200,Table 7,822,NEEDS_VERIFICATION,NEEDS_VERIFICATION,Asymmetric or duplicate source entries; conversion rule unconfirmed
+bp_400,Table 7,822,NEEDS_VERIFICATION,NEEDS_VERIFICATION,Asymmetric or duplicate source entries; conversion rule unconfirmed
+bp_600,Table 7,822,NEEDS_VERIFICATION,NEEDS_VERIFICATION,Asymmetric or duplicate source entries; conversion rule unconfirmed
+bp_800,Table 7,822,NEEDS_VERIFICATION,NEEDS_VERIFICATION,Asymmetric or duplicate source entries; conversion rule unconfirmed
+can_292,Table 7,292,READY,SKIPPED,batch scope
+can_445,Table 7,445,READY,SKIPPED,batch scope
+can_715,Table 7,715,READY,SKIPPED,batch scope
+can_838,Table 7,838,READY,SKIPPED,batch scope
+dwt_209,Table 7,209,READY,SKIPPED,batch scope
+dwt_221,Table 7,221,READY,SKIPPED,batch scope
+dwt_234,Table 7,234,READY,SKIPPED,batch scope
+dwt_245,Table 7,245,READY,SKIPPED,batch scope
+dwt_310,Table 7,310,READY,SKIPPED,batch scope
+dwt_361,Table 7,361,READY,SKIPPED,batch scope
+dwt_419,Table 7,419,READY,SKIPPED,batch scope
+dwt_503,Table 7,503,READY,SKIPPED,batch scope
+dwt_592,Table 7,592,READY,SKIPPED,batch scope
+dwt_878,Table 7,878,READY,SKIPPED,batch scope
+dwt_918,Table 7,918,READY,SKIPPED,batch scope
+dwt_992,Table 7,992,READY,SKIPPED,batch scope
+fs_541_1,Table 7,541,NEEDS_VERIFICATION,NEEDS_VERIFICATION,Asymmetric or duplicate source entries; conversion rule unconfirmed
+fs_680_1,Table 7,680,NEEDS_VERIFICATION,NEEDS_VERIFICATION,Disconnected graph absent from paper Table 5
+fs_760_1,Table 7,760,NEEDS_VERIFICATION,NEEDS_VERIFICATION,Disconnected graph absent from paper Table 5
+gr_30_30,Table 7,900,READY,SKIPPED,batch scope
+gre_216a,Table 7,216,NEEDS_VERIFICATION,NEEDS_VERIFICATION,Asymmetric or duplicate source entries; conversion rule unconfirmed
+gre_343,Table 7,343,NEEDS_VERIFICATION,NEEDS_VERIFICATION,Asymmetric or duplicate source entries; conversion rule unconfirmed
+gre_512,Table 8,512,NEEDS_VERIFICATION,NEEDS_VERIFICATION,Asymmetric or duplicate source entries; conversion rule unconfirmed
+hor_131,Table 8,434,NEEDS_VERIFICATION,NEEDS_VERIFICATION,Asymmetric or duplicate source entries; conversion rule unconfirmed
+impcol_a,Table 8,207,NEEDS_VERIFICATION,NEEDS_VERIFICATION,Asymmetric or duplicate source entries; conversion rule unconfirmed
+impcol_d,Table 8,425,NEEDS_VERIFICATION,NEEDS_VERIFICATION,Asymmetric or duplicate source entries; conversion rule unconfirmed
+impcol_e,Table 8,225,NEEDS_VERIFICATION,NEEDS_VERIFICATION,Asymmetric or duplicate source entries; conversion rule unconfirmed
+jagmesh1,Table 8,936,READY,SKIPPED,batch scope
+jpwh_991,Table 8,991,NEEDS_VERIFICATION,NEEDS_VERIFICATION,Asymmetric or duplicate source entries; conversion rule unconfirmed
+lns_511,Table 8,511,NEEDS_VERIFICATION,NEEDS_VERIFICATION,Asymmetric or duplicate source entries; conversion rule unconfirmed
+mbeacxc,Table 8,496,NEEDS_VERIFICATION,NEEDS_VERIFICATION,Asymmetric or duplicate source entries; conversion rule unconfirmed
+mbeaflw,Table 8,496,NEEDS_VERIFICATION,NEEDS_VERIFICATION,Asymmetric or duplicate source entries; conversion rule unconfirmed
+mbeause,Table 8,492,INVALID_DATA,INVALID_DATA,Vertex count differs from paper
+mcfe,Table 8,765,NEEDS_VERIFICATION,NEEDS_VERIFICATION,Asymmetric or duplicate source entries; conversion rule unconfirmed
+nnc261,Table 8,261,NEEDS_VERIFICATION,NEEDS_VERIFICATION,Asymmetric or duplicate source entries; conversion rule unconfirmed
+nnc666,Table 8,666,NEEDS_VERIFICATION,NEEDS_VERIFICATION,Asymmetric or duplicate source entries; conversion rule unconfirmed
+nos1,Table 8,237,READY,SKIPPED,batch scope
+nos2,Table 8,957,READY,SKIPPED,batch scope
+nos3,Table 8,960,READY,SKIPPED,batch scope
+nos5,Table 8,468,READY,SKIPPED,batch scope
+nos6,Table 8,675,READY,SKIPPED,batch scope
+nos7,Table 8,729,READY,SKIPPED,batch scope
+orsirr_2,Table 8,886,READY,SKIPPED,batch scope
+plat362,Table 8,362,READY,SKIPPED,batch scope
+plskz362,Table 8,362,READY,SKIPPED,batch scope
+pores_3,Table 8,532,NEEDS_VERIFICATION,NEEDS_VERIFICATION,Asymmetric or duplicate source entries; conversion rule unconfirmed
+saylr1,Table 8,238,READY,SKIPPED,batch scope
+saylr3,Table 8,1000,READY,SKIPPED,batch scope
+sherman1,Table 8,1000,READY,SKIPPED,batch scope
+sherman4,Table 8,1104,READY,SKIPPED,batch scope
+shl_0,Table 8,663,NEEDS_VERIFICATION,NEEDS_VERIFICATION,Asymmetric or duplicate source entries; conversion rule unconfirmed
+shl_200,Table 8,663,NEEDS_VERIFICATION,NEEDS_VERIFICATION,Asymmetric or duplicate source entries; conversion rule unconfirmed
+shl_400,Table 8,663,NEEDS_VERIFICATION,NEEDS_VERIFICATION,Asymmetric or duplicate source entries; conversion rule unconfirmed
+steam1,Table 8,240,NEEDS_VERIFICATION,NEEDS_VERIFICATION,Asymmetric or duplicate source entries; conversion rule unconfirmed
+steam2,Table 8,600,NEEDS_VERIFICATION,NEEDS_VERIFICATION,Asymmetric or duplicate source entries; conversion rule unconfirmed
+str_0,Table 8,363,NEEDS_VERIFICATION,NEEDS_VERIFICATION,Asymmetric or duplicate source entries; conversion rule unconfirmed
+str_200,Table 8,363,NEEDS_VERIFICATION,NEEDS_VERIFICATION,Asymmetric or duplicate source entries; conversion rule unconfirmed
+str_600,Table 8,363,NEEDS_VERIFICATION,NEEDS_VERIFICATION,Asymmetric or duplicate source entries; conversion rule unconfirmed
+west0381,Table 8,381,NEEDS_VERIFICATION,NEEDS_VERIFICATION,Asymmetric or duplicate source entries; conversion rule unconfirmed
+west0479,Table 8,479,NEEDS_VERIFICATION,NEEDS_VERIFICATION,Asymmetric or duplicate source entries; conversion rule unconfirmed
+west0497,Table 8,497,NEEDS_VERIFICATION,NEEDS_VERIFICATION,Asymmetric or duplicate source entries; conversion rule unconfirmed
+west0655,Table 8,655,NEEDS_VERIFICATION,NEEDS_VERIFICATION,Asymmetric or duplicate source entries; conversion rule unconfirmed
+west0989,Table 8,989,NEEDS_VERIFICATION,NEEDS_VERIFICATION,Asymmetric or duplicate source entries; conversion rule unconfirmed

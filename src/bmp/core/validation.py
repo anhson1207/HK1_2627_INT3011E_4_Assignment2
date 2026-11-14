@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Mapping
+from typing import Any, Mapping
 
 from bmp.core.graph import Graph
 
@@ -24,21 +24,43 @@ class ValidationReport:
         }
 
 
-def compute_bandwidth(graph: Graph, assignment: Mapping[int, int]) -> int:
-    """Compute the maximum edge span for an already valid assignment."""
+def calculate_bandwidth(graph: Graph, assignment: Mapping[int, int]) -> int:
+    """Compute the maximum edge span for an assignment.
 
-    if not graph.edges:
+    For an edgeless graph or graph with n <= 1, the bandwidth is 0.
+    """
+    if not graph.edges or graph.order <= 1:
         return 0
     return max(abs(assignment[u] - assignment[v]) for u, v in graph.edges)
 
 
-def validate_assignment(
+# Backward-compatible alias
+compute_bandwidth = calculate_bandwidth
+
+
+def validate_solution(
     graph: Graph,
-    assignment: Mapping[int, int],
+    solution: Any,
     *,
     claimed_bandwidth: int | None = None,
 ) -> ValidationReport:
-    """Check totality, range, bijectivity, and the claimed bandwidth."""
+    """Check totality, range, bijectivity, and the claimed bandwidth.
+
+    Accepts either a mapping (vertex -> label) or a SolverResult/BMPSolution.
+    """
+    assignment: Mapping[int, int]
+    if hasattr(solution, "permutation") and solution.permutation is not None:
+        assignment = solution.permutation
+        if claimed_bandwidth is None:
+            claimed_bandwidth = solution.bandwidth
+    elif hasattr(solution, "assignment") and solution.assignment is not None:
+        assignment = solution.assignment
+        if claimed_bandwidth is None:
+            claimed_bandwidth = solution.bandwidth
+    elif isinstance(solution, Mapping):
+        assignment = solution
+    else:
+        return ValidationReport(False, None, (f"Invalid solution type: {type(solution)}",))
 
     errors: list[str] = []
     expected_vertices = set(graph.vertices)
@@ -64,7 +86,7 @@ def validate_assignment(
 
     actual_bandwidth: int | None = None
     if not errors:
-        actual_bandwidth = compute_bandwidth(graph, assignment)
+        actual_bandwidth = calculate_bandwidth(graph, assignment)
         if claimed_bandwidth is not None and claimed_bandwidth != actual_bandwidth:
             errors.append(
                 f"Claimed bandwidth {claimed_bandwidth} does not match actual bandwidth "
@@ -72,3 +94,15 @@ def validate_assignment(
             )
 
     return ValidationReport(not errors, actual_bandwidth, tuple(errors))
+
+
+# Backward-compatible alias
+validate_assignment = validate_solution
+
+__all__ = [
+    "ValidationReport",
+    "calculate_bandwidth",
+    "compute_bandwidth",
+    "validate_solution",
+    "validate_assignment",
+]

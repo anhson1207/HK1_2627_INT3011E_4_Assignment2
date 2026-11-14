@@ -1,0 +1,53 @@
+[benchmark]
+experiment_id = "m3_8_full113_v1"
+provenance = "data/benchmark_provenance.json"
+raw_dir = "data/benchmarks/raw"
+legacy_results_csv = "results/member3-harwell-boeing.csv"
+output_dir = "results/member3_m3_8_full113"
+
+# Determinism, fairness & safety limits
+threads = 1
+primary_seed = 17
+max_batch_seconds = 780.0
+memory_limit_mb = 4096.0
+max_sat_variables = 500000
+max_sat_clauses = 2500000
+
+# Heuristic & exact budgets (resumable, resource-bounded on Apple M2 16GB)
+sa_timeout_seconds = 0.8
+sa_max_iterations = 10000000
+sa_legacy_iterations = 2000
+drsa_timeout_seconds = 0.8
+sensitivity_heuristic_timeout_seconds = 0.5
+
+cpsat_short_timeout_seconds = 3.0
+cpsat_extended_timeout_seconds = 12.0
+cpsat_extended_max_n = 700
+cpsat_proof_timeout_seconds = 30.0
+cpsat_proof_candidates = [
+  "pores_1",
+  "ibm32",
+  "bcspwr01",
+  "bcspwr02",
+  "curtis54",
+  "will57",
+  "impcol_b",
+  "steam3",
+  "ash85",
+  "nos4",
+]
+
+sat_timeout_seconds = 6.0
+sat_study_instances = [
+  "pores_1",
+  "ibm32",
+  "bcspwr01",
+  "bcspwr02",
+  "curtis54",
+  "will57",
+  "impcol_b",
+  "steam3",
+]
+
+mip_timeout_seconds = 15.0
+cpo_timeout_seconds = 10.0
