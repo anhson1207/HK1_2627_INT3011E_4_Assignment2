@@ -5,6 +5,7 @@ from __future__ import annotations
 import math
 from dataclasses import dataclass
 from time import monotonic
+from typing import Callable
 
 from bmp.core.bounds import degree_lower_bound, identity_upper_bound
 from bmp.core.graph import Graph
@@ -26,6 +27,7 @@ class GurobiMIPSolver:
     def solve(
         self, graph: Graph, *, timeout_seconds: float | None = None,
         symmetry_breaking: bool = False,
+        on_stage: Callable[[str], None] | None = None,
     ) -> BMPSolution:
         if timeout_seconds is not None and (not math.isfinite(timeout_seconds) or timeout_seconds < 0):
             raise ValueError("timeout_seconds must be finite and non-negative")
@@ -59,6 +61,8 @@ class GurobiMIPSolver:
             )
 
         try:
+            if on_stage:
+                on_stage("initializing")
             environment = gp.Env(empty=True)
             environment.setParam("OutputFlag", 0)
             environment.start()
@@ -83,6 +87,8 @@ class GurobiMIPSolver:
         n = graph.order
         positions = range(1, n + 1)
         try:
+            if on_stage:
+                on_stage("building")
             x = model.addVars(graph.vertices, positions, vtype=gp.GRB.BINARY, name="x")
             bandwidth = model.addVar(
                 vtype=gp.GRB.INTEGER, lb=lower, ub=best_bandwidth, name="B"
@@ -109,7 +115,11 @@ class GurobiMIPSolver:
             bandwidth.Start = best_bandwidth
             if timeout_seconds is not None:
                 model.Params.TimeLimit = max(0.0, timeout_seconds - (monotonic() - started))
+            if on_stage:
+                on_stage("optimizing")
             model.optimize()
+            if on_stage:
+                on_stage("finished")
         except gp.GurobiError as error:
             if _is_license_error(error):
                 return result(
@@ -122,6 +132,7 @@ class GurobiMIPSolver:
         code = model.Status
         metadata: dict[str, object] = {
             "gurobi_status": int(code), "symmetry_breaking": symmetry_breaking,
+            "incumbent_origin": "solver" if model.SolCount else "identity_start",
         }
         if model.SolCount:
             candidate = {

@@ -145,8 +145,12 @@ def worker(graph_path, solver, encoding, strategy, amo, symmetry, timeout, progr
                   else IncrementalSATSolver(encoder, backend_name="glucose"))
         result = engine.solve(graph, timeout_seconds=timeout, on_incumbent=checkpoint)
     elif solver == "gurobi":
+        def gurobi_stage(stage):
+            temporary = progress_path.with_suffix(".tmp")
+            temporary.write_text(json.dumps({"stage": stage}), encoding="utf-8")
+            os.replace(temporary, progress_path)
         result = GurobiMIPSolver().solve(graph, timeout_seconds=max(0.0, timeout - 2.0),
-                                         symmetry_breaking=symmetry)
+                                         symmetry_breaking=symmetry, on_stage=gurobi_stage)
     else:
         result = CPLEXMIPSolver().solve(graph, timeout_seconds=max(0.0, timeout - 2.0),
                                         symmetry_breaking=symmetry)
@@ -160,11 +164,14 @@ def worker(graph_path, solver, encoding, strategy, amo, symmetry, timeout, progr
     print(json.dumps({
         "status": status, "bandwidth": report.actual_bandwidth if report and report.valid else None,
         "best_bound": result.lower_bound, "validation": report.valid if report else None,
-        "assignment": assignment, "incumbent_origin": "solver" if assignment else "",
+        "assignment": assignment, "incumbent_origin": result.metadata.get(
+            "incumbent_origin", "solver" if assignment else ""),
         "runtime_total_s": monotonic() - started, "num_variables": result.num_variables,
         "num_clauses": result.num_clauses, "sat_calls": result.sat_calls,
         "encoding_time_s": result.encoding_time_s, "solving_time_s": result.solving_time_s,
         "error": "; ".join(report.errors) if report and not report.valid else result.metadata.get("reason", ""),
+        "gurobi_started": solver == "gurobi" and result.metadata.get("gurobi_status") is not None,
+        "gurobi_status": result.metadata.get("gurobi_status", ""),
     }), flush=True)
 
 
