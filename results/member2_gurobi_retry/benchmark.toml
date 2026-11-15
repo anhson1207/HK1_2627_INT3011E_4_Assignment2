@@ -1,0 +1,10 @@
+[benchmark]
+manifest = "manifest.csv"
+graph_dir = "../../data/hb_table6_7_8/graphs"
+output_dir = "."
+timeout_seconds = 60.0
+repetitions = 1
+max_sat_estimated_clauses = 2000000
+max_mip_variables = 1250000
+amo = ["pairwise", "sequential", "binary", "commander"]
+solvers = ["gurobi"]

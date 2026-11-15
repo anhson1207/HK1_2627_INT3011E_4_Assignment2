@@ -1,0 +1,72 @@
+{
+  "tables": {
+    "6": {
+      "reference_rows": 30,
+      "unique_instances": 30,
+      "runs_recorded": 60,
+      "optimal_runs": 0,
+      "optimal_instances": 0,
+      "timeout_runs": 60,
+      "resource_limit_runs": 0,
+      "unavailable_runs": 0,
+      "comparison": {
+        "better": 0,
+        "equal": 5,
+        "worse": 25,
+        "no_solution": 0,
+        "missing_best": 0
+      }
+    },
+    "7": {
+      "reference_rows": 18,
+      "unique_instances": 18,
+      "runs_recorded": 36,
+      "optimal_runs": 0,
+      "optimal_instances": 0,
+      "timeout_runs": 36,
+      "resource_limit_runs": 0,
+      "unavailable_runs": 0,
+      "comparison": {
+        "better": 0,
+        "equal": 0,
+        "worse": 18,
+        "no_solution": 0,
+        "missing_best": 0
+      }
+    },
+    "8": {
+      "reference_rows": 19,
+      "unique_instances": 19,
+      "runs_recorded": 38,
+      "optimal_runs": 0,
+      "optimal_instances": 0,
+      "timeout_runs": 38,
+      "resource_limit_runs": 0,
+      "unavailable_runs": 0,
+      "comparison": {
+        "better": 0,
+        "equal": 1,
+        "worse": 18,
+        "no_solution": 0,
+        "missing_best": 0
+      }
+    }
+  },
+  "overall": {
+    "reference_rows": 67,
+    "unique_instances": 67,
+    "runs_recorded": 134,
+    "optimal_runs": 0,
+    "optimal_instances": 0,
+    "timeout_runs": 134,
+    "resource_limit_runs": 0,
+    "unavailable_runs": 0,
+    "comparison": {
+      "better": 0,
+      "equal": 6,
+      "worse": 61,
+      "no_solution": 0,
+      "missing_best": 0
+    }
+  }
+}

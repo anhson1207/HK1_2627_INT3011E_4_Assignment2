@@ -1,0 +1,5 @@
+table,total,eligible,attempted,sat_feasible_l10,sat_feasible_cumulative,sat_optimal,sat_optimal_cumulative,bound_optimal_cumulative,resource_limit,timeout_no_sat
+Table 6,31,31,31,18,20,1,3,0,0,13
+Table 7,41,18,14,7,7,0,0,0,23,12
+Table 8,41,22,14,10,10,1,1,1,19,13
+Total,113,71,59,35,37,2,4,1,42,38

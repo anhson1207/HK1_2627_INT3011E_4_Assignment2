@@ -1,0 +1,6 @@
+component,baseline_reference,m3_9_observed,regression_detected
+Dataset_Harwell_Boeing,M3.8 / complete (113: 31 T6 / 41 T7 / 41 T8),113/113 unique verified,False
+MiniSat22_HB_Eligibility,M3.8 8 studied; complete 10 HB studied,"85/113 eligible, 85/113 attempted",False
+MiniSat22_HB_Witnesses,0d90086 baseline 10 HB subset (4s limit),"14/113 solver witnesses (3 SAT OPT, 0 bound OPT)",False
+CP_SAT_1D_BMP_Preservation,"results/member3_complete/cpsat_results.csv (113/113 valid: 16 OPT, 97 FEAS)",Untouched 113/113 preserved (verified via pytest regression),False
+Heuristics_RCM_SA_DRSA_CPO,"RCM 113/113, SA 113/113, DRSA 113/113, CPO CE 20/20",All preserved 100% untouched,False

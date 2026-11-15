@@ -81,6 +81,7 @@ def report_progress(
     num_clauses: int | None = None,
     initial_clauses: int | None = None,
     added_clauses: int | None = None,
+    sat_solved_any: bool = False,
     incumbent_source: str = "initial",
 ) -> None:
     conn = getattr(solver, "_progress_conn", None)
@@ -98,6 +99,7 @@ def report_progress(
                 "num_clauses": num_clauses,
                 "initial_clauses": initial_clauses,
                 "added_clauses": added_clauses,
+                "sat_solved_any": sat_solved_any,
                 "incumbent_source": incumbent_source,
             },
         ))
@@ -267,16 +269,21 @@ def run_bounded_solver(
         incumbent = dict(progress["permutation"])
         upper = calculate_bandwidth(graph, incumbent)
         lower = progress["lower_bound"]
-        incumbent_source = str(progress.get("incumbent_source", "initial"))
+        sat_solved_any = bool(progress.get("sat_solved_any")) or any(
+            ev.get("outcome") == "SAT" for ev in sat_trace
+        )
+        incumbent_source = str(progress.get("incumbent_source", "SAT" if sat_solved_any else "HEURISTIC"))
     elif heuristic_permutation is not None:
         incumbent = dict(heuristic_permutation)
         upper = calculate_bandwidth(graph, incumbent)
         lower = 0
-        incumbent_source = "heuristic"
+        sat_solved_any = False
+        incumbent_source = "HEURISTIC"
     else:
         upper, incumbent = identity_upper_bound(graph)
         lower = 0
-        incumbent_source = "initial"
+        sat_solved_any = False
+        incumbent_source = "HEURISTIC"
 
     emit_incumbent(
         graph, incumbent, upper, on_incumbent=on_incumbent, last_key=last_key
@@ -290,8 +297,12 @@ def run_bounded_solver(
         encoding=solver.encoder.name,
         strategy=(
             f"repeated_{solver.search_mode}"
-            if hasattr(solver, "search_mode")
-            else "incremental"
+            if hasattr(solver, "search_mode") and "Repeated" in type(solver).__name__
+            else (
+                "incremental_binary"
+                if getattr(solver, "search_mode", "linear") == "binary"
+                else "incremental"
+            )
         ),
         status=status,
         bandwidth=upper,
@@ -309,6 +320,8 @@ def run_bounded_solver(
             "timeout_seconds": timeout_seconds,
             "initial_clauses": progress["initial_clauses"] if progress else None,
             "added_clauses": progress["added_clauses"] if progress else None,
+            "sat_solved_any": sat_solved_any,
+            "timed_out": status is SolutionStatus.TIMEOUT,
             "incumbent_source": incumbent_source,
             "sat_trace": sat_trace,
             "sampled_peak_memory_mb": peak_memory_mb,

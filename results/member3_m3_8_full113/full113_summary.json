@@ -1,0 +1,241 @@
+{
+  "experiment_id": "m3_8_full113_v1",
+  "timestamp": "2026-11-11T12:13:56+00:00",
+  "dataset_summary": {
+    "total_catalog_names": 113,
+    "graphs_constructed_primary": 113,
+    "tier1_ready_count": 54,
+    "tier2_exploratory_count": 59,
+    "needs_verification_count": 58,
+    "invalid_data_count": 1,
+    "table_counts": {
+      "Table 6": 31,
+      "Table 7": 41,
+      "Table 8": 41
+    },
+    "unique_topologies_in_113": 111,
+    "duplicate_pairs_in_113": [
+      {
+        "instance": "mbeaflw",
+        "duplicate_of": "mbeacxc"
+      },
+      {
+        "instance": "sherman1",
+        "duplicate_of": "saylr3"
+      }
+    ],
+    "total_graph_views_constructed": 136
+  },
+  "batch_execution": {
+    "total_run_records": 1279,
+    "planned_static_runs": 1240,
+    "planned_dynamic_pass2_runs": 39,
+    "executed_in_this_batch": 83,
+    "interrupted_by_batch_budget": false
+  },
+  "coverage_table_113": [
+    {
+      "method_label": "RCM (primary 113)",
+      "catalog_instances": 113,
+      "dataset_loaded": 113,
+      "preflight_evaluated": 113,
+      "solver_attempted": 113,
+      "valid_solution_found": 113,
+      "optimal_proved": 0,
+      "feasible_solution_found": 113,
+      "timeout_with_incumbent": 0,
+      "timeout_no_incumbent": 0,
+      "resource_limit": 0,
+      "blocked_license": 0,
+      "error_count": 0,
+      "tier1_ready_valid": 54,
+      "tier2_exploratory_valid": 59,
+      "median_wall_time_s": 0.0106
+    },
+    {
+      "method_label": "SA (primary 113)",
+      "catalog_instances": 113,
+      "dataset_loaded": 113,
+      "preflight_evaluated": 113,
+      "solver_attempted": 113,
+      "valid_solution_found": 113,
+      "optimal_proved": 0,
+      "feasible_solution_found": 113,
+      "timeout_with_incumbent": 0,
+      "timeout_no_incumbent": 0,
+      "resource_limit": 0,
+      "blocked_license": 0,
+      "error_count": 0,
+      "tier1_ready_valid": 54,
+      "tier2_exploratory_valid": 59,
+      "median_wall_time_s": 0.8072
+    },
+    {
+      "method_label": "DRSA Warm MODIFIED (113)",
+      "catalog_instances": 113,
+      "dataset_loaded": 113,
+      "preflight_evaluated": 113,
+      "solver_attempted": 113,
+      "valid_solution_found": 113,
+      "optimal_proved": 0,
+      "feasible_solution_found": 113,
+      "timeout_with_incumbent": 0,
+      "timeout_no_incumbent": 0,
+      "resource_limit": 0,
+      "blocked_license": 0,
+      "error_count": 0,
+      "tier1_ready_valid": 54,
+      "tier2_exploratory_valid": 59,
+      "median_wall_time_s": 0.8105
+    },
+    {
+      "method_label": "DRSA Paper-Bounded (113)",
+      "catalog_instances": 113,
+      "dataset_loaded": 113,
+      "preflight_evaluated": 113,
+      "solver_attempted": 113,
+      "valid_solution_found": 113,
+      "optimal_proved": 0,
+      "feasible_solution_found": 113,
+      "timeout_with_incumbent": 0,
+      "timeout_no_incumbent": 0,
+      "resource_limit": 0,
+      "blocked_license": 0,
+      "error_count": 0,
+      "tier1_ready_valid": 54,
+      "tier2_exploratory_valid": 59,
+      "median_wall_time_s": 0.8144
+    },
+    {
+      "method_label": "CP-SAT Best Across Passes (113)",
+      "catalog_instances": 113,
+      "dataset_loaded": 113,
+      "preflight_evaluated": 113,
+      "solver_attempted": 113,
+      "valid_solution_found": 78,
+      "optimal_proved": 4,
+      "feasible_solution_found": 74,
+      "timeout_with_incumbent": 0,
+      "timeout_no_incumbent": 35,
+      "resource_limit": 0,
+      "blocked_license": 0,
+      "error_count": 0,
+      "tier1_ready_valid": 40,
+      "tier2_exploratory_valid": 38,
+      "median_wall_time_s": 3.8799
+    },
+    {
+      "method_label": "SAT Order+Product+Inc CaDiCaL (113)",
+      "catalog_instances": 113,
+      "dataset_loaded": 113,
+      "preflight_evaluated": 113,
+      "solver_attempted": 54,
+      "valid_solution_found": 54,
+      "optimal_proved": 0,
+      "feasible_solution_found": 0,
+      "timeout_with_incumbent": 54,
+      "timeout_no_incumbent": 0,
+      "resource_limit": 59,
+      "blocked_license": 0,
+      "error_count": 0,
+      "tier1_ready_valid": 25,
+      "tier2_exploratory_valid": 29,
+      "median_wall_time_s": 6.015
+    },
+    {
+      "method_label": "Gurobi Eval (113)",
+      "catalog_instances": 113,
+      "dataset_loaded": 113,
+      "preflight_evaluated": 113,
+      "solver_attempted": 3,
+      "valid_solution_found": 3,
+      "optimal_proved": 0,
+      "feasible_solution_found": 0,
+      "timeout_with_incumbent": 3,
+      "timeout_no_incumbent": 0,
+      "resource_limit": 0,
+      "blocked_license": 110,
+      "error_count": 0,
+      "tier1_ready_valid": 1,
+      "tier2_exploratory_valid": 2,
+      "median_wall_time_s": 15.8432
+    },
+    {
+      "method_label": "CPLEX CE (113)",
+      "catalog_instances": 113,
+      "dataset_loaded": 113,
+      "preflight_evaluated": 113,
+      "solver_attempted": 1,
+      "valid_solution_found": 1,
+      "optimal_proved": 0,
+      "feasible_solution_found": 0,
+      "timeout_with_incumbent": 1,
+      "timeout_no_incumbent": 0,
+      "resource_limit": 0,
+      "blocked_license": 112,
+      "error_count": 0,
+      "tier1_ready_valid": 0,
+      "tier2_exploratory_valid": 1,
+      "median_wall_time_s": 15.9326
+    },
+    {
+      "method_label": "IBM CP Optimizer CE (113)",
+      "catalog_instances": 113,
+      "dataset_loaded": 113,
+      "preflight_evaluated": 113,
+      "solver_attempted": 20,
+      "valid_solution_found": 20,
+      "optimal_proved": 0,
+      "feasible_solution_found": 20,
+      "timeout_with_incumbent": 0,
+      "timeout_no_incumbent": 0,
+      "resource_limit": 0,
+      "blocked_license": 93,
+      "error_count": 0,
+      "tier1_ready_valid": 8,
+      "tier2_exploratory_valid": 12,
+      "median_wall_time_s": 10.1726
+    }
+  ],
+  "tier_comparison": {
+    "tier1_verified_54": {
+      "count": 54,
+      "proved_optimal": 2,
+      "matched_published_best": 8,
+      "mean_gap_vs_published_best": 20.2778,
+      "median_gap_vs_published_best": 14.0
+    },
+    "tier2_exploratory_59": {
+      "count": 59,
+      "proved_optimal": 2,
+      "matched_published_best": 7,
+      "below_paper_lb_count": 0,
+      "mean_gap_vs_published_best": 91.4576,
+      "median_gap_vs_published_best": 38
+    }
+  },
+  "mbeause_sensitivity": {
+    "raw_496": {
+      "n": 496,
+      "best_bw": 471,
+      "rcm_bw": 473,
+      "sa_bw": 471,
+      "drsa_warm_bw": 473
+    },
+    "dropped_4_isolated_492": {
+      "rcm": 473,
+      "sa": 473,
+      "drsa_modified_variant": 473
+    }
+  },
+  "sat_preflight_summary": {
+    "total_preflight_rows": 8136,
+    "configs_per_instance": 72,
+    "recommended_compact_order_product_eligible": 56
+  },
+  "validation_totals": {
+    "total_with_solution": 828,
+    "validation_failed": 0,
+    "execution_errors": 0
+  }
+}

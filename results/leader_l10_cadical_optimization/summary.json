@@ -1,0 +1,13 @@
+{
+  "dataset": 113,
+  "l9_sat_witnesses": 23,
+  "l9_eligible": 70,
+  "l10_eligible": 71,
+  "l10_attempted": 59,
+  "l10_sat_witnesses": 35,
+  "cumulative_sat_witnesses": 37,
+  "l10_sat_optimal": 2,
+  "elapsed_seconds": 1460.75,
+  "complete_primary": true,
+  "all_eligible_solver_invoked": false
+}

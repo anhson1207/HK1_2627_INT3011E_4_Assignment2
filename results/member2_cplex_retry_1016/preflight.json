@@ -1,0 +1,10 @@
+{
+  "reference_rows": 67,
+  "unique_instances": 67,
+  "configurations_per_instance": 2,
+  "expected_runs": 134,
+  "legacy_runs_reused": 0,
+  "legacy_audit": null,
+  "runs_already_recorded": 2,
+  "new_runs_remaining": 132
+}

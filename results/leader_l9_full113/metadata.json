@@ -1,0 +1,19 @@
+{
+  "timestamp": "2026-11-12T12:56:40+00:00",
+  "git_branch": "dev/leader",
+  "git_commit": "60cbc2e",
+  "python_version": "3.14.3",
+  "platform": "macOS-14.0-arm64-arm-64bit-Mach-O",
+  "machine": "arm64",
+  "cpu_model": "Apple M2",
+  "cpu_cores": 8,
+  "ram_gb": 16.0,
+  "pysat_version": "1.9.dev17",
+  "cadical_backend": "cadical195",
+  "resource_limits": {
+    "max_sat_variables": 500000,
+    "max_sat_clauses": 2500000,
+    "memory_limit_mb": 4096.0,
+    "threads": 1
+  }
+}

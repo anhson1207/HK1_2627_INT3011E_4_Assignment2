@@ -1,0 +1,179 @@
+{
+  "experiment_id": "leader_l9_full113_v1",
+  "timestamp": "2026-11-12T13:11:25+00:00",
+  "metadata": {
+    "timestamp": "2026-11-12T12:56:40+00:00",
+    "git_branch": "dev/leader",
+    "git_commit": "60cbc2e",
+    "python_version": "3.14.3",
+    "platform": "macOS-14.0-arm64-arm-64bit-Mach-O",
+    "machine": "arm64",
+    "cpu_model": "Apple M2",
+    "cpu_cores": 8,
+    "ram_gb": 16.0,
+    "pysat_version": "1.9.dev17",
+    "cadical_backend": "cadical195",
+    "resource_limits": {
+      "max_sat_variables": 500000,
+      "max_sat_clauses": 2500000,
+      "memory_limit_mb": 4096.0,
+      "threads": 1
+    }
+  },
+  "dataset_summary": {
+    "total_instances": 113,
+    "tier1_ready": 54,
+    "tier2_needs_verification": 58,
+    "tier2_invalid_data": 1,
+    "table_counts": {
+      "Table 6": 31,
+      "Table 7": 41,
+      "Table 8": 41
+    },
+    "unique_topologies": 111,
+    "mbeause_sensitivity": {
+      "raw_496": {
+        "n": 496,
+        "m": 36209,
+        "isolated": [
+          493,
+          494,
+          495,
+          496
+        ],
+        "certified_lb": 245,
+        "rcm_ub": 473,
+        "rcm_tight_ub": 473
+      },
+      "drop4_492": {
+        "n": 492,
+        "m": 36209,
+        "certified_lb": 245,
+        "rcm_ub": 473,
+        "rcm_tight_ub": 473,
+        "topology_sha256": "8e02c916639a424ff7513a89b3fa7f80aaefc887339d5e919d8ffc4989a42120"
+      }
+    }
+  },
+  "batch_execution": {
+    "total_run_records": 446,
+    "planned_static_runs": 363,
+    "planned_recovery_runs": 49,
+    "planned_proof_runs": 11,
+    "executed_in_this_batch": 25,
+    "interrupted_by_batch_budget": false,
+    "validation_failures": 0,
+    "execution_errors": 0
+  },
+  "preflight_eligible_by_config": {
+    "base_pw_pw_rep_lin": 10,
+    "base_pw_seq_rep_lin": 17,
+    "base_pw_seq_inc_lin": 12,
+    "base_ord_pw_rep_lin": 27,
+    "base_ord_seq_rep_lin": 53,
+    "base_ord_seq_inc_lin": 20,
+    "l9_ord_compact_seq_inc_bin_dec": 42,
+    "l9_ord_compact_seq_rep_bin_dec": 54,
+    "l9_ord_compact_seq_inc_lin_dec": 21,
+    "l9_ord_compact_pw_rep_bin_dec": 29,
+    "l9_pw_pig_sup_seq_rep_bin_dec": 66,
+    "l9_pw_pig_supsing_seq_rep_bin_dec": 70
+  },
+  "overall_113_coverage": {
+    "total": 113,
+    "eligible": 70,
+    "attempted": 70,
+    "sat_solved_feasible": 23,
+    "sat_improved_rcm": 17,
+    "proved_optimal": 3,
+    "timeout_no_sat_model": 46,
+    "resource_limit": 43
+  },
+  "coverage_by_table": {
+    "Table 6": {
+      "total": 31,
+      "eligible": 31,
+      "attempted": 31,
+      "sat_solved_feasible": 18,
+      "sat_improved_rcm": 12,
+      "proved_optimal": 2,
+      "timeout_no_sat_model": 13,
+      "resource_limit": 0
+    },
+    "Table 7": {
+      "total": 41,
+      "eligible": 18,
+      "attempted": 18,
+      "sat_solved_feasible": 3,
+      "sat_improved_rcm": 3,
+      "proved_optimal": 0,
+      "timeout_no_sat_model": 15,
+      "resource_limit": 23
+    },
+    "Table 8": {
+      "total": 41,
+      "eligible": 21,
+      "attempted": 21,
+      "sat_solved_feasible": 2,
+      "sat_improved_rcm": 2,
+      "proved_optimal": 1,
+      "timeout_no_sat_model": 18,
+      "resource_limit": 20
+    }
+  },
+  "coverage_by_tier": {
+    "Tier1_READY_54": {
+      "total": 54,
+      "eligible": 34,
+      "attempted": 34,
+      "sat_solved_feasible": 9,
+      "sat_improved_rcm": 6,
+      "proved_optimal": 1,
+      "timeout_no_sat_model": 24,
+      "resource_limit": 20
+    },
+    "Tier2_Exploratory_59": {
+      "total": 59,
+      "eligible": 36,
+      "attempted": 36,
+      "sat_solved_feasible": 14,
+      "sat_improved_rcm": 11,
+      "proved_optimal": 2,
+      "timeout_no_sat_model": 22,
+      "resource_limit": 23
+    }
+  },
+  "coverage_by_size_group": {
+    "Small (n<=150)": {
+      "total": 23,
+      "eligible": 23,
+      "attempted": 23,
+      "sat_solved_feasible": 15,
+      "sat_improved_rcm": 9,
+      "proved_optimal": 2,
+      "timeout_no_sat_model": 8,
+      "resource_limit": 0
+    },
+    "Medium (151..500)": {
+      "total": 46,
+      "eligible": 46,
+      "attempted": 46,
+      "sat_solved_feasible": 8,
+      "sat_improved_rcm": 8,
+      "proved_optimal": 1,
+      "timeout_no_sat_model": 37,
+      "resource_limit": 0
+    },
+    "Large (n>500)": {
+      "total": 44,
+      "eligible": 1,
+      "attempted": 1,
+      "sat_solved_feasible": 0,
+      "sat_improved_rcm": 0,
+      "proved_optimal": 0,
+      "timeout_no_sat_model": 1,
+      "resource_limit": 43
+    }
+  },
+  "verdict_line": "CaDiCaL found valid feasible SAT solutions on 23/113 instances, proved optimality on 3/113 instances, and 90/113 instances remain unresolved (timeout or ResourceLimits)."
+}

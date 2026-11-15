@@ -1,0 +1,75 @@
+[benchmark]
+experiment_id = "leader_l9_full113_v1"
+provenance = "data/benchmark_provenance.json"
+raw_dir = "data/benchmarks/raw"
+output_dir = "results/leader_l9_full113"
+l8_runs_csv = "results/leader/l8_sat_runs.csv"
+
+# Safety & reproducibility limits
+threads = 1
+max_batch_seconds = 750.0
+memory_limit_mb = 4096.0
+max_sat_variables = 500000
+max_sat_clauses = 2500000
+
+# Stage timeouts (all strictly bounded via POSIX worker subprocess)
+baseline_timeout_seconds = 6.0
+ablation_timeout_seconds = 8.0
+campaign_timeout_seconds = 12.0
+recovery_timeout_seconds = 20.0
+proof_timeout_seconds = 45.0
+
+baseline_instances = [
+  "pores_1",
+  "ibm32",
+  "bcspwr01",
+  "bcsstk01",
+  "bcspwr02",
+  "curtis54",
+  "will57",
+  "impcol_b",
+]
+
+ablation_instances = [
+  "pores_1",
+  "ibm32",
+  "bcspwr01",
+  "bcsstk01",
+  "bcspwr02",
+  "curtis54",
+  "will57",
+  "impcol_b",
+  "steam3",
+  "ash85",
+  "nos4",
+  "gre_115",
+]
+
+warm_start_instances = [
+  "pores_1",
+  "ibm32",
+  "bcspwr01",
+  "bcsstk01",
+  "bcspwr02",
+  "curtis54",
+  "will57",
+  "impcol_b",
+  "ash85",
+  "nos4",
+]
+
+proof_candidates = [
+  "pores_1",
+  "ibm32",
+  "bcspwr01",
+  "bcsstk01",
+  "bcspwr02",
+  "curtis54",
+  "will57",
+  "impcol_b",
+  "steam3",
+  "ash85",
+  "nos4",
+  "gent113",
+  "gre_115",
+]

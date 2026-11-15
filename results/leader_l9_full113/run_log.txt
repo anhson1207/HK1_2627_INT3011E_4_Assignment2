@@ -1,0 +1,7 @@
+Leader Phase L9 Full 113/113 Log (2026-11-12T13:11:25+00:00)
+Git: dev/leader@60cbc2e | PySAT 1.9.dev17 | cadical195
+Dataset: 113/113 (Tier1=54, Tier2=59)
+Total Run Records: 446 | Interrupted: False | Errors: 0 | Validation Failures: 0
+CaDiCaL found valid feasible SAT solutions on 23/113 instances, proved optimality on 3/113 instances, and 90/113 instances remain unresolved (timeout or ResourceLimits).
+By Table: {'Table 6': {'total': 31, 'eligible': 31, 'attempted': 31, 'sat_solved_feasible': 18, 'sat_improved_rcm': 12, 'proved_optimal': 2, 'timeout_no_sat_model': 13, 'resource_limit': 0}, 'Table 7': {'total': 41, 'eligible': 18, 'attempted': 18, 'sat_solved_feasible': 3, 'sat_improved_rcm': 3, 'proved_optimal': 0, 'timeout_no_sat_model': 15, 'resource_limit': 23}, 'Table 8': {'total': 41, 'eligible': 21, 'attempted': 21, 'sat_solved_feasible': 2, 'sat_improved_rcm': 2, 'proved_optimal': 1, 'timeout_no_sat_model': 18, 'resource_limit': 20}}
+By Tier: {'Tier1_READY_54': {'total': 54, 'eligible': 34, 'attempted': 34, 'sat_solved_feasible': 9, 'sat_improved_rcm': 6, 'proved_optimal': 1, 'timeout_no_sat_model': 24, 'resource_limit': 20}, 'Tier2_Exploratory_59': {'total': 59, 'eligible': 36, 'attempted': 36, 'sat_solved_feasible': 14, 'sat_improved_rcm': 11, 'proved_optimal': 2, 'timeout_no_sat_model': 22, 'resource_limit': 23}}

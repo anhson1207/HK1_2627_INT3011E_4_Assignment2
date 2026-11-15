@@ -8,6 +8,7 @@ full reproducible CSV/JSON/summary/comparison exports.
 from __future__ import annotations
 
 import argparse
+from collections import Counter
 import csv
 import datetime as dt
 import hashlib
@@ -1232,6 +1233,110 @@ def main() -> None:
         run(args.config, set(args.instance) if args.instance else None, not args.rerun)
     else:
         parser.error("config is required")
+
+
+def identity(row: dict[str, Any]) -> tuple[str, str, str, str, str, str, str]:
+    return (
+        row["instance"],
+        row["solver"],
+        row["encoding"],
+        row["strategy"],
+        row["amo"],
+        str(row["symmetry_breaking"]).lower(),
+        str(row["repetition"]),
+    )
+
+
+def read_rows(path: Path) -> list[dict[str, str]]:
+    with path.open(newline="", encoding="utf-8") as source:
+        return list(csv.DictReader(source))
+
+
+def unique_instances(manifest: list[dict[str, str]]) -> dict[str, dict[str, str]]:
+    instances = {}
+    for item in manifest:
+        previous = instances.setdefault(item["instance"], item)
+        if previous["n"] != item["n"]:
+            raise ValueError(f"Conflicting n for repeated instance {item['instance']}")
+    return instances
+
+
+def expected_keys(instances: dict[str, Any], config: dict[str, Any], repetitions: int) -> set[tuple[str, ...]]:
+    keys = set()
+    for name in instances:
+        for solver, encoding, strategy, amo, symmetry in configurations(config):
+            for repetition in range(1, repetitions + 1):
+                keys.add((
+                    name,
+                    solver,
+                    encoding,
+                    strategy,
+                    amo,
+                    str(symmetry).lower(),
+                    str(repetition),
+                ))
+    return keys
+
+
+def audit_legacy(
+    rows: list[dict[str, Any]],
+    config: dict[str, Any],
+    repetitions: int,
+    legacy_manifest: list[dict[str, str]],
+    graph_dir: Path,
+    timeout: float,
+) -> dict[str, int]:
+    """Reject duplicates, missing configurations, and invalid saved incumbents."""
+    from bmp.core.validation import validate_assignment
+    from bmp.io.readers import read_graph
+
+    old_names = {row["instance"] for row in rows}
+    references = unique_instances(legacy_manifest)
+    unexpected_names = old_names - set(references)
+    expected = expected_keys(references, config, repetitions)
+    keys = [identity(row) for row in rows]
+    duplicates = [key for key, count in Counter(keys).items() if count > 1]
+    missing = expected - set(keys)
+    unexpected = set(keys) - expected
+    problems = []
+    if unexpected_names:
+        problems.append(f"Unknown legacy instances: {sorted(unexpected_names)}")
+    if duplicates:
+        problems.append(f"Duplicate legacy keys ({len(duplicates)}): {duplicates[:5]}")
+    if missing:
+        problems.append(f"Missing legacy keys ({len(missing)}): {sorted(missing)[:5]}")
+    if unexpected:
+        problems.append(f"Unexpected legacy configurations ({len(unexpected)}): {sorted(unexpected)[:5]}")
+    graphs = {}
+    for row in rows:
+        name = row["instance"]
+        if name not in references:
+            continue
+        if row["n"] != references[name]["n"] or row["table"] != references[name]["table"]:
+            problems.append(f"Legacy n/table mismatch: {name}")
+        if float(row["timeout_seconds"]) != timeout:
+            problems.append(f"Legacy timeout mismatch: {name}")
+        if row.get("assignment"):
+            if name not in graphs:
+                graphs[name] = read_graph(graph_dir / f"{name}.edgelist")
+            assignment = {int(v): int(label) for v, label in json.loads(row["assignment"]).items()}
+            report = validate_assignment(
+                graphs[name],
+                assignment,
+                claimed_bandwidth=int(row["bandwidth"]) if row["bandwidth"] else None,
+            )
+            if not report.valid and row["status"] != "ERROR":
+                problems.append(f"Invalid legacy assignment: {name} {identity(row)}: {report.errors}")
+    if problems:
+        raise ValueError("Legacy runs cannot be reused:\n" + "\n".join(problems[:20]))
+    return {
+        "rows": len(rows),
+        "unique_keys": len(set(keys)),
+        "duplicates": len(duplicates),
+        "missing": len(missing),
+        "unexpected": len(unexpected),
+        "instances": len(old_names),
+    }
 
 
 if __name__ == "__main__":

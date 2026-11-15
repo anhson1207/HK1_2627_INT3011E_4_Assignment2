@@ -3,12 +3,13 @@
 from __future__ import annotations
 
 from time import monotonic
-from typing import Mapping, Sequence
+from typing import Literal, Sequence
 
 from bmp.core.graph import Graph
 from bmp.encodings.base import BMPEncoder, CNFFormula
 from bmp.encodings.cardinality.base import AMOEncoder, SimpleVarAllocator, get_amo_encoder
-from bmp.encodings.cardinality.pairwise_amo import PairwiseAMOEncoder
+
+ChannelMode = Literal["full", "one_sided"]
 
 
 class OrderEncoding(BMPEncoder):
@@ -16,39 +17,25 @@ class OrderEncoding(BMPEncoder):
 
     Variables:
         Order variables y[v, t]: True iff label p(v) >= t (for 2 <= t <= n).
-        Exact-value channeling variables x[v, p]: True iff p(v) == p (for 1 <= p <= n).
+        Channeling variables x[v, p]: True iff p(v) == p.
+        - Default (``compact_boundary=False``): x[v, p] for all 1 <= p <= n.
+        - ``compact_boundary=True``: omits x[v, 1] and x[v, n] by reusing
+          ``-y[v, 2]`` and ``y[v, n]`` directly inside occupancy AMO, saving
+          ``2n`` variables and boundary channeling clauses.
 
-    Variable indexing:
-        - For vertex v in 0..n-1, t in 2..n:
-          y_var = v * (n - 1) + (t - 1)  (1-based ID: 1 .. n*(n-1))
-        - For vertex v in 0..n-1, p in 1..n:
-          offset = n * (n - 1)
-          x_var = offset + v * n + p     (ID: n*(n-1) + 1 .. n*(n-1) + n^2)
-
-    Constraints:
-        1. Monotonicity of Order Variables:
-           y[v, t + 1] -> y[v, t]   (not y[v, t+1] or y[v, t]) for all 2 <= t <= n - 1.
-        2. Channeling between Exact Variables x and Order Variables y:
-           x[v, 1] <-> not y[v, 2]
-           x[v, n] <-> y[v, n]
-           For 2 <= p <= n - 1:
-             x[v, p] <-> (y[v, p] and not y[v, p + 1])
-           Implemented via standard CNF clauses:
-             x[v, p] -> y[v, p]           (not x[v, p] or y[v, p])
-             x[v, p] -> not y[v, p+1]     (not x[v, p] or not y[v, p+1])
-             y[v, p] and not y[v, p+1] -> x[v, p]
-                                          (not y[v, p] or y[v, p+1] or x[v, p])
-        3. Injectivity / All-Different:
-           For each label p in 1..n:
-             AMO_{v in V} x[v, p] (using specified amo_encoder)
-           (Combined with Exactly-One implied by Order monotonicity, this guarantees bijection).
-        4. Bandwidth Constraints (for bandwidth threshold k):
-           For every edge (u, v) in E and for all t >= 2 such that t + k <= n:
-             y[u, t + k] -> y[v, t]   (not y[u, t + k] or y[v, t])
-             y[v, t + k] -> y[u, t]   (not y[v, t + k] or y[u, t])
+    Channeling constraints (``channel_mode``):
+        - ``full`` (default): biconditional x[v,p] <-> (y[v,p] and not y[v,p+1]).
+        - ``one_sided``: implies-only (y[v,p] and not y[v,p+1]) -> x[v,p], reducing
+          channeling clauses by ~3x while remaining exact under monotone AllDiff AMO.
     """
 
-    def __init__(self, amo: str | AMOEncoder = "pairwise") -> None:
+    def __init__(
+        self,
+        amo: str | AMOEncoder = "pairwise",
+        *,
+        channel_mode: ChannelMode = "full",
+        compact_boundary: bool = False,
+    ) -> None:
         if isinstance(amo, str):
             self._amo_encoder: AMOEncoder = get_amo_encoder(amo)
             self._amo_name = amo.lower()
@@ -56,13 +43,29 @@ class OrderEncoding(BMPEncoder):
             self._amo_encoder = amo
             self._amo_name = getattr(amo, "name", type(amo).__name__)
 
+        self._channel_mode = channel_mode.lower()
+        if self._channel_mode not in ("full", "one_sided"):
+            raise ValueError(f"Unsupported channel_mode: {channel_mode!r}")
+        self._compact_boundary = bool(compact_boundary)
+
     @property
     def name(self) -> str:
-        return f"order_{self._amo_name}"
+        if self._channel_mode == "full" and not self._compact_boundary:
+            return f"order_{self._amo_name}"
+        b_tag = "compactb" if self._compact_boundary else "fullb"
+        return f"order_{self._amo_name}_{self._channel_mode}_{b_tag}"
 
     @property
     def amo_name(self) -> str:
         return self._amo_name
+
+    @property
+    def channel_mode(self) -> str:
+        return self._channel_mode
+
+    @property
+    def compact_boundary(self) -> bool:
+        return self._compact_boundary
 
     def _vertex_index_map(self, graph: Graph) -> dict[int, int]:
         return {v: i for i, v in enumerate(graph.vertices)}
@@ -76,13 +79,26 @@ class OrderEncoding(BMPEncoder):
         return v_idx * (n - 1) + (t - 1)
 
     def var_x(self, v_idx: int, p: int, n: int) -> int:
-        """Variable ID for exact channeling variable x[v, p] (p(v) == p), where 1 <= p <= n."""
+        """Variable ID for channeling variable x[v, p] (p(v) == p)."""
         if not (0 <= v_idx < n):
             raise ValueError(f"v_idx out of bounds: {v_idx} for n={n}")
         if not (1 <= p <= n):
             raise ValueError(f"Label p out of bounds: {p} for n={n}")
         offset = n * (n - 1)
+        if self._compact_boundary:
+            if p == 1 or p == n:
+                raise ValueError(f"Boundary label p={p} uses literal directly when compact_boundary=True")
+            return offset + v_idx * (n - 2) + (p - 1)
         return offset + v_idx * n + p
+
+    def _label_literal(self, v_idx: int, p: int, n: int) -> int:
+        """Literal representing p(v) == p (positive for true assignment)."""
+        if self._compact_boundary:
+            if p == 1:
+                return -self.var_y(v_idx, 2, n)
+            if p == n:
+                return self.var_y(v_idx, n, n)
+        return self.var_x(v_idx, p, n)
 
     def encode_fixed(self, graph: Graph, **kwargs: object) -> CNFFormula:
         """Generate fixed k-independent clauses (monotonicity, channeling, injectivity)."""
@@ -92,9 +108,12 @@ class OrderEncoding(BMPEncoder):
             return CNFFormula(build_time_s=monotonic() - started)
 
         v_map = self._vertex_index_map(graph)
-        num_orig_vars = n * (n - 1) + n * n
+        num_y_vars = n * (n - 1)
+        num_chan_vars = n * (n - 2) if self._compact_boundary else n * n
+        num_orig_vars = num_y_vars + num_chan_vars
         allocator = SimpleVarAllocator(start_id=num_orig_vars + 1)
         clauses: list[list[int]] = []
+        one_sided = self._channel_mode == "one_sided"
 
         # 1. Monotonicity: y[v, t+1] -> y[v, t]
         for v in graph.vertices:
@@ -105,42 +124,43 @@ class OrderEncoding(BMPEncoder):
         # 2. Channeling with exact variables x[v, p]
         for v in graph.vertices:
             v_idx = v_map[v]
-            # p = 1: x[v, 1] <-> not y[v, 2]
-            y2 = self.var_y(v_idx, 2, n)
-            x1 = self.var_x(v_idx, 1, n)
-            clauses.append([-x1, -y2])
-            clauses.append([x1, y2])
+            if not self._compact_boundary:
+                y2 = self.var_y(v_idx, 2, n)
+                x1 = self.var_x(v_idx, 1, n)
+                if not one_sided:
+                    clauses.append([-x1, -y2])
+                clauses.append([x1, y2])
 
-            # 2 <= p <= n - 1: x[v, p] <-> y[v, p] and not y[v, p+1]
             for p in range(2, n):
                 xp = self.var_x(v_idx, p, n)
                 yp = self.var_y(v_idx, p, n)
                 yp_next = self.var_y(v_idx, p + 1, n)
-                # xp -> yp
-                clauses.append([-xp, yp])
-                # xp -> not yp_next
-                clauses.append([-xp, -yp_next])
-                # yp and not yp_next -> xp
+                if not one_sided:
+                    clauses.append([-xp, yp])
+                    clauses.append([-xp, -yp_next])
                 clauses.append([-yp, yp_next, xp])
 
-            # p = n: x[v, n] <-> y[v, n]
-            yn = self.var_y(v_idx, n, n)
-            xn = self.var_x(v_idx, n, n)
-            clauses.append([-xn, yn])
-            clauses.append([xn, -yn])
+            if not self._compact_boundary:
+                yn = self.var_y(v_idx, n, n)
+                xn = self.var_x(v_idx, n, n)
+                if not one_sided:
+                    clauses.append([-xn, yn])
+                clauses.append([xn, -yn])
 
         # 3. Injectivity: At-Most-One vertex per label p in 1..n
+        v_indices = [v_map[v] for v in graph.vertices]
         for p in range(1, n + 1):
-            lits = [self.var_x(v_map[v], p, n) for v in graph.vertices]
+            lits = [self._label_literal(v_idx, p, n) for v_idx in v_indices]
             amo_clauses, _ = self._amo_encoder.encode(lits, allocator)
             clauses.extend(amo_clauses)
 
         # 4. Optional Reversal Symmetry Breaking: p(anchor) <= ceil(n / 2)
         if kwargs.get("symmetry_breaking", False) and n >= 2:
             from bmp.solvers.sat.search import select_anchor_vertex
+
             anchor = select_anchor_vertex(graph)
             a_idx = v_map[anchor]
-            cutoff = (n + 1) // 2  # ceil(n / 2)
+            cutoff = (n + 1) // 2
             if cutoff + 1 <= n:
                 clauses.append([-self.var_y(a_idx, cutoff + 1, n)])
 
@@ -153,32 +173,30 @@ class OrderEncoding(BMPEncoder):
             num_original_vars=num_orig_vars,
             num_aux_vars=num_aux_vars,
             build_time_s=monotonic() - started,
-            comments=[f"OrderEncoding fixed clauses (n={n}, amo={self._amo_name})"],
+            comments=[
+                f"OrderEncoding fixed clauses (n={n}, amo={self._amo_name}, "
+                f"channel={self._channel_mode}, compact_boundary={self._compact_boundary})"
+            ],
         )
 
     def encode_bandwidth_step(self, graph: Graph, k: int, **kwargs: object) -> list[list[int]]:
-        """Generate clauses enforcing bandwidth <= k using order variables.
-
-        For every edge (u, v) and all t >= 2 such that t + k <= n:
-            y[u, t + k] -> y[v, t]   (not y[u, t + k] or y[v, t])
-            y[v, t + k] -> y[u, t]   (not y[v, t + k] or y[u, t])
-        """
+        """Generate clauses enforcing bandwidth <= k using order variables."""
         n = graph.order
-        if n <= 1 or not graph.edges:
+        if n <= 1 or not graph.edges or k >= n - 1:
             return []
 
         v_map = self._vertex_index_map(graph)
         clauses: list[list[int]] = []
+        stride = n - 1
 
         for u, v in graph.edges:
-            u_idx = v_map[u]
-            v_idx = v_map[v]
+            u_base = v_map[u] * stride
+            v_base = v_map[v] * stride
             for t in range(2, n - k + 1):
-                y_u_tk = self.var_y(u_idx, t + k, n)
-                y_v_t = self.var_y(v_idx, t, n)
-                y_v_tk = self.var_y(v_idx, t + k, n)
-                y_u_t = self.var_y(u_idx, t, n)
-
+                y_u_tk = u_base + (t + k - 1)
+                y_v_t = v_base + (t - 1)
+                y_v_tk = v_base + (t + k - 1)
+                y_u_t = u_base + (t - 1)
                 clauses.append([-y_u_tk, y_v_t])
                 clauses.append([-y_v_tk, y_u_t])
 
@@ -205,18 +223,15 @@ class OrderEncoding(BMPEncoder):
 
         for v in graph.vertices:
             v_idx = v_map[v]
-            # p(v) = 1 + number of true y[v, t] variables for t in 2..n
             label = 1
             for t in range(2, n + 1):
-                y_var = self.var_y(v_idx, t, n)
-                if y_var in model_set:
+                if self.var_y(v_idx, t, n) in model_set:
                     label += 1
                 else:
-                    # By monotonicity, subsequent t should not be true
                     break
             assignment[v] = label
 
         return assignment
 
 
-__all__ = ["OrderEncoding"]
+__all__ = ["ChannelMode", "OrderEncoding"]

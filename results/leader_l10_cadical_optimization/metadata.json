@@ -1,0 +1,10 @@
+{
+  "source_commit": "e614334",
+  "member3_source": "dev/member-3 read-only",
+  "limits": {
+    "max_variables": 500000,
+    "max_clauses": 2500000,
+    "timeout_seconds": null,
+    "memory_limit_mb": 4096
+  }
+}

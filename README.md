@@ -187,7 +187,9 @@ Benchmark summary across 10 instances (100 runs total) from `data/leader_sat_ben
 
 These are small synthetic graphs. The [L7 official 113-instance dataset audit and bounded SAT attempt](docs/leader_l7_audit.md) record the earlier Leader status; no general encoding or strategy ranking is inferred from the table below.
 
-The [L8 dataset classification and staged SAT audit](docs/leader_l8_audit.md) is the latest official Leader assessment. Its source checks and run tables are kept separate from the earlier L7 artifacts.
+The [L8 dataset classification and staged SAT audit](docs/leader_l8_audit.md) is the latest official L8 Leader assessment. Its source checks and run tables are kept separate from the earlier L7 artifacts.
+
+The [Leader Phase L9 Full 113-Instance SAT Report](docs/leader-l9-full113-sat-report.md) and [L9 Integration Guide](docs/leader-l9-integration-guide.md) document the full 113-instance Harwell-Boeing expansion (`54 READY` + `58 NEEDS_VERIFICATION` + `1 INVALID_DATA` `mbeause`), encoding/AMO/strategy optimizations (`70/113` eligible & attempted, `23/113` valid CaDiCaL SAT solutions, `3/113` proved `OPTIMAL`), and 12 SVG visualizations under `results/leader_l9_full113/`.
 
 | Encoding | Strategy | Symmetry Breaking | Avg Total Runtime (s) | Avg Solver Time (s) | Avg Clauses | Avg SAT Calls |
 | :--- | :--- | :---: | :---: | :---: | :---: |
@@ -216,9 +218,8 @@ pytest -v
 
 ---
 
-## 8. Ongoing Development & Member Responsibilities
+## 8. Development & Integrated Member Achievements
 
-- **`dev/leader`**: SAT Position & Order Encodings, Pairwise & Sequential AMO, Repeated & Incremental CaDiCaL SAT, Symmetry Breaking, L6–L8 CNF Estimator/ResourceLimits/Worker & 113-instance Audit (`54 READY / 58 NEEDS_VERIFICATION / 1 INVALID_DATA`).
-- **`dev/member-2` (Integrated with Leader L8, M2.2 Validated & M2.3 Audited)**: Binary & Commander Cardinality Encodings, Glucose 4 SAT Backend (`SATBackend` contract), Live-Verified Gurobi (`13.0.3`) & CPLEX (`22.2.0.0`) Assignment MIPs, Member 2 Experiment Runners (`configs/member2.toml`, `configs/member2_m2_2.toml`, `configs/member2_m2_3_baseline.toml`, `configs/member2_m2_3_studies.toml` using the 113-instance `READY`-filtered catalog), `cnsplots` Visualization, [Phase M2.2 Report](docs/member2-m2_2-report.md), [Phase M2.3 Benchmark & Final Audit Report](docs/member2-m2_3-report.md), and [Member 3 Integration Guide](docs/member3-integration-guide.md).
-- **`dev/member-3` (In Development by Member 3)**: Product & Ladder Cardinality Encodings, MiniSat Solver, CP-SAT, CP Optimizer, Harwell-Boeing Dataset Pipeline, Metaheuristics (RCM, SA, DRSA).
-
+- **`dev/leader` (Phases L9–L10 Complete; Full 113 SAT Coverage & Adaptive CaDiCaL Optimization)**: SAT Position & Order Encodings, Pairwise & Sequential AMO, Repeated & Incremental CaDiCaL SAT, Symmetry Breaking, L6–L8 CNF Estimator/ResourceLimits/Worker, Phase L9 Full 113 Benchmark ([Phase L9 Report](docs/leader-l9-full113-sat-report.md)), and Phase L10 Adaptive CaDiCaL Optimization (37 SAT witnesses, 4 SAT-proved optimal, 1 bound-proved optimal across 113 instances, 17 SVGs in `results/leader_l10_cadical_optimization/`, [Phase L10 Report](docs/leader-l10-cadical-optimization-report.md)).
+- **`dev/member-2` (Phases M2.1–M2.3 & Tables 6–8 Benchmarks Complete)**: Binary & Commander Cardinality Encodings (`BinaryAMO`, `CommanderAMO`), Glucose 4 SAT Backend (`GlucoseBackend`), Live-Verified Gurobi (`13.0.3`) & CPLEX (`22.2.0.0`) Assignment MIPs, 11-configuration benchmark across Tables 6–8 (1,243 runs, 6 OPTIMAL including new record `steam3` bw=5 beating published best=7, Gurobi retry on 108 graphs, IBM CP on 109/113 graphs; reports in `docs/member2_table6_7_8_report.md` and `docs/member2-report.md`).
+- **`dev/member-3` (Phases M3.1–M3.9 Complete; Full 113/113 CP-SAT & MiniSat22 Covered)**: Product & Ladder Cardinality Encodings (`ProductAMO`, `LadderAMO`), MiniSat22 SAT Backend (`MiniSatBackend`), Full 113/113 CP-SAT Coverage (`113/113` valid solutions, `16 OPTIMAL`, `97 FEASIBLE`, `0` errors across all Harwell–Boeing instances in `results/member3_complete/cpsat_results.csv`), IBM CP Optimizer CE (`CPOptimizerSolver`), DRSA/SA/RCM Metaheuristics (`DRSASolver`), Harwell–Boeing forensic dataset pipeline, and full Phase M3.9 MiniSat22 113-instance benchmark in `results/member3_m3_9_minisat_full113/` ([Phase M3.9 Report](docs/member3-m3_9-minisat-full113-report.md), [Completion Report](MEMBER3_COMPLETION_REPORT.md)).

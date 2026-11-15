@@ -1,15 +1,16 @@
 [build-system]
-requires = ["setuptools"]
+requires = ["setuptools>=61.0"]
 build-backend = "setuptools.build_meta"
 
 [project]
 name = "bmp-optimization"
 version = "0.1.0"
-description = "Reproducible research software for the graph bandwidth minimization problem"
+description = "Bandwidth Minimization Problem (BMP) solvers, CNF encodings, and exact methods"
 readme = "README.md"
 requires-python = ">=3.11"
-authors = [{ name = "BMP Optimization contributors" }]
-keywords = ["bandwidth-minimization", "combinatorial-optimization", "sat"]
+authors = [
+  { name = "BMP Team" },
+]
 classifiers = [
   "Development Status :: 3 - Alpha",
   "Intended Audience :: Science/Research",
@@ -22,6 +23,9 @@ dependencies = ["python-sat>=1.8"]
 [project.optional-dependencies]
 gurobi = ["gurobipy"]
 cplex = ["cplex"]
+cp-sat = ["ortools>=9.11"]
+cp-optimizer = ["docplex>=2.25"]
+heuristics = []
 plots = ["cnsplots==0.8.0", "matplotlib", "pandas"]
 datasets = ["requests", "pypdf"]
 dev = ["pytest>=8.0"]
@@ -31,9 +35,6 @@ bmp = "bmp.cli:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]
-
-[tool.setuptools.package-data]
-"bmp.core" = ["official_paper_results.csv"]
 
 [tool.pytest.ini_options]
 addopts = "-q"
