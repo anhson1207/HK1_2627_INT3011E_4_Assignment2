@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from time import monotonic
-from typing import Literal, Mapping
+from typing import Callable, Literal, Mapping
 
 from bmp.core.graph import Graph
 from bmp.core.solution import SolutionStatus, SolverResult
@@ -17,7 +17,7 @@ from bmp.solvers.sat.search import (
     compute_lower_bound,
     solve_sat_with_decomposition,
 )
-from bmp.solvers.sat.worker import report_progress, report_sat_event
+from bmp.solvers.sat.worker import emit_incumbent, report_progress, report_sat_event
 
 
 class RepeatedSATSolver:
@@ -65,6 +65,7 @@ class RepeatedSATSolver:
         heuristic_permutation: Mapping[int, int] | None = None,
         symmetry_breaking: bool = False,
         limits: ResourceLimits | None = None,
+        on_incumbent: Callable[[Mapping[int, int], int], None] | None = None,
     ) -> SolverResult:
         started = monotonic()
         n = graph.order
@@ -83,6 +84,7 @@ class RepeatedSATSolver:
                 heuristic_permutation=heuristic_permutation,
                 symmetry_breaking=symmetry_breaking,
                 limits=limits,
+                on_incumbent=on_incumbent,
             )
 
         if self.decompose_components:
@@ -96,8 +98,10 @@ class RepeatedSATSolver:
                 limits=limits,
             )
 
+        # Base case: edgeless or order <= 1
         if n <= 1 or not graph.edges:
             identity_perm = {v: i + 1 for i, v in enumerate(graph.vertices)}
+            emit_incumbent(graph, identity_perm, 0, on_incumbent=on_incumbent, last_key=None)
             return SolverResult(
                 instance=graph.name,
                 method="SAT",
@@ -117,8 +121,9 @@ class RepeatedSATSolver:
                 upper_bound=0,
                 metadata={
                     "symmetry_breaking": symmetry_breaking,
+                    "fast_path": "edgeless",
                     "sat_solved_any": False,
-                    "incumbent_source": "BOUNDS_OPTIMALITY_CERTIFICATE",
+                    "incumbent_source": "edgeless",
                 },
             )
 
@@ -129,10 +134,10 @@ class RepeatedSATSolver:
             symmetry_breaking=symmetry_breaking,
             init_mode=self.init_mode,
         )
-        if not validate_solution(graph, init_perm, claimed_bandwidth=ub).valid:
-            raise ValueError("Initial upper bound requires a valid permutation on this graph")
+        initial_source = "heuristic" if heuristic_permutation is not None else "initial"
 
         if lb == ub and not self.certify_feasible_with_sat:
+            emit_incumbent(graph, init_perm, ub, on_incumbent=on_incumbent, last_key=None)
             return SolverResult(
                 instance=graph.name,
                 method="SAT",
@@ -154,7 +159,7 @@ class RepeatedSATSolver:
                     "symmetry_breaking": symmetry_breaking,
                     "fast_path": "lb_equals_ub",
                     "sat_solved_any": False,
-                    "incumbent_source": "BOUNDS_OPTIMALITY_CERTIFICATE",
+                    "incumbent_source": initial_source,
                 },
             )
 
@@ -189,12 +194,20 @@ class RepeatedSATSolver:
                         "estimate": estimate.to_dict(),
                         "symmetry_breaking": symmetry_breaking,
                         "sat_solved_any": False,
-                        "incumbent_source": "HEURISTIC",
+                        "incumbent_source": initial_source,
                     },
                 )
 
         best_bandwidth = ub
         best_permutation: dict[int, int] | None = dict(init_perm) if init_perm else None
+        incumbent_source = initial_source
+        last_key = emit_incumbent(
+            graph,
+            best_permutation,
+            best_bandwidth,
+            on_incumbent=on_incumbent,
+            last_key=None,
+        )
         certified_lb = lb
         sat_calls = 0
         total_encoding_time = 0.0
@@ -204,6 +217,7 @@ class RepeatedSATSolver:
         timed_out = False
         resource_reason: str | None = None
         sat_solved_any = False
+
         report_progress(
             self,
             bandwidth=best_bandwidth,
@@ -211,7 +225,7 @@ class RepeatedSATSolver:
             lower_bound=certified_lb,
             sat_calls=0,
             sat_solved_any=False,
-            incumbent_source="HEURISTIC",
+            incumbent_source=incumbent_source,
         )
 
         if self.search_mode == "linear":
@@ -250,7 +264,7 @@ class RepeatedSATSolver:
                     num_variables=last_num_vars,
                     num_clauses=last_num_clauses,
                     sat_solved_any=sat_solved_any,
-                    incumbent_source="SAT" if sat_solved_any else "HEURISTIC",
+                    incumbent_source=incumbent_source,
                 )
                 report_sat_event(self, k=k, outcome="STARTED")
                 sat_calls += 1
@@ -273,12 +287,19 @@ class RepeatedSATSolver:
                         raise RuntimeError(f"Solver returned SAT but model is None for k={k}")
                     decoded_perm = self.encoder.decode(graph, model, k)
                     actual_bw = calculate_bandwidth(graph, decoded_perm)
-                    if not validate_solution(graph, decoded_perm).valid or actual_bw > k:
-                        raise RuntimeError(f"Invalid CaDiCaL model at k={k}")
                     sat_solved_any = True
                     report_sat_event(self, k=k, outcome="SAT", solve_time_s=solve_time, bandwidth=actual_bw)
-                    best_bandwidth = actual_bw
-                    best_permutation = decoded_perm
+                    if actual_bw <= best_bandwidth:
+                        best_bandwidth = actual_bw
+                        best_permutation = decoded_perm
+                        incumbent_source = "sat"
+                        last_key = emit_incumbent(
+                            graph,
+                            best_permutation,
+                            best_bandwidth,
+                            on_incumbent=on_incumbent,
+                            last_key=last_key,
+                        )
                     report_progress(
                         self,
                         bandwidth=best_bandwidth,
@@ -290,7 +311,7 @@ class RepeatedSATSolver:
                         num_variables=last_num_vars,
                         num_clauses=last_num_clauses,
                         sat_solved_any=sat_solved_any,
-                        incumbent_source="SAT",
+                        incumbent_source=incumbent_source,
                     )
 
                     if best_bandwidth <= certified_lb:
@@ -312,15 +333,12 @@ class RepeatedSATSolver:
                         num_variables=last_num_vars,
                         num_clauses=last_num_clauses,
                         sat_solved_any=sat_solved_any,
-                        incumbent_source="SAT" if sat_solved_any else "HEURISTIC",
+                        incumbent_source=incumbent_source,
                     )
                     break
 
         elif self.search_mode in ("binary", "adaptive"):
             low = certified_lb
-            # Adaptive mode obtains an independently decoded SAT witness at the
-            # validated incumbent bound before attempting a harder threshold.
-            # The incumbent permutation is never passed as SAT assumptions.
             high = best_bandwidth if self.search_mode == "adaptive" else best_bandwidth - 1
             first_adaptive_call = self.search_mode == "adaptive"
             while low <= high:
@@ -366,7 +384,7 @@ class RepeatedSATSolver:
                     num_variables=last_num_vars,
                     num_clauses=last_num_clauses,
                     sat_solved_any=sat_solved_any,
-                    incumbent_source="SAT" if sat_solved_any else "HEURISTIC",
+                    incumbent_source=incumbent_source,
                 )
                 report_sat_event(self, k=mid, outcome="STARTED")
                 sat_calls += 1
@@ -390,31 +408,39 @@ class RepeatedSATSolver:
                     decoded_perm = self.encoder.decode(graph, model, mid)
                     actual_bw = calculate_bandwidth(graph, decoded_perm)
                     if not validate_solution(graph, decoded_perm).valid or actual_bw > mid:
-                        raise RuntimeError(f"Invalid CaDiCaL model at k={mid}")
+                        raise RuntimeError(f"Invalid model at k={mid}")
                     sat_solved_any = True
                     report_sat_event(self, k=mid, outcome="SAT", solve_time_s=solve_time, bandwidth=actual_bw)
                     if actual_bw <= best_bandwidth:
                         best_bandwidth = actual_bw
                         best_permutation = decoded_perm
-                        report_progress(
-                            self,
-                            bandwidth=best_bandwidth,
-                            permutation=best_permutation,
-                            lower_bound=certified_lb,
-                            sat_calls=sat_calls,
-                            encoding_time_s=total_encoding_time,
-                            solving_time_s=total_solving_time,
-                            num_variables=last_num_vars,
-                            num_clauses=last_num_clauses,
-                            sat_solved_any=sat_solved_any,
-                            incumbent_source="SAT",
+                        incumbent_source = "sat"
+                        last_key = emit_incumbent(
+                            graph,
+                            best_permutation,
+                            best_bandwidth,
+                            on_incumbent=on_incumbent,
+                            last_key=last_key,
                         )
+                    report_progress(
+                        self,
+                        bandwidth=best_bandwidth,
+                        permutation=best_permutation,
+                        lower_bound=certified_lb,
+                        sat_calls=sat_calls,
+                        encoding_time_s=total_encoding_time,
+                        solving_time_s=total_solving_time,
+                        num_variables=last_num_vars,
+                        num_clauses=last_num_clauses,
+                        sat_solved_any=sat_solved_any,
+                        incumbent_source=incumbent_source,
+                    )
                     high = min(mid - 1, actual_bw - 1)
                 else:
                     backend.delete()
                     report_sat_event(self, k=mid, outcome="UNSAT", solve_time_s=solve_time)
                     if confirming_incumbent:
-                        raise RuntimeError("CaDiCaL reported UNSAT at a validated feasible bound")
+                        raise RuntimeError("Solver reported UNSAT at a validated feasible bound")
                     low = mid + 1
                     certified_lb = max(certified_lb, low)
                     report_progress(
@@ -428,7 +454,7 @@ class RepeatedSATSolver:
                         num_variables=last_num_vars,
                         num_clauses=last_num_clauses,
                         sat_solved_any=sat_solved_any,
-                        incumbent_source="SAT" if sat_solved_any else "HEURISTIC",
+                        incumbent_source=incumbent_source,
                     )
 
         runtime = monotonic() - started
@@ -436,7 +462,7 @@ class RepeatedSATSolver:
         if resource_reason:
             status = SolutionStatus.SKIPPED
         elif timed_out:
-            status = SolutionStatus.FEASIBLE if best_permutation is not None else SolutionStatus.TIMEOUT
+            status = SolutionStatus.TIMEOUT
         elif best_bandwidth is not None and certified_lb == best_bandwidth:
             status = SolutionStatus.OPTIMAL
         elif best_permutation is not None and certified_lb < best_bandwidth:
@@ -463,9 +489,10 @@ class RepeatedSATSolver:
                 "symmetry_breaking": symmetry_breaking,
                 "search_mode": self.search_mode,
                 "threshold_policy": self.threshold_policy,
-                "skipped_reason": resource_reason,
+                "incumbent_source": incumbent_source,
                 "sat_solved_any": sat_solved_any,
-                "incumbent_source": "SAT" if sat_solved_any else "HEURISTIC",
+                "timed_out": timed_out,
+                "skipped_reason": resource_reason,
             },
         )
 

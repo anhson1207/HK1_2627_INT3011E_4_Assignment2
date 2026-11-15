@@ -218,8 +218,8 @@ pytest -v
 
 ---
 
-## 8. Ongoing Development & Member Responsibilities
+## 8. Development & Integrated Member Achievements
 
 - **`dev/leader` (Phases L9–L10 Complete; Full 113 SAT Coverage & Adaptive CaDiCaL Optimization)**: SAT Position & Order Encodings, Pairwise & Sequential AMO, Repeated & Incremental CaDiCaL SAT, Symmetry Breaking, L6–L8 CNF Estimator/ResourceLimits/Worker, Phase L9 Full 113 Benchmark ([Phase L9 Report](docs/leader-l9-full113-sat-report.md)), and Phase L10 Adaptive CaDiCaL Optimization (37 SAT witnesses, 4 SAT-proved optimal, 1 bound-proved optimal across 113 instances, 17 SVGs in `results/leader_l10_cadical_optimization/`, [Phase L10 Report](docs/leader-l10-cadical-optimization-report.md)).
-- **`dev/member-2` (In Development by Member 2)**: Binary & Commander Cardinality Encodings, Glucose SAT Solver, Gurobi MIP, CPLEX MIP, Comprehensive Benchmarking Suite.
-- **`dev/member-3` (In Development by Member 3)**: Product & Ladder Cardinality Encodings, MiniSat Solver, CP-SAT, CP Optimizer, Harwell-Boeing Dataset Pipeline, Metaheuristics (RCM, SA, DRSA).
+- **`dev/member-2` (Phases M2.1–M2.3 & Tables 6–8 Benchmarks Complete)**: Binary & Commander Cardinality Encodings (`BinaryAMO`, `CommanderAMO`), Glucose 4 SAT Backend (`GlucoseBackend`), Live-Verified Gurobi (`13.0.3`) & CPLEX (`22.2.0.0`) Assignment MIPs, 11-configuration benchmark across Tables 6–8 (1,243 runs, 6 OPTIMAL including new record `steam3` bw=5 beating published best=7, Gurobi retry on 108 graphs, IBM CP on 109/113 graphs; reports in `docs/member2_table6_7_8_report.md` and `docs/member2-report.md`).
+- **`dev/member-3` (Phases M3.1–M3.9 Complete; Full 113/113 CP-SAT & MiniSat22 Covered)**: Product & Ladder Cardinality Encodings (`ProductAMO`, `LadderAMO`), MiniSat22 SAT Backend (`MiniSatBackend`), Full 113/113 CP-SAT Coverage (`113/113` valid solutions, `16 OPTIMAL`, `97 FEASIBLE`, `0` errors across all Harwell–Boeing instances in `results/member3_complete/cpsat_results.csv`), IBM CP Optimizer CE (`CPOptimizerSolver`), DRSA/SA/RCM Metaheuristics (`DRSASolver`), Harwell–Boeing forensic dataset pipeline, and full Phase M3.9 MiniSat22 113-instance benchmark in `results/member3_m3_9_minisat_full113/` ([Phase M3.9 Report](docs/member3-m3_9-minisat-full113-report.md), [Completion Report](MEMBER3_COMPLETION_REPORT.md)).

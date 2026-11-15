@@ -1,0 +1,12 @@
+[benchmark]
+mode = "m2_3_baseline"
+provenance = "../data/benchmark_provenance.json"
+raw_dir = "../data/benchmarks/raw"
+output_dir = "../results/member2_m2_3"
+timeout_seconds = 30.0
+max_batch_seconds = 900.0
+repetitions = 1
+max_sat_variables = 500000
+max_sat_clauses = 2500000
+max_mip_variables = 250000
+memory_limit_mb = 4096.0

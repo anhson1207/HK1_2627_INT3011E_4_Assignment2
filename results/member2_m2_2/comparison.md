@@ -1,0 +1,121 @@
+# Member 2 Official Benchmark Comparison (113-instance Catalog)
+
+| Đồ thị | Bảng | Dataset | Paper LB | Paper Best | Bandwidth | Solver | Thời gian (s) | Trạng thái | Đối chiếu |
+|---|---|---|---:|---:|---:|---|---:|---|---|
+| arc130 | Table 6 | — | 63 | 63 | — | — | — | — | no_solution |
+| ash85 | Table 6 | — | 9 | 9 | — | — | — | — | no_solution |
+| bcspwr01 | Table 6 | READY | 5 | 5 | 5 | gurobi (MIP/-) | 3.403 | OPTIMAL | equal |
+| bcspwr02 | Table 6 | READY | 7 | 7 | 7 | cadical (order/sequential) | 30.005 | TIMEOUT | equal |
+| bcspwr03 | Table 6 | — | 9 | 10 | — | — | — | — | no_solution |
+| bcsstk01 | Table 6 | READY | 16 | 16 | 17 | cadical (order/sequential) | 30.004 | TIMEOUT | worse |
+| bcsstk04 | Table 6 | — | 36 | 37 | — | — | — | — | no_solution |
+| bcsstk05 | Table 6 | — | 19 | 20 | — | — | — | — | no_solution |
+| bcsstk22 | Table 6 | — | 9 | 10 | — | — | — | — | no_solution |
+| can_144 | Table 6 | — | 13 | 13 | — | — | — | — | no_solution |
+| can_161 | Table 6 | — | 18 | 18 | — | — | — | — | no_solution |
+| curtis54 | Table 6 | — | 10 | 10 | — | — | — | — | no_solution |
+| fs_183_1 | Table 6 | — | 52 | 60 | — | — | — | — | no_solution |
+| gent113 | Table 6 | — | 25 | 27 | — | — | — | — | no_solution |
+| gre_115 | Table 6 | — | 20 | 23 | — | — | — | — | no_solution |
+| gre_185 | Table 6 | — | 17 | 21 | — | — | — | — | no_solution |
+| ibm32 | Table 6 | — | 11 | 11 | — | — | — | — | no_solution |
+| impcol_b | Table 6 | — | 19 | 20 | — | — | — | — | no_solution |
+| impcol_c | Table 6 | — | 23 | 30 | — | — | — | — | no_solution |
+| lns_131 | Table 6 | — | 18 | 20 | — | — | — | — | no_solution |
+| lund_a | Table 6 | — | 19 | 23 | — | — | — | — | no_solution |
+| lund_b | Table 6 | — | 19 | 23 | — | — | — | — | no_solution |
+| mcca | Table 6 | — | 32 | 37 | — | — | — | — | no_solution |
+| nos4 | Table 6 | READY | 10 | 10 | 10 | cadical (order/sequential) | 30.007 | TIMEOUT | equal |
+| pores_1 | Table 6 | — | 7 | 7 | — | — | — | — | no_solution |
+| steam3 | Table 6 | — | 7 | 7 | — | — | — | — | no_solution |
+| west0132 | Table 6 | — | 23 | 32 | — | — | — | — | no_solution |
+| west0156 | Table 6 | — | 33 | 36 | — | — | — | — | no_solution |
+| west0167 | Table 6 | — | 31 | 34 | — | — | — | — | no_solution |
+| will199 | Table 6 | — | 55 | 64 | — | — | — | — | no_solution |
+| will57 | Table 6 | — | 6 | 6 | — | — | — | — | no_solution |
+| 494_bus | Table 7 | — | 25 | 28 | — | — | — | — | no_solution |
+| 662_bus | Table 7 | — | 36 | 39 | — | — | — | — | no_solution |
+| 685_bus | Table 7 | — | 30 | 32 | — | — | — | — | no_solution |
+| ash292 | Table 7 | — | 16 | 19 | — | — | — | — | no_solution |
+| bcspwr04 | Table 7 | — | 23 | 24 | — | — | — | — | no_solution |
+| bcspwr05 | Table 7 | — | 25 | 27 | — | — | — | — | no_solution |
+| bcsstk06 | Table 7 | — | 38 | 45 | — | — | — | — | no_solution |
+| bcsstk19 | Table 7 | — | 13 | 14 | — | — | — | — | no_solution |
+| bcsstk20 | Table 7 | — | 8 | 13 | — | — | — | — | no_solution |
+| bcsstm07 | Table 7 | — | 37 | 45 | — | — | — | — | no_solution |
+| bp_0 | Table 7 | — | 174 | 234 | — | — | — | — | no_solution |
+| bp_1000 | Table 7 | — | 197 | 283 | — | — | — | — | no_solution |
+| bp_1200 | Table 7 | — | 197 | 287 | — | — | — | — | no_solution |
+| bp_1400 | Table 7 | — | 199 | 291 | — | — | — | — | no_solution |
+| bp_1600 | Table 7 | — | 199 | 292 | — | — | — | — | no_solution |
+| bp_200 | Table 7 | — | 186 | 257 | — | — | — | — | no_solution |
+| bp_400 | Table 7 | — | 188 | 267 | — | — | — | — | no_solution |
+| bp_600 | Table 7 | — | 190 | 272 | — | — | — | — | no_solution |
+| bp_800 | Table 7 | — | 197 | 278 | — | — | — | — | no_solution |
+| can_292 | Table 7 | — | 34 | 38 | — | — | — | — | no_solution |
+| can_445 | Table 7 | — | 46 | 52 | — | — | — | — | no_solution |
+| can_715 | Table 7 | — | 54 | 71 | — | — | — | — | no_solution |
+| can_838 | Table 7 | — | 75 | 86 | — | — | — | — | no_solution |
+| dwt_209 | Table 7 | — | 21 | 23 | — | — | — | — | no_solution |
+| dwt_221 | Table 7 | — | 12 | 13 | — | — | — | — | no_solution |
+| dwt_234 | Table 7 | — | 11 | 11 | — | — | — | — | no_solution |
+| dwt_245 | Table 7 | — | 21 | 21 | — | — | — | — | no_solution |
+| dwt_310 | Table 7 | — | 11 | 12 | — | — | — | — | no_solution |
+| dwt_361 | Table 7 | — | 14 | 14 | — | — | — | — | no_solution |
+| dwt_419 | Table 7 | — | 23 | 25 | — | — | — | — | no_solution |
+| dwt_503 | Table 7 | — | 29 | 41 | — | — | — | — | no_solution |
+| dwt_592 | Table 7 | — | 22 | 29 | — | — | — | — | no_solution |
+| dwt_878 | Table 7 | — | 23 | 25 | — | — | — | — | no_solution |
+| dwt_918 | Table 7 | — | 27 | 32 | — | — | — | — | no_solution |
+| dwt_992 | Table 7 | — | 35 | 35 | — | — | — | — | no_solution |
+| fs_541_1 | Table 7 | — | 270 | 270 | — | — | — | — | no_solution |
+| fs_680_1 | Table 7 | — | 17 | 17 | — | — | — | — | no_solution |
+| fs_760_1 | Table 7 | — | 36 | 37 | — | — | — | — | no_solution |
+| gr_30_30 | Table 7 | — | 31 | 33 | — | — | — | — | no_solution |
+| gre_216a | Table 7 | — | 17 | 21 | — | — | — | — | no_solution |
+| gre_343 | Table 7 | — | 23 | 28 | — | — | — | — | no_solution |
+| gre_512 | Table 8 | — | 30 | 36 | — | — | — | — | no_solution |
+| hor_131 | Table 8 | — | 46 | 54 | — | — | — | — | no_solution |
+| impcol_a | Table 8 | — | 30 | 32 | — | — | — | — | no_solution |
+| impcol_d | Table 8 | — | 36 | 39 | — | — | — | — | no_solution |
+| impcol_e | Table 8 | — | 34 | 42 | — | — | — | — | no_solution |
+| jagmesh1 | Table 8 | — | 24 | 27 | — | — | — | — | no_solution |
+| jpwh_991 | Table 8 | — | 82 | 88 | — | — | — | — | no_solution |
+| lns_511 | Table 8 | — | 33 | 44 | — | — | — | — | no_solution |
+| mbeacxc | Table 8 | — | 246 | 260 | — | — | — | — | no_solution |
+| mbeaflw | Table 8 | — | 246 | 260 | — | — | — | — | no_solution |
+| mbeause | Table 8 | — | 249 | 254 | — | — | — | — | no_solution |
+| mcfe | Table 8 | — | 112 | 126 | — | — | — | — | no_solution |
+| nnc261 | Table 8 | — | 22 | 24 | — | — | — | — | no_solution |
+| nnc666 | Table 8 | — | 33 | 40 | — | — | — | — | no_solution |
+| nos1 | Table 8 | — | 3 | 3 | — | — | — | — | no_solution |
+| nos2 | Table 8 | — | 3 | 3 | — | — | — | — | no_solution |
+| nos3 | Table 8 | — | 43 | 44 | — | — | — | — | no_solution |
+| nos5 | Table 8 | — | 53 | 63 | — | — | — | — | no_solution |
+| nos6 | Table 8 | — | 15 | 16 | — | — | — | — | no_solution |
+| nos7 | Table 8 | — | 43 | 65 | — | — | — | — | no_solution |
+| orsirr_2 | Table 8 | — | 62 | 85 | — | — | — | — | no_solution |
+| plat362 | Table 8 | — | 29 | 34 | — | — | — | — | no_solution |
+| plskz362 | Table 8 | — | 15 | 18 | — | — | — | — | no_solution |
+| pores_3 | Table 8 | — | 13 | 13 | — | — | — | — | no_solution |
+| saylr1 | Table 8 | — | 12 | 14 | — | — | — | — | no_solution |
+| saylr3 | Table 8 | — | 35 | 46 | — | — | — | — | no_solution |
+| sherman1 | Table 8 | — | 35 | 46 | — | — | — | — | no_solution |
+| sherman4 | Table 8 | — | 21 | 27 | — | — | — | — | no_solution |
+| shl_0 | Table 8 | — | 211 | 224 | — | — | — | — | no_solution |
+| shl_200 | Table 8 | — | 220 | 233 | — | — | — | — | no_solution |
+| shl_400 | Table 8 | — | 213 | 229 | — | — | — | — | no_solution |
+| steam1 | Table 8 | — | 32 | 44 | — | — | — | — | no_solution |
+| steam2 | Table 8 | — | 54 | 63 | — | — | — | — | no_solution |
+| str_0 | Table 8 | — | 87 | 115 | — | — | — | — | no_solution |
+| str_200 | Table 8 | — | 90 | 124 | — | — | — | — | no_solution |
+| str_600 | Table 8 | — | 101 | 131 | — | — | — | — | no_solution |
+| west0381 | Table 8 | — | 119 | 149 | — | — | — | — | no_solution |
+| west0479 | Table 8 | — | 84 | 119 | — | — | — | — | no_solution |
+| west0497 | Table 8 | — | 69 | 85 | — | — | — | — | no_solution |
+| west0655 | Table 8 | — | 109 | 157 | — | — | — | — | no_solution |
+| west0989 | Table 8 | — | 123 | 207 | — | — | — | — | no_solution |
+
+Tổng catalog: 113 (Table 6: 31, Table 7: 41, Table 8: 41).
+Bằng Best: 3; tốt hơn: 0; kém hơn: 1; chưa có nghiệm trong đợt chạy: 109.
+Tổng lượt chạy (kể cả small oracle/pilot): 114; OPTIMAL: 62; FEASIBLE: 0; TIMEOUT: 36; RESOURCE_LIMIT: 2; SKIPPED: 0; UNAVAILABLE: 14; ERROR: 0.

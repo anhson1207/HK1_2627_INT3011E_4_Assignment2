@@ -42,6 +42,11 @@ def _solve_instance(
     max_vertices: int = 10,
     max_variables: int | None = 500_000,
     max_clauses: int | None = 2_500_000,
+    seed: int = 0,
+    initial_solution: str = "auto",
+    iterations: int | None = None,
+    max_moves: int | None = None,
+    drsa_variant: str = "paper",
 ) -> dict[str, object]:
     graph = read_graph(input_path, graph_format)  # type: ignore[arg-type]
     limits = ResourceLimits(
@@ -53,6 +58,80 @@ def _solve_instance(
     if strategy_name == "brute-force" or solver_name == "brute-force":
         solver = BruteForceSolver(max_vertices=max_vertices)
         result = solver.solve(graph, timeout_seconds=timeout_seconds)
+    elif solver_name == "gurobi":
+        from bmp.solvers.exact.gurobi import GurobiMIPSolver
+
+        result = GurobiMIPSolver().solve(
+            graph,
+            timeout_seconds=timeout_seconds,
+            symmetry_breaking=symmetry_breaking,
+        )
+    elif solver_name == "cplex":
+        from bmp.solvers.exact.cplex import CPLEXMIPSolver
+
+        result = CPLEXMIPSolver().solve(
+            graph,
+            timeout_seconds=timeout_seconds,
+            symmetry_breaking=symmetry_breaking,
+        )
+    elif solver_name == "cp-sat":
+        from bmp.solvers.exact.cpsat import CPSATSolver
+
+        result = CPSATSolver().solve(
+            graph,
+            timeout_seconds=timeout_seconds,
+            symmetry_breaking=symmetry_breaking,
+        )
+    elif solver_name == "cp-optimizer":
+        from bmp.solvers.exact.cp_optimizer import CPOptimizerSolver
+
+        result = CPOptimizerSolver().solve(
+            graph,
+            timeout_seconds=timeout_seconds,
+            symmetry_breaking=symmetry_breaking,
+        )
+    elif solver_name == "rcm":
+        from bmp.heuristics.rcm import RCMSolver
+
+        result = RCMSolver().solve(graph, timeout_seconds=timeout_seconds)
+    elif solver_name == "sa":
+        from bmp.heuristics.sa import SimulatedAnnealingSolver
+
+        sa_init = "rcm" if initial_solution == "auto" else initial_solution
+        sa_kwargs: dict[str, object] = {"seed": seed, "initial_mode": sa_init}
+        if iterations is not None:
+            sa_kwargs["iterations"] = iterations
+        result = SimulatedAnnealingSolver(**sa_kwargs).solve(  # type: ignore[arg-type]
+            graph,
+            timeout_seconds=timeout_seconds,
+        )
+    elif solver_name == "drsa":
+        from bmp.heuristics.drsa import DRSASolver
+
+        if drsa_variant == "paper":
+            drsa_init = "random" if initial_solution == "auto" else initial_solution
+            drsa = DRSASolver(seed=seed, initial_mode=drsa_init)
+        elif drsa_variant == "bandwidth_only":
+            drsa_init = "random" if initial_solution == "auto" else initial_solution
+            drsa = DRSASolver(
+                seed=seed,
+                initial_mode=drsa_init,
+                evaluation_mode="bandwidth_only",
+                variant="MODIFIED_VARIANT",
+            )
+        else:
+            drsa_init = "rcm" if initial_solution == "auto" else initial_solution
+            drsa = DRSASolver(
+                seed=seed,
+                initial_temperature=2.0,
+                initial_mode=drsa_init,
+                variant="MODIFIED_VARIANT",
+            )
+        result = drsa.solve(
+            graph,
+            timeout_seconds=timeout_seconds,
+            max_total_moves=max_moves,
+        )
     elif strategy_name in ("repeated", "repeated_linear", "repeated_binary"):
         if encoding_name == "pairwise":
             encoder = PairwiseEncoding(amo=amo_name)
@@ -66,7 +145,7 @@ def _solve_instance(
         sat_solver = RepeatedSATSolver(
             encoder=encoder,
             backend_name=solver_name,
-            search_mode=mode,
+            search_mode=mode,  # type: ignore[arg-type]
         )
         result = sat_solver.solve(
             graph,
@@ -77,6 +156,11 @@ def _solve_instance(
     elif strategy_name == "incremental":
         if search_mode == "adaptive":
             raise ValueError("adaptive search is currently supported only with repeated SAT")
+        if search_mode == "binary":
+            raise ValueError(
+                "Incremental SAT strategy only supports linear search mode; "
+                "use --strategy repeated --search-mode binary"
+            )
         from bmp.solvers.sat.incremental import IncrementalSATSolver
         if encoding_name == "pairwise":
             encoder = PairwiseEncoding(amo=amo_name)
@@ -128,17 +212,53 @@ def _build_parser() -> argparse.ArgumentParser:
     )
     subparsers = parser.add_subparsers(dest="command", required=True)
 
-    solve = subparsers.add_parser("solve", help="solve an instance using SAT or brute force")
+    solve = subparsers.add_parser("solve", help="solve an instance using SAT, MIP, CP, heuristics, or brute force")
     solve.add_argument("input", nargs="?", type=Path, default=None, help="path to input graph file")
     solve.add_argument("--graph", "-g", type=Path, default=None, dest="graph_opt", help="alias for input path")
     solve.add_argument("--format", choices=FORMATS, default="auto")
-    solve.add_argument("--solver", choices=("cadical", "cadical195", "brute-force"), default="cadical")
+    solve.add_argument(
+        "--solver",
+        choices=(
+            "cadical",
+            "cadical195",
+            "glucose",
+            "glucose4",
+            "minisat",
+            "minisat22",
+            "gurobi",
+            "cplex",
+            "cp-sat",
+            "cp-optimizer",
+            "rcm",
+            "sa",
+            "drsa",
+            "brute-force",
+        ),
+        default="cadical",
+    )
     solve.add_argument("--encoding", choices=("pairwise", "order"), default="pairwise")
     solve.add_argument("--strategy", choices=("repeated", "incremental", "brute-force"), default="repeated")
-    solve.add_argument("--amo", choices=("pairwise", "sequential"), default="pairwise")
+    solve.add_argument(
+        "--amo",
+        choices=("pairwise", "sequential", "binary", "commander", "product", "ladder"),
+        default="pairwise",
+    )
     solve.add_argument("--search-mode", choices=("linear", "binary", "adaptive"), default="linear")
     solve.add_argument("--symmetry-breaking", action="store_true", default=False)
     solve.add_argument("--timeout", type=float, default=None)
+    solve.add_argument("--seed", type=int, default=0)
+    solve.add_argument(
+        "--initial-solution",
+        choices=("auto", "random", "identity", "cm", "rcm", "best_initial"),
+        default="auto",
+    )
+    solve.add_argument("--iterations", type=int, default=None)
+    solve.add_argument("--max-moves", type=int, default=None)
+    solve.add_argument(
+        "--drsa-variant",
+        choices=("paper", "bandwidth_only", "modified_warm"),
+        default="paper",
+    )
     solve.add_argument("--max-vertices", type=int, default=10)
     solve.add_argument("--max-variables", type=int, default=500_000, help="safety limit on maximum estimated variables")
     solve.add_argument("--max-clauses", type=int, default=2_500_000, help="safety limit on maximum estimated clauses")
@@ -147,7 +267,11 @@ def _build_parser() -> argparse.ArgumentParser:
     estimate.add_argument("input", type=Path, help="path to input graph file")
     estimate.add_argument("--format", choices=FORMATS, default="auto")
     estimate.add_argument("--encoding", choices=("pairwise", "order"), default="pairwise")
-    estimate.add_argument("--amo", choices=("pairwise", "sequential"), default="pairwise")
+    estimate.add_argument(
+        "--amo",
+        choices=("pairwise", "sequential", "binary", "commander", "product", "ladder"),
+        default="pairwise",
+    )
     estimate.add_argument("--k", "-k", type=int, default=None, help="target bandwidth threshold (default: worst-case k=0)")
     estimate.add_argument("--symmetry-breaking", action="store_true", default=False)
 
@@ -205,6 +329,8 @@ def _run_config(path: Path) -> dict[str, object]:
         encoding_name=encoding_name,
         strategy_name=strategy_name,
         amo_name=amo_name,
+        search_mode=solve.get("search_mode", "linear"),
+        symmetry_breaking=bool(solve.get("symmetry_breaking", False)),
         timeout_seconds=solve.get("timeout_seconds"),
         max_vertices=solve.get("max_vertices", 10),
         max_variables=solve.get("max_variables", 500_000),
@@ -234,6 +360,11 @@ def main(argv: Sequence[str] | None = None) -> int:
                 max_vertices=args.max_vertices,
                 max_variables=args.max_variables,
                 max_clauses=args.max_clauses,
+                seed=args.seed,
+                initial_solution=args.initial_solution,
+                iterations=args.iterations,
+                max_moves=args.max_moves,
+                drsa_variant=args.drsa_variant,
             )
         elif args.command == "estimate-cnf":
             graph = read_graph(args.input, args.format)
@@ -338,8 +469,10 @@ def main(argv: Sequence[str] | None = None) -> int:
                 TABLE_7_INSTANCES,
                 TABLE_8_INSTANCES,
                 ALL_INSTANCES,
+                VALIDATOR_VERSION,
                 preflight_check_dataset,
             )
+            from bmp.io.readers import CONVERSION_VERSION, OFFICIAL_CONVERSION_POLICY
             if args.table == "6":
                 catalog = TABLE_6_INSTANCES
             elif args.table == "7":
@@ -364,6 +497,9 @@ def main(argv: Sequence[str] | None = None) -> int:
                 "needs_verification_instances": list(report.needs_verification_instances),
                 "missing_instances": list(report.missing_instances),
                 "errors": list(report.errors),
+                "validator_version": VALIDATOR_VERSION,
+                "official_conversion_policy": OFFICIAL_CONVERSION_POLICY,
+                "conversion_version": CONVERSION_VERSION,
                 "dependency_status": "STRUCTURAL_READY" if report.ready_for_execution else "DATA_REVIEW_REQUIRED",
                 "verification_level": "file_parse_and_vertex_count_only; use benchmark_provenance.json for topology audit",
             }

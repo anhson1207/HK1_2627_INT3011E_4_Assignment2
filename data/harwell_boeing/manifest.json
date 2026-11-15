@@ -1,0 +1,17 @@
+{
+  "doi": "10.1016/j.ins.2014.12.041",
+  "paper_url": "https://math.nist.gov/~JBernal/DRSA.pdf",
+  "paper_sha256": "47427ae1d0b4e62a5ecad887f3ca67d9344959fbc0fcf4a25381ea4d6a4a6702",
+  "printed_pages": [
+    45,
+    46
+  ],
+  "table_rows": {
+    "6": 31,
+    "7": 41
+  },
+  "source_index": "https://math.nist.gov/MatrixMarket/matrices.html",
+  "metadata": "metadata.csv",
+  "checksums": "SHA-256 over original gzip bytes",
+  "conversion": "Undirected structural union of nonzero off-diagonal entries; all declared vertices and components retained"
+}

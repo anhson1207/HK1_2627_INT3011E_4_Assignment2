@@ -1,0 +1,24 @@
+{
+  "generated_at": "2026-11-10T11:17:43+00:00",
+  "git_commit": "ed0c90d",
+  "config": "/Users/nguyenanhson/BMP/configs/member2_m2_2.toml",
+  "mode": "pilot_m2_2",
+  "python": "3.14.3 (v3.14.3:323c59a5e34, Feb  3 2026, 11:41:37) [Clang 16.0.0 (clang-1600.0.26.6)]",
+  "platform": "macOS-14.0-arm64-arm-64bit-Mach-O",
+  "machine": "arm64",
+  "cpu_count": 8,
+  "solver_versions": {
+    "cadical": "cadical195 (PySAT 1.9.dev17)",
+    "glucose": "glucose4 (PySAT 1.9.dev17)",
+    "gurobi": "gurobipy 13.0.3",
+    "cplex": "cplex 22.2.0.0"
+  },
+  "resource_limits": {
+    "max_sat_variables": 500000,
+    "max_sat_clauses": 2500000,
+    "max_mip_variables": 250000,
+    "memory_limit_mb": 4096.0,
+    "max_batch_seconds": 900.0
+  },
+  "total_batch_wall_s": 363.934
+}

@@ -1,0 +1,64 @@
+[benchmark]
+experiment_id = "m3_6_unified_v1"
+provenance = "data/benchmark_provenance.json"
+raw_dir = "data/benchmarks/raw"
+output_dir = "results/member3_m3_6"
+
+# Fairness & resource guard limits
+threads = 1
+exact_timeout_seconds = 15.0
+sat_study_timeout_seconds = 10.0
+extended_timeout_seconds = 60.0
+heuristic_timeout_seconds = 0.8
+heuristic_extended_timeout_seconds = 5.0
+warm_start_drsa_timeout_seconds = 0.5
+small_oracle_timeout_seconds = 5.0
+max_batch_seconds = 850.0
+
+max_sat_variables = 500000
+max_sat_clauses = 2500000
+max_cp_variables = 2000
+max_cp_constraints = 25000
+memory_limit_mb = 4096.0
+
+primary_seed = 17
+stability_seeds = [17, 23, 42]
+
+# 10 verified READY representative instances spanning Tables 6, 7, 8, densities & connectedness
+representative_instances = [
+  "bcspwr01",
+  "bcsstk01",
+  "bcspwr02",
+  "ash85",
+  "nos4",
+  "bcspwr03",
+  "bcsstk22",
+  "dwt_209",
+  "nos1",
+  "saylr1",
+]
+
+# Controlled SAT subset withincnf/time limits (Pairwise naturally hits guard on nos4/saylr1)
+sat_study_instances = [
+  "bcspwr01",
+  "bcsstk01",
+  "bcspwr02",
+  "ash85",
+  "nos4",
+  "saylr1",
+]
+
+sat_amo_study_instances = [
+  "bcspwr01",
+  "bcsstk01",
+  "bcspwr02",
+  "ash85",
+]
+
+# Promising instances for targeted 60s extended runs
+extended_instances = [
+  "bcsstk01",
+  "nos4",
+  "nos1",
+  "saylr1",
+]

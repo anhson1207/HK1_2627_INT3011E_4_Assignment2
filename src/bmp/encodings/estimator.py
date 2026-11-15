@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
+from math import isqrt
 from typing import Mapping
 
 from bmp.core.graph import Graph
@@ -61,6 +62,71 @@ class ResourceLimits:
         return True, None
 
 
+def _binary_amo_counts(m: int) -> tuple[int, int]:
+    """Return exact (aux_vars, clauses) for Binary AMO over m literals."""
+    if m < 2:
+        return 0, 0
+    bits = (m - 1).bit_length()
+    return bits, m * bits
+
+
+def _commander_amo_counts(m: int) -> tuple[int, int]:
+    """Return exact (aux_vars, clauses) for recursive group-3 Commander AMO over m literals."""
+    if m < 2:
+        return 0, 0
+    if m <= 3:
+        return 0, m * (m - 1) // 2
+    aux = 0
+    clauses = 0
+    num_groups = 0
+    for start in range(0, m, 3):
+        group_size = min(3, m - start)
+        clauses += group_size * (group_size - 1) // 2 + group_size
+        aux += 1
+        num_groups += 1
+    sub_aux, sub_clauses = _commander_amo_counts(num_groups)
+    return aux + sub_aux, clauses + sub_clauses
+
+
+def _product_amo_counts(m: int) -> tuple[int, int]:
+    """Return exact (aux_vars, clauses) for 2-Product AMO over m literals."""
+    if m < 2:
+        return 0, 0
+    rows = isqrt(m - 1) + 1
+    cols = (m + rows - 1) // rows
+    aux = rows + cols
+    clauses = 2 * m + rows * (rows - 1) // 2 + cols * (cols - 1) // 2
+    return aux, clauses
+
+
+def _ladder_amo_counts(m: int) -> tuple[int, int]:
+    """Return exact (aux_vars, clauses) for Ladder AMO over m literals."""
+    if m < 2:
+        return 0, 0
+    return m - 1, 3 * m - 4
+
+
+def _single_amo_counts(amo_type: str, m: int, raw_amo: str) -> tuple[int, int]:
+    """Return exact (aux_vars, clauses) for a single AMO constraint of width m."""
+    if amo_type in ("pairwise", "naive"):
+        return 0, m * (m - 1) // 2
+    if amo_type in ("sequential", "seqcounter"):
+        if m < 2:
+            return 0, 0
+        if m == 2:
+            return 0, 1
+        return m - 1, 3 * m - 4
+    if amo_type == "binary":
+        return _binary_amo_counts(m)
+    if amo_type == "commander":
+        return _commander_amo_counts(m)
+    if amo_type == "product":
+        return _product_amo_counts(m)
+    if amo_type == "ladder":
+        return _ladder_amo_counts(m)
+    raise ValueError(f"Unsupported AMO type for estimation: {raw_amo}")
+
+
 def estimate_cnf_size(
     graph: Graph,
     *,
@@ -77,7 +143,7 @@ def estimate_cnf_size(
     n = graph.order
     m = graph.size
 
-    if n == 0 or (n == 1 and encoding.lower() == "order"):
+    if n == 0:
         return CNFSizeEstimate(
             num_variables=0,
             num_original_vars=0,
@@ -86,7 +152,20 @@ def estimate_cnf_size(
             num_clauses=0,
             num_fixed_clauses=0,
             num_bandwidth_clauses=0,
-            formula_breakdown={"empty": 0},
+            formula_breakdown={},
+        )
+
+    if n == 1:
+        is_pw = encoding.lower() == "pairwise"
+        return CNFSizeEstimate(
+            num_variables=1 if is_pw else 0,
+            num_original_vars=1 if is_pw else 0,
+            num_channeling_vars=0,
+            num_aux_vars=0,
+            num_clauses=1 if is_pw else 0,
+            num_fixed_clauses=1 if is_pw else 0,
+            num_bandwidth_clauses=0,
+            formula_breakdown={"alo_vertex": 1} if is_pw else {},
         )
 
     if k is not None and k < 0:
@@ -94,6 +173,8 @@ def estimate_cnf_size(
     eval_k = 0 if k is None else min(k, n - 1)
     enc_family = encoding.lower()
     amo_type = amo.lower()
+
+    aux_per_amo, clauses_per_amo = _single_amo_counts(amo_type, n, amo)
 
     if enc_family == "pairwise":
         occ = occupancy_mode.lower()
@@ -108,24 +189,9 @@ def estimate_cnf_size(
         alo_clauses = n
         amo_blocks_factor = 2 if occ == "both" else 1
 
-        if amo_type in ("pairwise", "naive"):
-            num_aux = 0
-            single_amo = n * (n * (n - 1) // 2)
-        elif amo_type in ("sequential", "seqcounter"):
-            if n == 2:
-                num_aux = 0
-                single_amo = 1 * 2
-            elif n <= 1:
-                num_aux = 0
-                single_amo = 0
-            else:
-                num_aux = amo_blocks_factor * n * (n - 1)
-                single_amo = n * (3 * n - 4)
-        else:
-            raise ValueError(f"Unsupported AMO type for estimation: {amo}")
-
-        amo_vertex_clauses = single_amo if occ == "both" else 0
-        amo_label_clauses = single_amo
+        num_aux = amo_blocks_factor * n * aux_per_amo
+        amo_label_clauses = n * clauses_per_amo
+        amo_vertex_clauses = n * clauses_per_amo if occ == "both" else 0
 
         sym_clauses = 0
         if symmetry_breaking and n >= 2:
@@ -179,23 +245,10 @@ def estimate_cnf_size(
         elif compact_boundary:
             chan_clauses = (3 if cmode == "full" else 1) * n * (n - 2)
         else:
-            if cmode == "full":
-                chan_clauses = n * (3 * n - 2)
-            else:
-                chan_clauses = n * n
+            chan_clauses = n * (3 * n - 2) if cmode == "full" else n * n
 
-        if amo_type in ("pairwise", "naive"):
-            num_aux = 0
-            alldiff_clauses = n * (n * (n - 1) // 2)
-        elif amo_type in ("sequential", "seqcounter"):
-            if n == 2:
-                num_aux = 0
-                alldiff_clauses = 2
-            else:
-                num_aux = n * (n - 1)
-                alldiff_clauses = n * (3 * n - 4)
-        else:
-            raise ValueError(f"Unsupported AMO type for estimation: {amo}")
+        num_aux = n * aux_per_amo
+        alldiff_clauses = n * clauses_per_amo
 
         sym_clauses = 1 if (symmetry_breaking and n >= 2) else 0
         fixed_clauses = mono_clauses + chan_clauses + alldiff_clauses + sym_clauses
@@ -307,18 +360,12 @@ def estimate_for_encoder(
     k: int | None = None,
     symmetry_breaking: bool = False,
 ) -> CNFSizeEstimate:
-    """Compute exact CNF size estimate matching an encoder instance's options."""
-    opts = _encoder_estimate_kwargs(encoder)
+    """Compute closed-form CNF size estimate directly matching an encoder instance."""
     return estimate_cnf_size(
         graph,
         k=k,
         symmetry_breaking=symmetry_breaking,
-        encoding=str(opts["encoding"]),
-        amo=str(opts["amo"]),
-        occupancy_mode=str(opts.get("occupancy_mode", "both")),
-        bandwidth_mode=str(opts.get("bandwidth_mode", "conflict")),
-        channel_mode=str(opts.get("channel_mode", "full")),
-        compact_boundary=bool(opts.get("compact_boundary", False)),
+        **_encoder_estimate_kwargs(encoder),  # type: ignore[arg-type]
     )
 
 
@@ -332,39 +379,40 @@ def estimate_incremental_for_encoder(
     search_mode: str = "linear",
     steps_count: int | None = None,
 ) -> CNFSizeEstimate:
-    """Estimate cumulative incremental CNF size honoring encoder variant and search mode."""
-    opts = _encoder_estimate_kwargs(encoder)
-    encoding = str(opts["encoding"])
-    amo = str(opts["amo"])
-    bwm = str(opts.get("bandwidth_mode", "conflict"))
-    if search_mode == "binary":
-        single = estimate_for_encoder(encoder, graph, k=target_k, symmetry_breaking=symmetry_breaking)
-        if steps_count is None:
-            span = max(1, initial_k - target_k + 1)
-            steps_count = span.bit_length()
-        # Each binary call adds <= single.num_bandwidth_clauses + 1 activation variable
-        added = single.num_bandwidth_clauses * max(1, steps_count)
-        return CNFSizeEstimate(
-            num_variables=single.num_variables + max(1, steps_count),
-            num_original_vars=single.num_original_vars,
-            num_channeling_vars=single.num_channeling_vars,
-            num_aux_vars=single.num_aux_vars + max(1, steps_count),
-            num_clauses=single.num_fixed_clauses + added + max(1, steps_count),
-            num_fixed_clauses=single.num_fixed_clauses,
-            num_bandwidth_clauses=added,
-            formula_breakdown={**single.formula_breakdown, "bandwidth": added},
+    """Compute incremental CNF size estimate (linear diff/step or binary activation)."""
+    kwargs = _encoder_estimate_kwargs(encoder)
+    if search_mode == "linear":
+        return estimate_incremental_cnf_size(
+            graph,
+            initial_k=initial_k,
+            target_k=target_k,
+            symmetry_breaking=symmetry_breaking,
+            **kwargs,  # type: ignore[arg-type]
         )
-    return estimate_incremental_cnf_size(
+    # Binary incremental starts at mid=(lb+ub-1)//2 and guards steps with activation vars.
+    base = estimate_cnf_size(
         graph,
-        encoding=encoding,
-        amo=amo,
-        initial_k=initial_k,
-        target_k=target_k,
+        k=initial_k,
         symmetry_breaking=symmetry_breaking,
-        occupancy_mode=str(opts.get("occupancy_mode", "both")),
-        bandwidth_mode=bwm,
-        channel_mode=str(opts.get("channel_mode", "full")),
-        compact_boundary=bool(opts.get("compact_boundary", False)),
+        **kwargs,  # type: ignore[arg-type]
+    )
+    mid_k = max(0, (initial_k + target_k) // 2)
+    step = estimate_cnf_size(
+        graph,
+        k=mid_k,
+        symmetry_breaking=symmetry_breaking,
+        **kwargs,  # type: ignore[arg-type]
+    )
+    added_steps = 1 if steps_count is None else max(1, steps_count)
+    return CNFSizeEstimate(
+        num_variables=base.num_variables + added_steps,
+        num_original_vars=base.num_original_vars,
+        num_channeling_vars=base.num_channeling_vars,
+        num_aux_vars=base.num_aux_vars + added_steps,
+        num_clauses=base.num_fixed_clauses + step.num_bandwidth_clauses * added_steps + added_steps,
+        num_fixed_clauses=base.num_fixed_clauses,
+        num_bandwidth_clauses=step.num_bandwidth_clauses * added_steps,
+        formula_breakdown={**base.formula_breakdown, "bandwidth": step.num_bandwidth_clauses * added_steps},
     )
 
 

@@ -1,0 +1,14 @@
+Phase M3.8 Full 113/113 Coverage Log (2026-11-11T12:13:56+00:00)
+Catalog covered: 113/113 | Constructed primary graphs: 113/113
+Tier 1 READY: 54 | Tier 2 Exploratory: 59
+Total records: 1279 | Interrupted: False
+Validation failed: 0 | Errors: 0
+  RCM (primary 113): attempted=113, valid=113, opt=0, feas=113, to_inc=0, to_no=0, res_lim=0, blk_lic=0
+  SA (primary 113): attempted=113, valid=113, opt=0, feas=113, to_inc=0, to_no=0, res_lim=0, blk_lic=0
+  DRSA Warm MODIFIED (113): attempted=113, valid=113, opt=0, feas=113, to_inc=0, to_no=0, res_lim=0, blk_lic=0
+  DRSA Paper-Bounded (113): attempted=113, valid=113, opt=0, feas=113, to_inc=0, to_no=0, res_lim=0, blk_lic=0
+  CP-SAT Best Across Passes (113): attempted=113, valid=78, opt=4, feas=74, to_inc=0, to_no=35, res_lim=0, blk_lic=0
+  SAT Order+Product+Inc CaDiCaL (113): attempted=54, valid=54, opt=0, feas=0, to_inc=54, to_no=0, res_lim=59, blk_lic=0
+  Gurobi Eval (113): attempted=3, valid=3, opt=0, feas=0, to_inc=3, to_no=0, res_lim=0, blk_lic=110
+  CPLEX CE (113): attempted=1, valid=1, opt=0, feas=0, to_inc=1, to_no=0, res_lim=0, blk_lic=112
+  IBM CP Optimizer CE (113): attempted=20, valid=20, opt=0, feas=20, to_inc=0, to_no=0, res_lim=0, blk_lic=93

@@ -1,0 +1,74 @@
+[
+  {
+    "encoding": "pairwise",
+    "strategy": "repeated",
+    "k1": "UNSAT",
+    "k2": "SAT",
+    "assignment_k2": {
+      "1": 3,
+      "2": 4,
+      "3": 2,
+      "4": 1
+    },
+    "validation": true,
+    "actual_bandwidth": 2,
+    "same_solver_k2_then_k1": false,
+    "strategy_status": "OPTIMAL",
+    "strategy_bandwidth": 2,
+    "strategy_sat_calls": 1
+  },
+  {
+    "encoding": "pairwise",
+    "strategy": "incremental",
+    "k1": "UNSAT",
+    "k2": "SAT",
+    "assignment_k2": {
+      "1": 3,
+      "2": 4,
+      "3": 2,
+      "4": 1
+    },
+    "validation": true,
+    "actual_bandwidth": 2,
+    "same_solver_k2_then_k1": true,
+    "strategy_status": "OPTIMAL",
+    "strategy_bandwidth": 2,
+    "strategy_sat_calls": 1
+  },
+  {
+    "encoding": "order",
+    "strategy": "repeated",
+    "k1": "UNSAT",
+    "k2": "SAT",
+    "assignment_k2": {
+      "1": 3,
+      "2": 4,
+      "3": 2,
+      "4": 1
+    },
+    "validation": true,
+    "actual_bandwidth": 2,
+    "same_solver_k2_then_k1": false,
+    "strategy_status": "OPTIMAL",
+    "strategy_bandwidth": 2,
+    "strategy_sat_calls": 1
+  },
+  {
+    "encoding": "order",
+    "strategy": "incremental",
+    "k1": "UNSAT",
+    "k2": "SAT",
+    "assignment_k2": {
+      "1": 3,
+      "2": 4,
+      "3": 2,
+      "4": 1
+    },
+    "validation": true,
+    "actual_bandwidth": 2,
+    "same_solver_k2_then_k1": true,
+    "strategy_status": "OPTIMAL",
+    "strategy_bandwidth": 2,
+    "strategy_sat_calls": 1
+  }
+]

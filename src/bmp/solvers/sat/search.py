@@ -660,11 +660,13 @@ def solve_sat_with_decomposition(
         metadata={
             "symmetry_breaking": symmetry_breaking,
             "sat_solved_any": any_sat_solved,
+            "timed_out": any_timeout,
             "incumbent_source": "SAT" if any_sat_solved else "HEURISTIC",
             "skipped_reason": skipped_reason,
             "worker_reason": error_reason,
             "decomposed": True,
             "component_count": len(components),
+            "component_orders": [c.order for c in components],
             "isolated_count": len(isolated),
             "largest_component_n": max((c.order for c in components), default=0),
             "component_statuses": [r.status.value for r in comp_results],

@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from time import monotonic
-from typing import Literal, Mapping
+from typing import Callable, Literal, Mapping
 
 from bmp.core.graph import Graph
 from bmp.core.solution import SolutionStatus, SolverResult
@@ -14,7 +14,6 @@ from bmp.encodings.estimator import (
     estimate_for_encoder,
     estimate_incremental_for_encoder,
 )
-from bmp.encodings.order import OrderEncoding
 from bmp.encodings.pairwise import PairwiseEncoding
 from bmp.solvers.sat.backends.base import get_sat_backend
 from bmp.solvers.sat.search import (
@@ -22,7 +21,7 @@ from bmp.solvers.sat.search import (
     compute_lower_bound,
     solve_sat_with_decomposition,
 )
-from bmp.solvers.sat.worker import report_progress, report_sat_event
+from bmp.solvers.sat.worker import emit_incumbent, report_progress, report_sat_event
 
 
 class IncrementalSATSolver:
@@ -78,6 +77,7 @@ class IncrementalSATSolver:
         heuristic_permutation: Mapping[int, int] | None = None,
         symmetry_breaking: bool = False,
         limits: ResourceLimits | None = None,
+        on_incumbent: Callable[[Mapping[int, int], int], None] | None = None,
     ) -> SolverResult:
         started = monotonic()
         n = graph.order
@@ -96,6 +96,7 @@ class IncrementalSATSolver:
                 heuristic_permutation=heuristic_permutation,
                 symmetry_breaking=symmetry_breaking,
                 limits=limits,
+                on_incumbent=on_incumbent,
             )
 
         if self.decompose_components:
@@ -109,8 +110,10 @@ class IncrementalSATSolver:
                 limits=limits,
             )
 
+        # Base case: edgeless or order <= 1
         if n <= 1 or not graph.edges:
             identity_perm = {v: i + 1 for i, v in enumerate(graph.vertices)}
+            emit_incumbent(graph, identity_perm, 0, on_incumbent=on_incumbent, last_key=None)
             return SolverResult(
                 instance=graph.name,
                 method="SAT",
@@ -130,8 +133,9 @@ class IncrementalSATSolver:
                 upper_bound=0,
                 metadata={
                     "symmetry_breaking": symmetry_breaking,
+                    "fast_path": "edgeless",
                     "sat_solved_any": False,
-                    "incumbent_source": "BOUNDS_OPTIMALITY_CERTIFICATE",
+                    "incumbent_source": "edgeless",
                 },
             )
 
@@ -142,8 +146,10 @@ class IncrementalSATSolver:
             symmetry_breaking=symmetry_breaking,
             init_mode=self.init_mode,
         )
+        initial_source = "heuristic" if heuristic_permutation is not None else "initial"
 
         if lb == ub:
+            emit_incumbent(graph, init_perm, ub, on_incumbent=on_incumbent, last_key=None)
             return SolverResult(
                 instance=graph.name,
                 method="SAT",
@@ -165,7 +171,7 @@ class IncrementalSATSolver:
                     "symmetry_breaking": symmetry_breaking,
                     "fast_path": "lb_equals_ub",
                     "sat_solved_any": False,
-                    "incumbent_source": "BOUNDS_OPTIMALITY_CERTIFICATE",
+                    "incumbent_source": initial_source,
                 },
             )
 
@@ -200,12 +206,20 @@ class IncrementalSATSolver:
                         "estimate": estimate.to_dict(),
                         "symmetry_breaking": symmetry_breaking,
                         "sat_solved_any": False,
-                        "incumbent_source": "HEURISTIC",
+                        "incumbent_source": initial_source,
                     },
                 )
 
         best_bandwidth = ub
         best_permutation: dict[int, int] | None = dict(init_perm) if init_perm else None
+        incumbent_source = initial_source
+        last_key = emit_incumbent(
+            graph,
+            best_permutation,
+            best_bandwidth,
+            on_incumbent=on_incumbent,
+            last_key=None,
+        )
         certified_lb = lb
         sat_calls = 0
         total_encoding_time = 0.0
@@ -225,7 +239,7 @@ class IncrementalSATSolver:
             lower_bound=certified_lb,
             sat_calls=0,
             sat_solved_any=False,
-            incumbent_source="HEURISTIC",
+            incumbent_source=incumbent_source,
         )
 
         backend = get_sat_backend(self.backend_name)
@@ -292,7 +306,7 @@ class IncrementalSATSolver:
                         initial_clauses=fixed_clauses,
                         added_clauses=added_clauses,
                         sat_solved_any=sat_solved_any,
-                        incumbent_source="SAT" if sat_solved_any else "HEURISTIC",
+                        incumbent_source="sat" if sat_solved_any else incumbent_source,
                     )
 
                     solve_start = monotonic()
@@ -300,9 +314,10 @@ class IncrementalSATSolver:
                     sat_calls += 1
                     remaining = None if effective_timeout is None else effective_timeout - (monotonic() - started)
                     is_sat = backend.solve_with_timeout(remaining, assumptions=[act_var])
-                    total_solving_time += monotonic() - solve_start
+                    solve_time = monotonic() - solve_start
+                    total_solving_time += solve_time
                     if is_sat is None:
-                        report_sat_event(self, k=mid, outcome="UNKNOWN")
+                        report_sat_event(self, k=mid, outcome="UNKNOWN", solve_time_s=solve_time)
                         timed_out = True
                         break
 
@@ -313,16 +328,24 @@ class IncrementalSATSolver:
                         decoded = self.encoder.decode(graph, model, mid)
                         actual_bw = calculate_bandwidth(graph, decoded)
                         sat_solved_any = True
-                        report_sat_event(self, k=mid, outcome="SAT", bandwidth=actual_bw)
-                        if actual_bw < best_bandwidth:
+                        report_sat_event(self, k=mid, outcome="SAT", solve_time_s=solve_time, bandwidth=actual_bw)
+                        if actual_bw <= best_bandwidth:
                             best_bandwidth = actual_bw
                             best_permutation = decoded
+                            incumbent_source = "sat"
+                            last_key = emit_incumbent(
+                                graph,
+                                best_permutation,
+                                best_bandwidth,
+                                on_incumbent=on_incumbent,
+                                last_key=last_key,
+                            )
                         backend.add_clause([act_var])
                         accumulated_clauses += 1
                         added_clauses += 1
                         high = min(mid - 1, best_bandwidth - 1)
                     else:
-                        report_sat_event(self, k=mid, outcome="UNSAT")
+                        report_sat_event(self, k=mid, outcome="UNSAT", solve_time_s=solve_time)
                         backend.add_clause([-act_var])
                         accumulated_clauses += 1
                         added_clauses += 1
@@ -342,7 +365,7 @@ class IncrementalSATSolver:
                         initial_clauses=fixed_clauses,
                         added_clauses=added_clauses,
                         sat_solved_any=sat_solved_any,
-                        incumbent_source="SAT" if sat_solved_any else "HEURISTIC",
+                        incumbent_source=incumbent_source,
                     )
             else:
                 k_curr = best_bandwidth - 1
@@ -367,7 +390,7 @@ class IncrementalSATSolver:
                     initial_clauses=fixed_clauses,
                     added_clauses=added_clauses,
                     sat_solved_any=False,
-                    incumbent_source="HEURISTIC",
+                    incumbent_source=incumbent_source,
                 )
 
                 while k_curr >= certified_lb:
@@ -380,9 +403,10 @@ class IncrementalSATSolver:
                     sat_calls += 1
                     remaining = None if effective_timeout is None else effective_timeout - (monotonic() - started)
                     is_sat = backend.solve_with_timeout(remaining)
-                    total_solving_time += monotonic() - solve_start
+                    solve_time = monotonic() - solve_start
+                    total_solving_time += solve_time
                     if is_sat is None:
-                        report_sat_event(self, k=k_curr, outcome="UNKNOWN")
+                        report_sat_event(self, k=k_curr, outcome="UNKNOWN", solve_time_s=solve_time)
                         timed_out = True
                         break
 
@@ -393,9 +417,18 @@ class IncrementalSATSolver:
                         decoded = self.encoder.decode(graph, model, k_curr)
                         actual_bw = calculate_bandwidth(graph, decoded)
                         sat_solved_any = True
-                        report_sat_event(self, k=k_curr, outcome="SAT", bandwidth=actual_bw)
-                        best_bandwidth = actual_bw
-                        best_permutation = decoded
+                        report_sat_event(self, k=k_curr, outcome="SAT", solve_time_s=solve_time, bandwidth=actual_bw)
+                        if actual_bw <= best_bandwidth:
+                            best_bandwidth = actual_bw
+                            best_permutation = decoded
+                            incumbent_source = "sat"
+                            last_key = emit_incumbent(
+                                graph,
+                                best_permutation,
+                                best_bandwidth,
+                                on_incumbent=on_incumbent,
+                                last_key=last_key,
+                            )
                         report_progress(
                             self,
                             bandwidth=best_bandwidth,
@@ -409,7 +442,7 @@ class IncrementalSATSolver:
                             initial_clauses=fixed_clauses,
                             added_clauses=added_clauses,
                             sat_solved_any=sat_solved_any,
-                            incumbent_source="SAT",
+                            incumbent_source=incumbent_source,
                         )
 
                         if best_bandwidth <= certified_lb:
@@ -448,7 +481,7 @@ class IncrementalSATSolver:
                         added_clauses += len(new_clauses)
                         k_curr = k_next
                     else:
-                        report_sat_event(self, k=k_curr, outcome="UNSAT")
+                        report_sat_event(self, k=k_curr, outcome="UNSAT", solve_time_s=solve_time)
                         certified_lb = k_curr + 1
                         report_progress(
                             self,
@@ -463,7 +496,7 @@ class IncrementalSATSolver:
                             initial_clauses=fixed_clauses,
                             added_clauses=added_clauses,
                             sat_solved_any=sat_solved_any,
-                            incumbent_source="SAT" if sat_solved_any else "HEURISTIC",
+                            incumbent_source=incumbent_source,
                         )
                         break
 
@@ -475,7 +508,7 @@ class IncrementalSATSolver:
         if resource_reason:
             status = SolutionStatus.SKIPPED
         elif timed_out:
-            status = SolutionStatus.FEASIBLE if best_permutation is not None else SolutionStatus.TIMEOUT
+            status = SolutionStatus.TIMEOUT
         elif best_bandwidth is not None and certified_lb == best_bandwidth:
             status = SolutionStatus.OPTIMAL
         elif best_permutation is not None and certified_lb < best_bandwidth:
@@ -504,9 +537,10 @@ class IncrementalSATSolver:
                 "search_mode": self.search_mode,
                 "initial_clauses": fixed_clauses,
                 "added_clauses": added_clauses,
-                "skipped_reason": resource_reason,
+                "incumbent_source": incumbent_source,
                 "sat_solved_any": sat_solved_any,
-                "incumbent_source": "SAT" if sat_solved_any else "HEURISTIC",
+                "timed_out": timed_out,
+                "skipped_reason": resource_reason,
             },
         )
 

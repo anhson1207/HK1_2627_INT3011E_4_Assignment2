@@ -1,0 +1,42 @@
+{
+  "generated_at": "2026-11-10T12:54:04+00:00",
+  "git_commit": "1ac48fe",
+  "config": "/Users/nguyenanhson/BMP/configs/member2_m2_3_studies.toml",
+  "mode": "m2_3_studies",
+  "python": "3.14.3 (v3.14.3:323c59a5e34, Feb  3 2026, 11:41:37) [Clang 16.0.0 (clang-1600.0.26.6)]",
+  "platform": "macOS-14.0-arm64-arm-64bit-Mach-O",
+  "machine": "arm64",
+  "cpu_count": 8,
+  "solver_versions": {
+    "cadical": "cadical195 (PySAT 1.9.dev17)",
+    "glucose": "glucose4 (PySAT 1.9.dev17)",
+    "gurobi": "13.0.3",
+    "cplex": "22.2.0.0"
+  },
+  "licenses": {
+    "gurobi": {
+      "available": true,
+      "license_type": "SIZE_LIMITED_EVAL",
+      "max_variables": 2000,
+      "max_constraints": 2000,
+      "version": "13.0.3",
+      "note": "PyPI embedded size-limited evaluation license (max 2,000 vars & 2,000 constrs)"
+    },
+    "cplex": {
+      "available": true,
+      "license_type": "COMMUNITY_EDITION",
+      "max_variables": 1000,
+      "max_constraints": 1000,
+      "version": "22.2.0.0",
+      "note": "IBM CPLEX Community Edition (Error 1016 above 1,000 vars or 1,000 constrs)"
+    }
+  },
+  "resource_limits": {
+    "max_sat_variables": 500000,
+    "max_sat_clauses": 2500000,
+    "max_mip_variables": 250000,
+    "memory_limit_mb": 4096.0,
+    "max_batch_seconds": 900.0
+  },
+  "last_invocation_wall_s": 0.087
+}

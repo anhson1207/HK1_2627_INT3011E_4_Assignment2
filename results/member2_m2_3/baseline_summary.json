@@ -1,0 +1,52 @@
+{
+  "total_ready_in_catalog": 54,
+  "preflighted_count": 54,
+  "baseline_records_count": 54,
+  "actually_solved_attempted_count": 25,
+  "status_counts": {
+    "OPTIMAL": 0,
+    "FEASIBLE": 0,
+    "TIMEOUT": 25,
+    "RESOURCE_LIMIT": 29,
+    "SKIPPED": 0,
+    "UNAVAILABLE": 0,
+    "ERROR": 0
+  },
+  "total_wall_time_s": 755.266,
+  "by_table": {
+    "Table 6": {
+      "OPTIMAL": 0,
+      "FEASIBLE": 0,
+      "TIMEOUT": 13,
+      "RESOURCE_LIMIT": 0,
+      "SKIPPED": 0,
+      "UNAVAILABLE": 0,
+      "ERROR": 0
+    },
+    "Table 7": {
+      "OPTIMAL": 0,
+      "FEASIBLE": 0,
+      "TIMEOUT": 9,
+      "RESOURCE_LIMIT": 18,
+      "SKIPPED": 0,
+      "UNAVAILABLE": 0,
+      "ERROR": 0
+    },
+    "Table 8": {
+      "OPTIMAL": 0,
+      "FEASIBLE": 0,
+      "TIMEOUT": 3,
+      "RESOURCE_LIMIT": 11,
+      "SKIPPED": 0,
+      "UNAVAILABLE": 0,
+      "ERROR": 0
+    }
+  },
+  "solved_optimal_instances": [],
+  "matched_best_unproved_instances": [
+    "bcspwr01",
+    "lund_a",
+    "lund_b",
+    "saylr1"
+  ]
+}

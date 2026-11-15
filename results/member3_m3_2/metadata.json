@@ -1,0 +1,102 @@
+{
+  "experiment_name": "member3-m3.2-sat-pilot",
+  "timestamp": "2026-11-10T14:55:21+00:00",
+  "git_commit": "2bc4441",
+  "python_version": "3.14.3",
+  "platform": "macOS-14.0-arm64-arm-64bit-Mach-O",
+  "config": {
+    "name": "member3-m3.2-sat-pilot",
+    "provenance": "data/benchmark_provenance.json",
+    "raw_dir": "data/hb_table6_7/raw",
+    "output_dir": "results/member3_m3_2",
+    "timeout_seconds": 10.0,
+    "max_sat_variables": 500000,
+    "max_sat_clauses": 2500000,
+    "memory_limit_mb": 4096.0,
+    "symmetry_breaking": true,
+    "threshold_policy": "adaptive",
+    "pilot_instances": [
+      "bcspwr01",
+      "bcspwr02",
+      "bcsstk01",
+      "ash85"
+    ],
+    "resource_limit_probe_instances": [
+      "bcsstk04"
+    ],
+    "study_b_order_instances": [
+      "bcspwr01",
+      "bcspwr02",
+      "bcsstk01"
+    ],
+    "study_c_instances": [
+      "bcspwr01",
+      "bcspwr02",
+      "bcsstk01"
+    ],
+    "study_a_backends": [
+      "minisat",
+      "cadical",
+      "glucose"
+    ],
+    "study_b_amos": [
+      "product",
+      "pairwise",
+      "sequential",
+      "binary",
+      "commander"
+    ],
+    "study_c_amos": [
+      "ladder",
+      "sequential"
+    ]
+  },
+  "backend_versions": {
+    "cadical": "cadical195 (PySAT 1.9.dev17)",
+    "glucose": "glucose4 (PySAT 1.9.dev17)",
+    "minisat": "minisat22 (PySAT 1.9.dev17)"
+  },
+  "verified_dataset_instances": {
+    "ash85": {
+      "table": "Table 6",
+      "n": 85,
+      "m": 219,
+      "sha256": "f183acc1101b11a63864210713de295cdd0a98fc67bb756316a8d510933e92b3",
+      "validation_status": "READY",
+      "raw_path": "data/hb_table6_7/raw/ash85.mtx.gz"
+    },
+    "bcspwr01": {
+      "table": "Table 6",
+      "n": 39,
+      "m": 46,
+      "sha256": "6006f0ec5241cea77352113417adefe929f077dc615eaf184fc109729247cf8a",
+      "validation_status": "READY",
+      "raw_path": "data/hb_table6_7/raw/bcspwr01.mtx.gz"
+    },
+    "bcspwr02": {
+      "table": "Table 6",
+      "n": 49,
+      "m": 59,
+      "sha256": "9c0295c5061e19529b0c57365442c4437bcded520b09163508c7c80802a1b486",
+      "validation_status": "READY",
+      "raw_path": "data/hb_table6_7/raw/bcspwr02.mtx.gz"
+    },
+    "bcsstk01": {
+      "table": "Table 6",
+      "n": 48,
+      "m": 176,
+      "sha256": "567560f75b952d9c14c0d193ded5d80370d7ca26fe49f9e67deee55f22e55699",
+      "validation_status": "READY",
+      "raw_path": "data/hb_table6_7/raw/bcsstk01.mtx.gz"
+    },
+    "bcsstk04": {
+      "table": "Table 6",
+      "n": 132,
+      "m": 1758,
+      "sha256": "11aa7f961f13eb47752e7f7dddaa5ffb3213c0158ef8bb1f30cae59088771694",
+      "validation_status": "READY",
+      "raw_path": "data/hb_table6_7/raw/bcsstk04.mtx.gz"
+    }
+  },
+  "total_planned_runs": 80
+}

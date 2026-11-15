@@ -1,0 +1,80 @@
+{
+  "total_runs": 114,
+  "status_counts": {
+    "OPTIMAL": 62,
+    "FEASIBLE": 0,
+    "TIMEOUT": 36,
+    "RESOURCE_LIMIT": 2,
+    "SKIPPED": 0,
+    "UNAVAILABLE": 14,
+    "ERROR": 0
+  },
+  "catalog_relation_counts": {
+    "equal": 3,
+    "better": 0,
+    "worse": 1,
+    "no_solution": 109
+  },
+  "per_instance_best": [
+    {
+      "instance": "bcspwr01",
+      "table": "Table 6",
+      "n": 39,
+      "published_lb": 5,
+      "published_best": 5,
+      "best_bandwidth": 5,
+      "best_status": "OPTIMAL",
+      "proof_status": "PROVED",
+      "best_solver": "gurobi",
+      "best_encoding": null,
+      "best_amo": null,
+      "wall_time_s": 3.402774,
+      "relation_to_paper_best": "equal"
+    },
+    {
+      "instance": "bcspwr02",
+      "table": "Table 6",
+      "n": 49,
+      "published_lb": 7,
+      "published_best": 7,
+      "best_bandwidth": 7,
+      "best_status": "TIMEOUT",
+      "proof_status": "UNPROVED",
+      "best_solver": "cadical",
+      "best_encoding": "order",
+      "best_amo": "sequential",
+      "wall_time_s": 30.005299,
+      "relation_to_paper_best": "equal"
+    },
+    {
+      "instance": "bcsstk01",
+      "table": "Table 6",
+      "n": 48,
+      "published_lb": 16,
+      "published_best": 16,
+      "best_bandwidth": 17,
+      "best_status": "TIMEOUT",
+      "proof_status": "UNPROVED",
+      "best_solver": "cadical",
+      "best_encoding": "order",
+      "best_amo": "sequential",
+      "wall_time_s": 30.004155,
+      "relation_to_paper_best": "worse"
+    },
+    {
+      "instance": "nos4",
+      "table": "Table 6",
+      "n": 100,
+      "published_lb": 10,
+      "published_best": 10,
+      "best_bandwidth": 10,
+      "best_status": "TIMEOUT",
+      "proof_status": "UNPROVED",
+      "best_solver": "cadical",
+      "best_encoding": "order",
+      "best_amo": "sequential",
+      "wall_time_s": 30.006583,
+      "relation_to_paper_best": "equal"
+    }
+  ]
+}

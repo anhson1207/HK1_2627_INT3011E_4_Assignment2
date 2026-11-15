@@ -11,6 +11,7 @@ from typing import Mapping, Sequence
 
 from bmp.core.graph import Graph
 from bmp.io.readers import (
+    OFFICIAL_CONVERSION_POLICY,
     compute_topology_sha256,
     inspect_matrix_market,
     read_edge_list,
@@ -18,6 +19,7 @@ from bmp.io.readers import (
     read_matrix_market,
 )
 
+VALIDATOR_VERSION = "m3.5"
 CANONICAL_RAW_DIR = Path("data/benchmarks/raw")
 FALLBACK_RAW_DIRS: tuple[Path, ...] = (
     Path("data/hb_table6_7/raw"),
@@ -206,8 +208,9 @@ def resolve_raw_matrix_path(
 ) -> Path | None:
     """Resolve the canonical raw Matrix Market file for ``instance``.
 
-    Searches ``data/benchmarks/raw`` first, then fallback directories without
-    mutating tracked raw matrices.
+    Searches ``data/benchmarks/raw`` first, then legacy fallback directories
+    (``data/hb_table6_7/raw``, ``data/harwell_boeing/raw``) without mutating
+    existing tracked directories.
     """
 
     repo_root = Path.cwd() if root is None else Path(root)
@@ -276,6 +279,7 @@ __all__ = [
     "TABLE_7_INSTANCES",
     "TABLE_8_INSTANCES",
     "ALL_INSTANCES",
+    "VALIDATOR_VERSION",
     "audit_raw_copy_parity",
     "preflight_check_dataset",
     "resolve_raw_matrix_path",

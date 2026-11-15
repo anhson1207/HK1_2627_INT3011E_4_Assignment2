@@ -1,0 +1,115 @@
+m2_2_0001 [E_mip] path_p5 gurobi - - - sym=False t=30.0s -> OPTIMAL (PROVED) bw=1 bound=1.0 wall=0.013s
+m2_2_0002 [E_mip] cycle_c4 gurobi - - - sym=False t=30.0s -> OPTIMAL (PROVED) bw=2 bound=2.0 wall=0.006s
+m2_2_0003 [E_mip] star_k1_4 gurobi - - - sym=False t=30.0s -> OPTIMAL (PROVED) bw=2 bound=2.0 wall=0.001s
+m2_2_0004 [E_mip] complete_k5 gurobi - - - sym=False t=30.0s -> OPTIMAL (PROVED) bw=4 bound=4.0 wall=0.001s
+m2_2_0005 [E_mip] edgeless_5 gurobi - - - sym=False t=30.0s -> OPTIMAL (PROVED) bw=0 bound=0.0 wall=0.000s
+m2_2_0006 [E_mip] erdos_renyi_n8_p0.35_s201 gurobi - - - sym=False t=30.0s -> OPTIMAL (PROVED) bw=3 bound=3.0 wall=0.005s
+m2_2_0007 [E_mip] erdos_renyi_n10_p0.28_s203 gurobi - - - sym=False t=30.0s -> OPTIMAL (PROVED) bw=3 bound=3.0 wall=0.006s
+m2_2_0008 [E_mip] erdos_renyi_n12_p0.3_s204 gurobi - - - sym=False t=30.0s -> OPTIMAL (PROVED) bw=4 bound=4.0 wall=0.133s
+m2_2_0009 [E_mip] erdos_renyi_n14_p0.25_s205 gurobi - - - sym=False t=30.0s -> OPTIMAL (PROVED) bw=3 bound=3.0 wall=0.007s
+m2_2_0010 [E_mip;F_sat_vs_mip] path_p5 gurobi - - - sym=True t=30.0s -> OPTIMAL (PROVED) bw=1 bound=1.0 wall=0.001s
+m2_2_0011 [E_mip;F_sat_vs_mip] cycle_c4 gurobi - - - sym=True t=30.0s -> OPTIMAL (PROVED) bw=2 bound=2.0 wall=0.001s
+m2_2_0012 [E_mip;F_sat_vs_mip] star_k1_4 gurobi - - - sym=True t=30.0s -> OPTIMAL (PROVED) bw=2 bound=2.0 wall=0.001s
+m2_2_0013 [E_mip;F_sat_vs_mip] complete_k5 gurobi - - - sym=True t=30.0s -> OPTIMAL (PROVED) bw=4 bound=4.0 wall=0.001s
+m2_2_0014 [E_mip;F_sat_vs_mip] edgeless_5 gurobi - - - sym=True t=30.0s -> OPTIMAL (PROVED) bw=0 bound=0.0 wall=0.000s
+m2_2_0015 [E_mip;F_sat_vs_mip] erdos_renyi_n8_p0.35_s201 gurobi - - - sym=True t=30.0s -> OPTIMAL (PROVED) bw=3 bound=3.0 wall=0.002s
+m2_2_0016 [E_mip;F_sat_vs_mip] erdos_renyi_n10_p0.28_s203 gurobi - - - sym=True t=30.0s -> OPTIMAL (PROVED) bw=3 bound=3.0 wall=0.018s
+m2_2_0017 [E_mip;F_sat_vs_mip] erdos_renyi_n12_p0.3_s204 gurobi - - - sym=True t=30.0s -> OPTIMAL (PROVED) bw=4 bound=4.0 wall=0.105s
+m2_2_0018 [E_mip;F_sat_vs_mip] erdos_renyi_n14_p0.25_s205 gurobi - - - sym=True t=30.0s -> OPTIMAL (PROVED) bw=3 bound=3.0 wall=0.045s
+m2_2_0019 [E_mip] path_p5 cplex - - - sym=False t=30.0s -> OPTIMAL (PROVED) bw=1 bound=1.0 wall=0.007s
+m2_2_0020 [E_mip] cycle_c4 cplex - - - sym=False t=30.0s -> OPTIMAL (PROVED) bw=2 bound=2.0 wall=0.002s
+m2_2_0021 [E_mip] star_k1_4 cplex - - - sym=False t=30.0s -> OPTIMAL (PROVED) bw=2 bound=2.0 wall=0.001s
+m2_2_0022 [E_mip] complete_k5 cplex - - - sym=False t=30.0s -> OPTIMAL (PROVED) bw=4 bound=4.0 wall=0.001s
+m2_2_0023 [E_mip] edgeless_5 cplex - - - sym=False t=30.0s -> OPTIMAL (PROVED) bw=0 bound=0.0 wall=0.001s
+m2_2_0024 [E_mip] erdos_renyi_n8_p0.35_s201 cplex - - - sym=False t=30.0s -> OPTIMAL (PROVED) bw=3 bound=3.0 wall=0.007s
+m2_2_0025 [E_mip] erdos_renyi_n10_p0.28_s203 cplex - - - sym=False t=30.0s -> OPTIMAL (PROVED) bw=3 bound=3.0 wall=0.011s
+m2_2_0026 [E_mip] erdos_renyi_n12_p0.3_s204 cplex - - - sym=False t=30.0s -> OPTIMAL (PROVED) bw=4 bound=4.0 wall=0.134s
+m2_2_0027 [E_mip] erdos_renyi_n14_p0.25_s205 cplex - - - sym=False t=30.0s -> OPTIMAL (PROVED) bw=3 bound=3.0 wall=0.026s
+m2_2_0028 [E_mip;F_sat_vs_mip] path_p5 cplex - - - sym=True t=30.0s -> OPTIMAL (PROVED) bw=1 bound=1.0 wall=0.001s
+m2_2_0029 [E_mip;F_sat_vs_mip] cycle_c4 cplex - - - sym=True t=30.0s -> OPTIMAL (PROVED) bw=2 bound=2.0 wall=0.001s
+m2_2_0030 [E_mip;F_sat_vs_mip] star_k1_4 cplex - - - sym=True t=30.0s -> OPTIMAL (PROVED) bw=2 bound=2.0 wall=0.001s
+m2_2_0031 [E_mip;F_sat_vs_mip] complete_k5 cplex - - - sym=True t=30.0s -> OPTIMAL (PROVED) bw=4 bound=4.0 wall=0.001s
+m2_2_0032 [E_mip;F_sat_vs_mip] edgeless_5 cplex - - - sym=True t=30.0s -> OPTIMAL (PROVED) bw=0 bound=0.0 wall=0.001s
+m2_2_0033 [E_mip;F_sat_vs_mip] erdos_renyi_n8_p0.35_s201 cplex - - - sym=True t=30.0s -> OPTIMAL (PROVED) bw=3 bound=3.0 wall=0.005s
+m2_2_0034 [E_mip;F_sat_vs_mip] erdos_renyi_n10_p0.28_s203 cplex - - - sym=True t=30.0s -> OPTIMAL (PROVED) bw=3 bound=3.0 wall=0.008s
+m2_2_0035 [E_mip;F_sat_vs_mip] erdos_renyi_n12_p0.3_s204 cplex - - - sym=True t=30.0s -> OPTIMAL (PROVED) bw=4 bound=4.0 wall=0.075s
+m2_2_0036 [E_mip;F_sat_vs_mip] erdos_renyi_n14_p0.25_s205 cplex - - - sym=True t=30.0s -> OPTIMAL (PROVED) bw=3 bound=3.0 wall=0.021s
+m2_2_0037 [F_sat_vs_mip] path_p5 cadical order sequential incremental sym=True t=30.0s -> OPTIMAL (PROVED) bw=1 bound=1 wall=0.008s
+m2_2_0038 [F_sat_vs_mip] cycle_c4 cadical order sequential incremental sym=True t=30.0s -> OPTIMAL (PROVED) bw=2 bound=2 wall=0.004s
+m2_2_0039 [F_sat_vs_mip] star_k1_4 cadical order sequential incremental sym=True t=30.0s -> OPTIMAL (PROVED) bw=2 bound=2 wall=0.014s
+m2_2_0040 [F_sat_vs_mip] complete_k5 cadical order sequential incremental sym=True t=30.0s -> OPTIMAL (PROVED) bw=4 bound=4 wall=0.004s
+m2_2_0041 [F_sat_vs_mip] edgeless_5 cadical order sequential incremental sym=True t=30.0s -> OPTIMAL (PROVED) bw=0 bound=0 wall=0.004s
+m2_2_0042 [F_sat_vs_mip] erdos_renyi_n8_p0.35_s201 cadical order sequential incremental sym=True t=30.0s -> OPTIMAL (PROVED) bw=3 bound=3 wall=0.015s
+m2_2_0043 [F_sat_vs_mip] erdos_renyi_n10_p0.28_s203 cadical order sequential incremental sym=True t=30.0s -> OPTIMAL (PROVED) bw=3 bound=3 wall=0.014s
+m2_2_0044 [F_sat_vs_mip] erdos_renyi_n12_p0.3_s204 cadical order sequential incremental sym=True t=30.0s -> OPTIMAL (PROVED) bw=4 bound=4 wall=0.027s
+m2_2_0045 [F_sat_vs_mip] erdos_renyi_n14_p0.25_s205 cadical order sequential incremental sym=True t=30.0s -> OPTIMAL (PROVED) bw=3 bound=3 wall=0.014s
+m2_2_0046 [F_sat_vs_mip] path_p5 glucose order sequential incremental sym=True t=30.0s -> OPTIMAL (PROVED) bw=1 bound=1 wall=0.003s
+m2_2_0047 [F_sat_vs_mip] cycle_c4 glucose order sequential incremental sym=True t=30.0s -> OPTIMAL (PROVED) bw=2 bound=2 wall=0.003s
+m2_2_0048 [F_sat_vs_mip] star_k1_4 glucose order sequential incremental sym=True t=30.0s -> OPTIMAL (PROVED) bw=2 bound=2 wall=0.014s
+m2_2_0049 [F_sat_vs_mip] complete_k5 glucose order sequential incremental sym=True t=30.0s -> OPTIMAL (PROVED) bw=4 bound=4 wall=0.003s
+m2_2_0050 [F_sat_vs_mip] edgeless_5 glucose order sequential incremental sym=True t=30.0s -> OPTIMAL (PROVED) bw=0 bound=0 wall=0.003s
+m2_2_0051 [F_sat_vs_mip] erdos_renyi_n8_p0.35_s201 glucose order sequential incremental sym=True t=30.0s -> OPTIMAL (PROVED) bw=3 bound=3 wall=0.014s
+m2_2_0052 [F_sat_vs_mip] erdos_renyi_n10_p0.28_s203 glucose order sequential incremental sym=True t=30.0s -> OPTIMAL (PROVED) bw=3 bound=3 wall=0.014s
+m2_2_0053 [F_sat_vs_mip] erdos_renyi_n12_p0.3_s204 glucose order sequential incremental sym=True t=30.0s -> OPTIMAL (PROVED) bw=4 bound=4 wall=0.027s
+m2_2_0054 [F_sat_vs_mip] erdos_renyi_n14_p0.25_s205 glucose order sequential incremental sym=True t=30.0s -> OPTIMAL (PROVED) bw=3 bound=3 wall=0.014s
+m2_2_0055 [A_backend;C_strategy;D_encoding;F_sat_vs_mip] bcspwr01 cadical order sequential incremental sym=True t=30.0s -> OPTIMAL (PROVED) bw=5 bound=5 wall=7.781s
+m2_2_0056 [A_backend;C_strategy;D_encoding;F_sat_vs_mip] bcspwr02 cadical order sequential incremental sym=True t=30.0s -> TIMEOUT (UNPROVED) bw=7 bound=6 wall=30.005s | note=Wall clock deadline exceeded; worker terminated
+m2_2_0057 [A_backend;C_strategy;D_encoding;F_sat_vs_mip] bcsstk01 cadical order sequential incremental sym=True t=30.0s -> TIMEOUT (UNPROVED) bw=17 bound=12 wall=30.004s | note=Wall clock deadline exceeded; worker terminated
+m2_2_0058 [A_backend;C_strategy;D_encoding;F_sat_vs_mip] nos4 cadical order sequential incremental sym=True t=30.0s -> TIMEOUT (UNPROVED) bw=10 bound=8 wall=30.007s | note=Wall clock deadline exceeded; worker terminated
+m2_2_0059 [A_backend;B_cardinality;C_strategy;D_encoding;F_sat_vs_mip] bcspwr01 glucose order sequential incremental sym=True t=30.0s -> OPTIMAL (PROVED) bw=5 bound=5 wall=7.322s
+m2_2_0060 [A_backend;B_cardinality;C_strategy;D_encoding;F_sat_vs_mip] bcspwr02 glucose order sequential incremental sym=True t=30.0s -> TIMEOUT (UNPROVED) bw=8 bound=6 wall=30.010s | note=Wall clock deadline exceeded; worker terminated
+m2_2_0061 [A_backend;B_cardinality;C_strategy;D_encoding;F_sat_vs_mip] bcsstk01 glucose order sequential incremental sym=True t=30.0s -> TIMEOUT (UNPROVED) bw=21 bound=12 wall=30.010s | note=Wall clock deadline exceeded; worker terminated
+m2_2_0062 [A_backend;B_cardinality;C_strategy;D_encoding;F_sat_vs_mip] nos4 glucose order sequential incremental sym=True t=30.0s -> TIMEOUT (UNPROVED) bw=13 bound=8 wall=30.009s | note=Wall clock deadline exceeded; worker terminated
+m2_2_0063 [A_backend;C_strategy] bcspwr01 cadical order sequential repeated sym=True t=30.0s -> OPTIMAL (PROVED) bw=5 bound=5 wall=6.925s
+m2_2_0064 [A_backend;C_strategy] bcspwr02 cadical order sequential repeated sym=True t=30.0s -> TIMEOUT (UNPROVED) bw=7 bound=6 wall=30.007s | note=Wall clock deadline exceeded; worker terminated
+m2_2_0065 [A_backend;C_strategy] bcsstk01 cadical order sequential repeated sym=True t=30.0s -> TIMEOUT (UNPROVED) bw=18 bound=12 wall=30.007s | note=Wall clock deadline exceeded; worker terminated
+m2_2_0066 [A_backend;C_strategy] nos4 cadical order sequential repeated sym=True t=30.0s -> TIMEOUT (UNPROVED) bw=10 bound=8 wall=30.007s | note=Wall clock deadline exceeded; worker terminated
+m2_2_0067 [A_backend;C_strategy] bcspwr01 glucose order sequential repeated sym=True t=30.0s -> OPTIMAL (PROVED) bw=5 bound=5 wall=6.928s
+m2_2_0068 [A_backend;C_strategy] bcspwr02 glucose order sequential repeated sym=True t=30.0s -> TIMEOUT (UNPROVED) bw=7 bound=6 wall=30.020s | note=Wall clock deadline exceeded; worker terminated
+m2_2_0069 [A_backend;C_strategy] bcsstk01 glucose order sequential repeated sym=True t=30.0s -> TIMEOUT (UNPROVED) bw=20 bound=12 wall=30.011s | note=Wall clock deadline exceeded; worker terminated
+m2_2_0070 [A_backend;C_strategy] nos4 glucose order sequential repeated sym=True t=30.0s -> TIMEOUT (UNPROVED) bw=13 bound=8 wall=30.009s | note=Wall clock deadline exceeded; worker terminated
+m2_2_0071 [B_cardinality] bcspwr01 glucose order pairwise incremental sym=True t=30.0s -> OPTIMAL (PROVED) bw=5 bound=5 wall=11.732s
+m2_2_0072 [B_cardinality] bcspwr02 glucose order pairwise incremental sym=True t=30.0s -> TIMEOUT (UNPROVED) bw=7 bound=6 wall=30.007s | note=Wall clock deadline exceeded; worker terminated
+m2_2_0073 [B_cardinality] bcsstk01 glucose order pairwise incremental sym=True t=30.0s -> TIMEOUT (UNPROVED) bw=19 bound=12 wall=30.012s | note=Wall clock deadline exceeded; worker terminated
+m2_2_0074 [B_cardinality] nos4 glucose order pairwise incremental sym=True t=30.0s -> TIMEOUT (UNPROVED) bw=13 bound=8 wall=30.009s | note=Wall clock deadline exceeded; worker terminated
+m2_2_0075 [B_cardinality] bcspwr01 glucose order binary incremental sym=True t=30.0s -> OPTIMAL (PROVED) bw=5 bound=5 wall=11.627s
+m2_2_0076 [B_cardinality] bcspwr02 glucose order binary incremental sym=True t=30.0s -> TIMEOUT (UNPROVED) bw=7 bound=6 wall=30.009s | note=Wall clock deadline exceeded; worker terminated
+m2_2_0077 [B_cardinality] bcsstk01 glucose order binary incremental sym=True t=30.0s -> TIMEOUT (UNPROVED) bw=18 bound=12 wall=30.009s | note=Wall clock deadline exceeded; worker terminated
+m2_2_0078 [B_cardinality] nos4 glucose order binary incremental sym=True t=30.0s -> TIMEOUT (UNPROVED) bw=12 bound=8 wall=30.013s | note=Wall clock deadline exceeded; worker terminated
+m2_2_0079 [B_cardinality] bcspwr01 glucose order commander incremental sym=True t=30.0s -> OPTIMAL (PROVED) bw=5 bound=5 wall=12.511s
+m2_2_0080 [B_cardinality] bcspwr02 glucose order commander incremental sym=True t=30.0s -> TIMEOUT (UNPROVED) bw=7 bound=6 wall=30.017s | note=Wall clock deadline exceeded; worker terminated
+m2_2_0081 [B_cardinality] bcsstk01 glucose order commander incremental sym=True t=30.0s -> TIMEOUT (UNPROVED) bw=21 bound=12 wall=30.009s | note=Wall clock deadline exceeded; worker terminated
+m2_2_0082 [B_cardinality] nos4 glucose order commander incremental sym=True t=30.0s -> TIMEOUT (UNPROVED) bw=12 bound=8 wall=30.009s | note=Wall clock deadline exceeded; worker terminated
+m2_2_0083 [B_cardinality_pairwise] bcspwr01 glucose pairwise pairwise repeated sym=True t=30.0s -> TIMEOUT (UNPROVED) bw=5 bound=4 wall=30.010s | note=Wall clock deadline exceeded; worker terminated
+m2_2_0084 [B_cardinality_pairwise] bcspwr01 glucose pairwise sequential repeated sym=True t=30.0s -> TIMEOUT (UNPROVED) bw=5 bound=4 wall=30.010s | note=Wall clock deadline exceeded; worker terminated
+m2_2_0085 [B_cardinality_pairwise] bcspwr01 glucose pairwise binary repeated sym=True t=30.0s -> TIMEOUT (UNPROVED) bw=5 bound=4 wall=30.008s | note=Wall clock deadline exceeded; worker terminated
+m2_2_0086 [B_cardinality_pairwise] bcspwr01 glucose pairwise commander repeated sym=True t=30.0s -> TIMEOUT (UNPROVED) bw=5 bound=4 wall=30.009s | note=Wall clock deadline exceeded; worker terminated
+m2_2_0087 [D_encoding] bcspwr01 cadical pairwise sequential incremental sym=True t=30.0s -> TIMEOUT (UNPROVED) bw=5 bound=4 wall=30.006s | note=Wall clock deadline exceeded; worker terminated
+m2_2_0088 [D_encoding] bcspwr02 cadical pairwise sequential incremental sym=True t=30.0s -> TIMEOUT (UNPROVED) bw=8 bound=6 wall=30.008s | note=Wall clock deadline exceeded; worker terminated
+m2_2_0089 [D_encoding] bcsstk01 cadical pairwise sequential incremental sym=True t=30.0s -> TIMEOUT (UNPROVED) bw=19 bound=12 wall=30.008s | note=Wall clock deadline exceeded; worker terminated
+BATCH_BUDGET_STOP after 906.0s before nos4 cadical
+m2_2_0090 [D_encoding] nos4 cadical pairwise sequential incremental sym=True t=30.0s -> RESOURCE_LIMIT (N/A) bw=None bound=None wall=0.000s | note=Estimated clauses (2,504,650) exceeds safety limit (2,500,000)
+m2_2_0091 [D_encoding] bcspwr01 glucose pairwise sequential incremental sym=True t=30.0s -> TIMEOUT (UNPROVED) bw=5 bound=4 wall=30.006s | note=Wall clock deadline exceeded; worker terminated
+m2_2_0092 [D_encoding] bcspwr02 glucose pairwise sequential incremental sym=True t=30.0s -> TIMEOUT (UNPROVED) bw=8 bound=6 wall=30.010s | note=Wall clock deadline exceeded; worker terminated
+m2_2_0093 [D_encoding] bcsstk01 glucose pairwise sequential incremental sym=True t=30.0s -> TIMEOUT (UNPROVED) bw=21 bound=12 wall=30.043s | note=Wall clock deadline exceeded; worker terminated
+m2_2_0094 [D_encoding] nos4 glucose pairwise sequential incremental sym=True t=30.0s -> RESOURCE_LIMIT (N/A) bw=None bound=None wall=0.000s | note=Estimated clauses (2,504,650) exceeds safety limit (2,500,000)
+m2_2_0095 [E_mip] bcspwr01 gurobi - - - sym=False t=30.0s -> TIMEOUT (UNPROVED) bw=5 bound=4.0 wall=30.014s
+m2_2_0096 [E_mip] bcspwr02 gurobi - - - sym=False t=30.0s -> UNAVAILABLE (N/A) bw=None bound=None wall=0.017s | note=Gurobi license unavailable: Model too large for size-limited license; visit https://gurobi.com/unrestricted for more information
+m2_2_0097 [E_mip] bcsstk01 gurobi - - - sym=False t=30.0s -> UNAVAILABLE (N/A) bw=None bound=None wall=0.026s | note=Gurobi license unavailable: Model too large for size-limited license; visit https://gurobi.com/unrestricted for more information
+m2_2_0098 [E_mip] nos4 gurobi - - - sym=False t=30.0s -> UNAVAILABLE (N/A) bw=None bound=None wall=0.086s | note=Gurobi license unavailable: Model too large for size-limited license; visit https://gurobi.com/unrestricted for more information
+m2_2_0099 [E_mip;F_sat_vs_mip] bcspwr01 gurobi - - - sym=True t=30.0s -> OPTIMAL (PROVED) bw=5 bound=5.0 wall=3.403s
+m2_2_0100 [E_mip;F_sat_vs_mip] bcspwr02 gurobi - - - sym=True t=30.0s -> UNAVAILABLE (N/A) bw=None bound=None wall=0.017s | note=Gurobi license unavailable: Model too large for size-limited license; visit https://gurobi.com/unrestricted for more information
+m2_2_0101 [E_mip;F_sat_vs_mip] bcsstk01 gurobi - - - sym=True t=30.0s -> UNAVAILABLE (N/A) bw=None bound=None wall=0.031s | note=Gurobi license unavailable: Model too large for size-limited license; visit https://gurobi.com/unrestricted for more information
+m2_2_0102 [E_mip;F_sat_vs_mip] nos4 gurobi - - - sym=True t=30.0s -> UNAVAILABLE (N/A) bw=None bound=None wall=0.078s | note=Gurobi license unavailable: Model too large for size-limited license; visit https://gurobi.com/unrestricted for more information
+m2_2_0103 [E_mip] bcspwr01 cplex - - - sym=False t=30.0s -> UNAVAILABLE (N/A) bw=None bound=None wall=0.004s | note=CPLEX runtime or license unavailable: CPLEX Error  1016: Community Edition. Problem size limits exceeded. Purchase at http://ibm.biz/error1016.
+m2_2_0104 [E_mip] bcspwr02 cplex - - - sym=False t=30.0s -> UNAVAILABLE (N/A) bw=None bound=None wall=0.006s | note=CPLEX runtime or license unavailable: CPLEX Error  1016: Community Edition. Problem size limits exceeded. Purchase at http://ibm.biz/error1016.
+m2_2_0105 [E_mip] bcsstk01 cplex - - - sym=False t=30.0s -> UNAVAILABLE (N/A) bw=None bound=None wall=0.010s | note=CPLEX runtime or license unavailable: CPLEX Error  1016: Community Edition. Problem size limits exceeded. Purchase at http://ibm.biz/error1016.
+m2_2_0106 [E_mip] nos4 cplex - - - sym=False t=30.0s -> UNAVAILABLE (N/A) bw=None bound=None wall=0.027s | note=CPLEX runtime or license unavailable: CPLEX Error  1016: Community Edition. Problem size limits exceeded. Purchase at http://ibm.biz/error1016.
+m2_2_0107 [E_mip;F_sat_vs_mip] bcspwr01 cplex - - - sym=True t=30.0s -> UNAVAILABLE (N/A) bw=None bound=None wall=0.004s | note=CPLEX runtime or license unavailable: CPLEX Error  1016: Community Edition. Problem size limits exceeded. Purchase at http://ibm.biz/error1016.
+m2_2_0108 [E_mip;F_sat_vs_mip] bcspwr02 cplex - - - sym=True t=30.0s -> UNAVAILABLE (N/A) bw=None bound=None wall=0.006s | note=CPLEX runtime or license unavailable: CPLEX Error  1016: Community Edition. Problem size limits exceeded. Purchase at http://ibm.biz/error1016.
+m2_2_0109 [E_mip;F_sat_vs_mip] bcsstk01 cplex - - - sym=True t=30.0s -> UNAVAILABLE (N/A) bw=None bound=None wall=0.012s | note=CPLEX runtime or license unavailable: CPLEX Error  1016: Community Edition. Problem size limits exceeded. Purchase at http://ibm.biz/error1016.
+m2_2_0110 [E_mip;F_sat_vs_mip] nos4 cplex - - - sym=True t=30.0s -> UNAVAILABLE (N/A) bw=None bound=None wall=0.032s | note=CPLEX runtime or license unavailable: CPLEX Error  1016: Community Edition. Problem size limits exceeded. Purchase at http://ibm.biz/error1016.
+m2_2_0111 [A_backend_ext60;F_sat_vs_mip_ext60] bcspwr02 glucose order sequential incremental sym=True t=60.0s -> TIMEOUT (UNPROVED) bw=8 bound=6 wall=60.010s | note=Wall clock deadline exceeded; worker terminated
+m2_2_0112 [A_backend_ext60;F_sat_vs_mip_ext60] bcsstk01 glucose order sequential incremental sym=True t=60.0s -> TIMEOUT (UNPROVED) bw=21 bound=12 wall=60.013s | note=Wall clock deadline exceeded; worker terminated
+m2_2_0113 [A_backend_ext60;F_sat_vs_mip_ext60] bcspwr02 cadical order sequential incremental sym=True t=60.0s -> TIMEOUT (UNPROVED) bw=7 bound=6 wall=60.016s | note=Wall clock deadline exceeded; worker terminated
+m2_2_0114 [A_backend_ext60;F_sat_vs_mip_ext60] bcsstk01 cadical order sequential incremental sym=True t=60.0s -> TIMEOUT (UNPROVED) bw=17 bound=12 wall=60.010s | note=Wall clock deadline exceeded; worker terminated

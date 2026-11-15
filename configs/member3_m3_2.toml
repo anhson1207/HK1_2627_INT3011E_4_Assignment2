@@ -1,0 +1,21 @@
+[benchmark]
+name = "member3-m3.2-sat-pilot"
+provenance = "data/benchmark_provenance.json"
+raw_dir = "data/hb_table6_7/raw"
+output_dir = "results/member3_m3_2"
+timeout_seconds = 10.0
+max_sat_variables = 500000
+max_sat_clauses = 2500000
+memory_limit_mb = 4096.0
+symmetry_breaking = true
+threshold_policy = "adaptive"
+
+# Verified READY Table 6 pilot instances (never run unverified instances)
+pilot_instances = ["bcspwr01", "bcspwr02", "bcsstk01", "ash85"]
+resource_limit_probe_instances = ["bcsstk04"]
+study_b_order_instances = ["bcspwr01", "bcspwr02", "bcsstk01"]
+study_c_instances = ["bcspwr01", "bcspwr02", "bcsstk01"]
+
+study_a_backends = ["minisat", "cadical", "glucose"]
+study_b_amos = ["product", "pairwise", "sequential", "binary", "commander"]
+study_c_amos = ["ladder", "sequential"]
